@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { TaskPriorityBadge } from '@/features/tasks/components/TaskPriorityBadge'
 import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
 import type { CalendarItem } from '@/features/calendar/calendarItems'
+import { formatTimeRange } from '@/features/timeline/timeRange'
 import { cn } from '@/lib/utils'
 
 interface CalendarEventCardProps {
@@ -14,7 +15,12 @@ interface CalendarEventCardProps {
 export function CalendarEventCard({ item }: CalendarEventCardProps) {
   const title = item.kind === 'task' ? item.task.title : item.event.title
   const dateLabel = format(new Date(item.date), 'd MMMM', { locale: fr })
-  const timeLabel = item.kind === 'event' && item.event.startTime ? `${item.event.startTime}${item.event.endTime ? `–${item.event.endTime}` : ''}` : null
+  const timeLabel =
+    item.kind === 'event' && item.event.startTime
+      ? item.event.endTime
+        ? formatTimeRange(item.event.startTime, item.event.endTime)
+        : item.event.startTime
+      : null
   const href = item.kind === 'task' ? `/mariages/${item.weddingId}/taches` : `/mariages/${item.weddingId}/planning`
 
   return (

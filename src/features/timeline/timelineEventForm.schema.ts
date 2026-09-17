@@ -29,8 +29,12 @@ export const TimelineEventFormSchema = z
     status: z.string().min(1),
     notes: z.string().trim(),
   })
-  .refine((values) => values.startTime === '' || values.endTime === '' || values.endTime > values.startTime, {
-    message: "L'heure de fin doit être postérieure à l'heure de début.",
+  .refine((values) => values.startTime === '' || values.endTime === '' || values.endTime !== values.startTime, {
+    // Une heure de fin antérieure à l'heure de début est désormais valide :
+    // elle signifie que le moment se termine le lendemain (cf.
+    // src/features/timeline/timeRange.ts). Seule une égalité stricte reste
+    // rejetée : une durée nulle n'a pas de sens pour un moment de planning.
+    message: "L'heure de fin ne peut pas être identique à l'heure de début.",
     path: ['endTime'],
   })
 

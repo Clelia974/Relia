@@ -11,6 +11,7 @@ import {
   TimelineEventFormSchema,
   type TimelineEventFormValues,
 } from '@/features/timeline/timelineEventForm.schema'
+import { resolveTimeRange } from '@/features/timeline/timeRange'
 import { TIMELINE_EVENT_STATUS_LABELS, TIMELINE_EVENT_STATUS_OPTIONS } from '@/lib/timelineEventStatus'
 import type { TimelineEvent, Vendor } from '@/types/entities'
 
@@ -60,14 +61,8 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
     setValues((v) => ({ ...v, [key]: value }))
   }
 
-  const computedDuration =
-    values.startTime && values.endTime && values.endTime > values.startTime
-      ? (() => {
-          const [sh, sm] = values.startTime.split(':').map(Number)
-          const [eh, em] = values.endTime.split(':').map(Number)
-          return eh * 60 + em - (sh * 60 + sm)
-        })()
-      : null
+  const timeRange = resolveTimeRange(values.startTime, values.endTime)
+  const computedDuration = timeRange && timeRange.durationMinutes > 0 ? timeRange.durationMinutes : null
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -172,7 +167,10 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Durée {computedDuration !== null ? `: ${computedDuration} minutes` : 'calculée automatiquement une fois les deux heures renseignées.'}
+            Durée{' '}
+            {computedDuration !== null
+              ? `: ${computedDuration} minutes${timeRange?.crossesMidnight ? ' (se termine le lendemain)' : ''}`
+              : 'calculée automatiquement une fois les deux heures renseignées.'}
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">

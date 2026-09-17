@@ -3,6 +3,7 @@ import { fr } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { TIMELINE_EVENT_STATUS_LABELS } from '@/lib/timelineEventStatus'
 import type { TimelineConflict } from '@/features/timeline/conflicts'
+import { formatTimeRange, resolveTimeRange } from '@/features/timeline/timeRange'
 import type { Task, TimelineEvent, Wedding } from '@/types/entities'
 
 interface TimelineGanttViewProps {
@@ -19,11 +20,6 @@ const STATUS_BAR_TONE: Record<TimelineEvent['status'], string> = {
   confirme: 'bg-success',
   a_verifier: 'bg-warning',
   termine: 'bg-success',
-}
-
-function timeToMinutes(time: string) {
-  const [h, m] = time.split(':').map(Number)
-  return h * 60 + m
 }
 
 function minutesToLabel(minutes: number) {
@@ -71,8 +67,10 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
         const dateTasks = tasksByDate.get(dateKey) ?? []
         const isWeddingDay = isSameDay(new Date(dateKey), weddingDate)
 
-        const starts = dateEvents.map((e) => timeToMinutes(e.startTime!))
-        const ends = dateEvents.map((e) => timeToMinutes(e.endTime!))
+        const ranges = dateEvents.map((e) => resolveTimeRange(e.startTime, e.endTime)!)
+        const starts = ranges.map((r) => r.startMinutes)
+        // endMinutes dépasse 1440 pour un moment qui traverse minuit — la barre s'étend alors visuellement au-delà de la colonne 24:00 de cette même ligne, plutôt que d'être tronquée.
+        const ends = ranges.map((r) => r.endMinutes)
         const rangeStart = Math.floor(Math.min(...starts) / 60) * 60
         const rangeEnd = Math.max(Math.ceil(Math.max(...ends) / 60) * 60, rangeStart + 60)
         const totalMinutes = rangeEnd - rangeStart
@@ -106,9 +104,8 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
                 </div>
 
                 <div className="flex flex-col divide-y divide-border">
-                  {dateEvents.map((event) => {
-                    const start = timeToMinutes(event.startTime!)
-                    const end = timeToMinutes(event.endTime!)
+                  {dateEvents.map((event, index) => {
+                    const { startMinutes: start, endMinutes: end } = ranges[index]
                     const left = ((start - rangeStart) / totalMinutes) * 100
                     const width = Math.max(((end - start) / totalMinutes) * 100, 3)
                     const hasConflict = conflictedEventIds.has(event.id)
@@ -119,7 +116,7 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
                         <div className="w-44 shrink-0 truncate pl-3 pr-2">
                           <p className="truncate text-sm font-medium text-foreground">{event.title}</p>
                           <p className="truncate text-xs text-muted-foreground">
-                            {event.startTime}–{event.endTime}
+                            {formatTimeRange(event.startTime!, event.endTime!)}
                             {vendorName ? ` · ${vendorName}` : ''}
                           </p>
                         </div>
@@ -134,7 +131,7 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
                           <button
                             type="button"
                             onClick={() => onEditEvent(event)}
-                            title={`${event.title} (${event.startTime}–${event.endTime})`}
+                            title={`${event.title} (${formatTimeRange(event.startTime!, event.endTime!)})`}
                             className={cn(
                               'absolute top-1 flex h-5 items-center overflow-hidden rounded px-1.5 text-[11px] font-medium text-primary-foreground hover:opacity-90',
                               STATUS_BAR_TONE[event.status],

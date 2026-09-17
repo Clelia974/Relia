@@ -23,21 +23,20 @@ import { TimelinePreparation } from '@/features/timeline/components/TimelinePrep
 import { TimelineViewSwitcher, type TimelineView } from '@/features/timeline/components/TimelineViewSwitcher'
 import { WeddingDayTimeline } from '@/features/timeline/components/WeddingDayTimeline'
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts, type TimelineConflict } from '@/features/timeline/conflicts'
+import { resolveTimeRange } from '@/features/timeline/timeRange'
 import type { TimelineEventFormValues } from '@/features/timeline/timelineEventForm.schema'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { TimelineEvent } from '@/types/entities'
 
 function toEventPatch(values: TimelineEventFormValues) {
-  const [sh, sm] = values.startTime.split(':').map(Number)
-  const [eh, em] = values.endTime.split(':').map(Number)
   return {
     title: values.title.trim(),
     description: values.description.trim() || undefined,
     date: new Date(values.date).toISOString(),
     startTime: values.startTime,
     endTime: values.endTime,
-    durationMinutes: eh * 60 + em - (sh * 60 + sm),
+    durationMinutes: resolveTimeRange(values.startTime, values.endTime)?.durationMinutes,
     location: values.location.trim() || undefined,
     vendorId: values.vendorId || undefined,
     responsiblePerson: values.responsiblePerson.trim() || undefined,

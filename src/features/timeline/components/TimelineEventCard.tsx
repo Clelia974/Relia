@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { TIMELINE_EVENT_STATUS_LABELS } from '@/lib/timelineEventStatus'
+import { formatTimeRange } from '@/features/timeline/timeRange'
 import type { TimelineEvent } from '@/types/entities'
 
 const STATUS_TONE: Record<TimelineEvent['status'], string> = {
@@ -38,8 +39,7 @@ export function TimelineEventCard({ event, vendorName, hasConflict, onEdit, onDe
             {event.startTime && (
               <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Clock className="size-3.5 shrink-0" aria-hidden="true" />
-                {event.startTime}
-                {event.endTime && `–${event.endTime}`}
+                {event.endTime ? formatTimeRange(event.startTime, event.endTime) : event.startTime}
                 {duration !== undefined && ` · ${duration} min`}
               </p>
             )}

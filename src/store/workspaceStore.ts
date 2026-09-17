@@ -1,10 +1,12 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist, type PersistStorage } from 'zustand/middleware'
 import { generateId } from '@/lib/id'
 import { nowIso } from '@/lib/now'
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
 import { createDemoWorkspace, createEmptyWorkspace } from '@/lib/workspace/factories'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
+import { createSafeWorkspaceStorage } from '@/lib/workspace/safeStorage'
+import { usePersistenceStatus } from '@/store/persistenceStatus'
 import type {
   BusinessConfig,
   Expense,
@@ -26,6 +28,18 @@ import type {
 } from '@/types/entities'
 
 const STORAGE_KEY = 'relia-workspace'
+
+/**
+ * Pont entre la couche de stockage (synchrone, appelée pendant l'évaluation
+ * du module — donc AVANT que `useWorkspaceStore` n'existe) et `merge`
+ * (appelé dans le même cycle d'hydratation synchrone). Ces variables ne sont
+ * jamais lues en dehors de ce fichier : elles servent uniquement à faire
+ * remonter un incident de LECTURE détecté par `createSafeWorkspaceStorage`
+ * jusqu'à `merge`, qui construit alors l'état final (avec message clair)
+ * sans jamais référencer `useWorkspaceStore` avant son initialisation.
+ */
+let pendingCorruptedRaw: string | null = null
+let pendingReadUnavailable = false
 
 type NewWeddingInput = Pick<Wedding, 'coupleName' | 'date' | 'venue' | 'soldAmount' | 'clientBudget' | 'status'> &
   Partial<Pick<Wedding, 'notes' | 'vendorIds'>>
@@ -92,6 +106,11 @@ interface WorkspaceStoreState {
   /** Non-null lorsque l'hydratation depuis LocalStorage a dû ignorer des données invalides. */
   hydrationIssue: string | null
   clearHydrationIssue: () => void
+  /** Copie brute (jamais retravaillée) de la dernière donnée locale illisible — permet de proposer un export de récupération. Null si l'hydratation n'a rencontré aucun problème, ou après export/effacement. */
+  corruptedBackupRaw: string | null
+  clearCorruptedBackup: () => void
+  /** Redéclenche une tentative d'écriture immédiate du workspace courant (bouton "Réessayer" de l'alerte de persistance — cf. src/store/persistenceStatus.ts pour le message affiché). */
+  retryPersist: () => void
 
   createWedding: (input: NewWeddingInput) => string
   updateWedding: (id: string, patch: Partial<Omit<Wedding, 'id' | 'createdAt'>>) => void
@@ -165,6 +184,9 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       workspace: createEmptyWorkspace(),
       hydrationIssue: null,
       clearHydrationIssue: () => set({ hydrationIssue: null }),
+      corruptedBackupRaw: null,
+      clearCorruptedBackup: () => set({ corruptedBackupRaw: null }),
+      retryPersist: () => set((state) => ({ ...state })),
 
       createWedding: (input) => {
         const id = generateId()
@@ -704,15 +726,58 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         }))
       },
 
-      replaceWorkspace: (workspace) => set({ workspace, hydrationIssue: null }),
+      replaceWorkspace: (workspace) => set({ workspace, hydrationIssue: null, corruptedBackupRaw: null }),
 
-      resetWorkspace: (mode) => set({ workspace: mode === 'demo' ? createDemoWorkspace() : createEmptyWorkspace(), hydrationIssue: null }),
+      resetWorkspace: (mode) =>
+        set({
+          workspace: mode === 'demo' ? createDemoWorkspace() : createEmptyWorkspace(),
+          hydrationIssue: null,
+          corruptedBackupRaw: null,
+        }),
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
+      storage: createSafeWorkspaceStorage({
+        onReadCorrupted: (raw) => {
+          pendingCorruptedRaw = raw
+        },
+        onReadUnavailable: () => {
+          pendingReadUnavailable = true
+        },
+        onWriteError: (message) => {
+          // usePersistenceStatus n'a pas de middleware `persist` : le
+          // signaler ne redéclenche jamais d'écriture, contrairement à
+          // useWorkspaceStore.setState(...) qui aurait bouclé indéfiniment
+          // tant que l'écriture échoue (persist réécrit à chaque set()).
+          usePersistenceStatus.getState().setPersistenceIssue(message)
+        },
+        onWriteSuccess: () => {
+          usePersistenceStatus.getState().clearPersistenceIssue()
+        },
+      }) as PersistStorage<{ workspace: Workspace }>,
       partialize: (state) => ({ workspace: state.workspace }),
       merge: (persisted, current) => {
+        if (pendingReadUnavailable) {
+          pendingReadUnavailable = false
+          usePersistenceStatus
+            .getState()
+            .setPersistenceIssue(
+              'Le stockage local est indisponible dans ce navigateur : vos modifications ne pourront pas être sauvegardées automatiquement.',
+            )
+          return current
+        }
+
+        if (pendingCorruptedRaw !== null) {
+          const raw = pendingCorruptedRaw
+          pendingCorruptedRaw = null
+          return {
+            ...current,
+            hydrationIssue:
+              "Vos données locales n'ont pas pu être lues (fichier corrompu) — une copie de la donnée d'origine a été conservée sur cet appareil, et un espace vide a été restauré pour ne pas bloquer l'application.",
+            corruptedBackupRaw: raw,
+          }
+        }
+
         if (!persisted || typeof persisted !== 'object' || !('workspace' in persisted)) {
           return current
         }
@@ -720,7 +785,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (!result.ok) {
           return {
             ...current,
-            hydrationIssue: `Vos données locales étaient illisibles (${result.reason}) — un espace vide a été restauré pour ne pas bloquer l'application.`,
+            hydrationIssue: `Vos données locales étaient illisibles (${result.reason}) — une copie de la donnée d'origine a été conservée sur cet appareil, et un espace vide a été restauré pour ne pas bloquer l'application.`,
+            corruptedBackupRaw: JSON.stringify(persisted),
           }
         }
         return { ...current, workspace: result.workspace }
