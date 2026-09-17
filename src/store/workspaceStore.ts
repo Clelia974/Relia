@@ -202,6 +202,14 @@ interface WorkspaceStoreState {
   updateEquipmentItem: (id: string, patch: Partial<Omit<EquipmentItem, 'id' | 'weddingId' | 'createdAt'>>) => void
   updateEquipmentItemStatus: (id: string, status: EquipmentStatus) => void
   deleteEquipmentItem: (id: string) => void
+  /**
+   * Crée une tâche de démontage par zone (catégorie) encore concernée par un
+   * élément non récupéré. Idempotent : une zone qui a déjà sa tâche de
+   * démontage (même titre déterministe, même mariage, phase 'demontage')
+   * n'en reçoit jamais une seconde, même si le bouton est cliqué plusieurs
+   * fois. Retourne les ids des tâches créées (jamais celles déjà existantes).
+   */
+  createBreakdownTasksForZones: (weddingId: string, dueDate: string, vendorId?: string) => string[]
 
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
@@ -857,7 +865,11 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         set((state) => ({
           workspace: {
             ...state.workspace,
-            equipmentItems: state.workspace.equipmentItems.map((e) => (e.id === id ? { ...e, status, updatedAt: nowIso() } : e)),
+            equipmentItems: state.workspace.equipmentItems.map((e) =>
+              e.id === id
+                ? { ...e, status, returnedAt: status === 'recupere' ? (e.returnedAt ?? nowIso()) : e.returnedAt, updatedAt: nowIso() }
+                : e,
+            ),
           },
         }))
       },
@@ -866,6 +878,42 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         set((state) => ({
           workspace: { ...state.workspace, equipmentItems: state.workspace.equipmentItems.filter((e) => e.id !== id) },
         }))
+      },
+
+      createBreakdownTasksForZones: (weddingId, dueDate, vendorId) => {
+        const state = get()
+        const pending = state.workspace.equipmentItems.filter((e) => e.weddingId === weddingId && e.status !== 'recupere')
+        const zones = [...new Set(pending.map((e) => e.category ?? 'Non classé'))]
+        const existingTitles = new Set(
+          state.workspace.tasks
+            .filter((t) => t.weddingId === weddingId && t.phase === 'demontage')
+            .map((t) => t.title),
+        )
+
+        const timestamp = nowIso()
+        const created: Task[] = zones
+          .map((zone) => `Démontage : ${zone}`)
+          .filter((title) => !existingTitles.has(title))
+          .map((title) => ({
+            id: generateId(),
+            title,
+            description: `Récupérer et trier le matériel de la zone « ${title.replace('Démontage : ', '')} ».`,
+            status: 'a_faire' as const,
+            priority: 'normale' as const,
+            weddingId,
+            vendorId,
+            dueDate,
+            postponedCount: 0,
+            postponeHistory: [],
+            source: 'automatic' as const,
+            phase: 'demontage' as const,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }))
+
+        if (created.length === 0) return []
+        set((s) => ({ workspace: { ...s.workspace, tasks: [...s.workspace.tasks, ...created] } }))
+        return created.map((t) => t.id)
       },
 
       updateBusinessConfig: (patch) => {

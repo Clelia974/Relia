@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 7 as const
+export const CURRENT_SCHEMA_VERSION = 8 as const
 
 const isoDate = z
   .string()
@@ -466,6 +466,9 @@ export const EquipmentAcquisitionModeSchema = z.enum(['stock_personnel', 'achat'
 
 export const EquipmentStatusSchema = z.enum(['a_prevoir', 'pret', 'charge', 'installe', 'recupere'])
 
+/** Destination finale d'un élément matériel une fois désinstallé (Phase 4). */
+export const EquipmentDestinationSchema = z.enum(['stock', 'fournisseur', 'poubelle', 'autre'])
+
 /**
  * Élément de la checklist matériel d'UN mariage — jamais partagé ni
  * comptabilisé avec un autre mariage (pas d'inventaire global, cf. Phase 2).
@@ -480,6 +483,13 @@ export const EquipmentItemSchema = z.object({
   acquisitionMode: EquipmentAcquisitionModeSchema,
   status: EquipmentStatusSchema.default('a_prevoir'),
   notes: z.string().optional(),
+  /** Suivi de désinstallation (Phase 4) — tous facultatifs, jamais rétroactivement obligatoires. */
+  isDamaged: z.boolean().optional(),
+  damageNotes: z.string().optional(),
+  destination: EquipmentDestinationSchema.optional(),
+  destinationNotes: z.string().optional(),
+  /** Renseigné automatiquement la première fois que status passe à 'recupere' — jamais écrasé ensuite. */
+  returnedAt: isoDate.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })
@@ -622,6 +632,7 @@ export type ProposalTemplate = z.infer<typeof ProposalTemplateSchema>
 export type ClientDecision = z.infer<typeof ClientDecisionSchema>
 export type Invoice = z.infer<typeof InvoiceSchema>
 export type EquipmentAcquisitionMode = z.infer<typeof EquipmentAcquisitionModeSchema>
+export type EquipmentDestination = z.infer<typeof EquipmentDestinationSchema>
 export type EquipmentStatus = z.infer<typeof EquipmentStatusSchema>
 export type EquipmentItem = z.infer<typeof EquipmentItemSchema>
 export type UiPreferences = z.infer<typeof UiPreferencesSchema>

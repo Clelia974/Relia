@@ -37,6 +37,9 @@ const WeddingEquipmentTab = lazy(() =>
 const WeddingDayOfTab = lazy(() =>
   import('@/pages/mariages/WeddingDayOfTab').then((m) => ({ default: m.WeddingDayOfTab })),
 )
+const WeddingBreakdownTab = lazy(() =>
+  import('@/pages/mariages/WeddingBreakdownTab').then((m) => ({ default: m.WeddingBreakdownTab })),
+)
 const ProposalBuilderPage = lazy(() =>
   import('@/pages/mariages/ProposalBuilderPage').then((m) => ({ default: m.ProposalBuilderPage })),
 )
@@ -75,6 +78,7 @@ export function AppRouter() {
             <Route path="prestations" element={<WeddingSoldServicesTab />} />
             <Route path="materiel" element={<WeddingEquipmentTab />} />
             <Route path="jour-j" element={<WeddingDayOfTab />} />
+            <Route path="demontage" element={<WeddingBreakdownTab />} />
             <Route path="documents/propositions/:proposalId" element={<ProposalBuilderPage />} />
             <Route path="documents/factures/:invoiceId" element={<InvoicePreviewPage />} />
           </Route>

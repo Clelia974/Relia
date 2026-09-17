@@ -32,7 +32,8 @@ describe('migration v6 -> v7 (phase jour J)', () => {
     const result = migrateWorkspace(v6)
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.workspace.schemaVersion).toBe(7)
+    // La migration ne s'arrête pas à v7 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION (v8 depuis Phase 4).
+    expect(result.workspace.schemaVersion).toBe(8)
     expect(result.workspace.tasks).toHaveLength(1)
     expect(result.workspace.tasks[0].title).toBe('Tâche existante')
     expect(result.workspace.tasks[0].phase).toBeUndefined()

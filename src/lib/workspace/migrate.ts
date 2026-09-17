@@ -152,6 +152,14 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
    * moments déjà créés.
    */
   6: (data) => ({ ...data, schemaVersion: 7 }),
+
+  /**
+   * v7 → v8 (Phase 4) : ajoute le suivi de désinstallation (isDamaged,
+   * damageNotes, destination, destinationNotes, returnedAt) sur EquipmentItem
+   * existant — pas de nouvelle entité. Purement additif, aucune
+   * transformation de données existantes.
+   */
+  7: (data) => ({ ...data, schemaVersion: 8 }),
 }
 
 /**

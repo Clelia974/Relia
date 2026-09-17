@@ -8,6 +8,7 @@ export type {
   ClientDecision,
   DayPhase,
   EquipmentAcquisitionMode,
+  EquipmentDestination,
   EquipmentItem,
   EquipmentStatus,
   Expense,

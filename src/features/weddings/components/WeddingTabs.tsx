@@ -15,6 +15,7 @@ const tabs = [
   { to: 'prestations', label: 'Prestations vendues' },
   { to: 'materiel', label: 'Matériel' },
   { to: 'jour-j', label: 'Jour J' },
+  { to: 'demontage', label: 'Désinstallation' },
 ]
 
 export function WeddingTabs({ weddingId }: WeddingTabsProps) {

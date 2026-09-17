@@ -37,8 +37,8 @@ describe('migration v3 -> v4 (coût prestataire par relation)', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    // La migration ne s'arrête pas à v4 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION (v7 depuis Phase 3).
-    expect(result.workspace.schemaVersion).toBe(7)
+    // La migration ne s'arrête pas à v4 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION (v8 depuis Phase 4).
+    expect(result.workspace.schemaVersion).toBe(8)
     expect(result.workspace.vendors[0]).not.toHaveProperty('estimatedCost')
     expect(result.workspace.vendors[0]).not.toHaveProperty('actualCost')
     expect(result.workspace.vendorWeddingLinks).toHaveLength(1)
