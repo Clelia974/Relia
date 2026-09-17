@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ProposalTemplateForm } from '@/features/proposals/components/ProposalTemplateForm'
+import { readFileAsDataUrl } from '@/lib/readFileAsDataUrl'
 import { VAT_STATUS_LABELS, VAT_STATUS_OPTIONS, vatApplies } from '@/lib/vatStatus'
 import { exportWorkspaceToFile, parseWorkspaceFile } from '@/lib/workspace/importExport'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -26,15 +27,6 @@ import type { BusinessConfig, ProposalTemplate, VatStatus, Workspace } from '@/t
 
 const DEFAULT_BRAND_COLOR = '#9C6B3F'
 const MAX_LOGO_FILE_SIZE = 1024 * 1024
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
 
 export function ParametresPage() {
   const workspace = useWorkspaceStore((s) => s.workspace)

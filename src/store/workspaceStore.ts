@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, type PersistStorage } from 'zustand/middleware'
+import { computeClosingSummary } from '@/features/closing/closingSummary'
 import { generateId } from '@/lib/id'
 import { nowIso } from '@/lib/now'
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
@@ -9,6 +10,7 @@ import { createSafeWorkspaceStorage } from '@/lib/workspace/safeStorage'
 import { usePersistenceStatus } from '@/store/persistenceStatus'
 import type {
   BusinessConfig,
+  ClosingSession,
   EquipmentItem,
   EquipmentStatus,
   Expense,
@@ -211,6 +213,25 @@ interface WorkspaceStoreState {
    */
   createBreakdownTasksForZones: (weddingId: string, dueDate: string, vendorId?: string) => string[]
 
+  /**
+   * Clôture un mariage (Phase 5) : fige un bilan (ClosingSession.summary) à
+   * partir des données du moment, puis verrouille le mariage en y référençant
+   * cette clôture. Idempotent : un mariage déjà clôturé renvoie l'id de sa
+   * clôture existante sans en recréer une seconde. Retourne null si le
+   * mariage n'existe pas.
+   */
+  closeWedding: (weddingId: string) => string | null
+  /**
+   * Retire la référence de clôture côté Wedding (déverrouille) sans
+   * supprimer l'enregistrement ClosingSession — jamais effacé silencieusement,
+   * cf. ClosingSessionSchema. Une clôture ultérieure en créera une nouvelle.
+   */
+  reopenWedding: (weddingId: string) => void
+  /** Ajoute une image au portfolio avant/après de la clôture — jusqu'à 5, silencieusement ignorée au-delà (le contrôle utilisateur se fait côté UI). */
+  addPortfolioImage: (weddingId: string, dataUrl: string, caption?: string) => void
+  removePortfolioImage: (weddingId: string, imageId: string) => void
+  updateClientFeedback: (weddingId: string, patch: { clientFeedback?: string; clientRating?: number }) => void
+
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
   updateProposalTemplate: (tier: ProposalTier, patch: Pick<ProposalTemplate, 'label' | 'tagline' | 'lines'>) => void
@@ -300,6 +321,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
               invoices: w.invoices.filter((i) => i.weddingId !== id),
               soldServices: w.soldServices.filter((s) => s.weddingId !== id),
               equipmentItems: w.equipmentItems.filter((e) => e.weddingId !== id),
+              closingSessions: w.closingSessions.filter((c) => c.weddingId !== id),
             },
           }
         })
@@ -914,6 +936,107 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (created.length === 0) return []
         set((s) => ({ workspace: { ...s.workspace, tasks: [...s.workspace.tasks, ...created] } }))
         return created.map((t) => t.id)
+      },
+
+      closeWedding: (weddingId) => {
+        const state = get()
+        const wedding = state.workspace.weddings.find((w) => w.id === weddingId)
+        if (!wedding) return null
+        if (wedding.closingSessionId) return wedding.closingSessionId
+
+        const w = state.workspace
+        const tasks = w.tasks.filter((t) => t.weddingId === weddingId)
+        const items = w.equipmentItems.filter((e) => e.weddingId === weddingId)
+        const vendors = w.vendors.filter((v) => v.weddingIds.includes(weddingId))
+        const vendorLinks = w.vendorWeddingLinks.filter((l) => l.weddingId === weddingId)
+        const expenses = w.expenses.filter((e) => e.weddingId === weddingId)
+        const scopeChanges = w.scopeChanges.filter((sc) => sc.weddingId === weddingId)
+
+        const id = generateId()
+        const timestamp = nowIso()
+        const closingSession: ClosingSession = {
+          id,
+          weddingId,
+          closingDate: timestamp,
+          portfolioImages: [],
+          summary: computeClosingSummary(wedding, tasks, items, vendors, vendorLinks, expenses, scopeChanges),
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }
+
+        set((s) => ({
+          workspace: {
+            ...s.workspace,
+            closingSessions: [...s.workspace.closingSessions, closingSession],
+            weddings: s.workspace.weddings.map((wd) =>
+              wd.id === weddingId ? { ...wd, closingSessionId: id, updatedAt: timestamp } : wd,
+            ),
+          },
+        }))
+        return id
+      },
+
+      reopenWedding: (weddingId) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            weddings: state.workspace.weddings.map((w) =>
+              w.id === weddingId ? { ...w, closingSessionId: undefined, updatedAt: nowIso() } : w,
+            ),
+          },
+        }))
+      },
+
+      addPortfolioImage: (weddingId, dataUrl, caption) => {
+        set((state) => {
+          const wedding = state.workspace.weddings.find((w) => w.id === weddingId)
+          const closing = state.workspace.closingSessions.find((c) => c.id === wedding?.closingSessionId)
+          if (!closing || closing.portfolioImages.length >= 5) return { workspace: state.workspace }
+          const timestamp = nowIso()
+          const image = { id: generateId(), caption, dataUrl, uploadedAt: timestamp }
+          return {
+            workspace: {
+              ...state.workspace,
+              closingSessions: state.workspace.closingSessions.map((c) =>
+                c.id === closing.id ? { ...c, portfolioImages: [...c.portfolioImages, image], updatedAt: timestamp } : c,
+              ),
+            },
+          }
+        })
+      },
+
+      removePortfolioImage: (weddingId, imageId) => {
+        set((state) => {
+          const wedding = state.workspace.weddings.find((w) => w.id === weddingId)
+          const closing = state.workspace.closingSessions.find((c) => c.id === wedding?.closingSessionId)
+          if (!closing) return { workspace: state.workspace }
+          return {
+            workspace: {
+              ...state.workspace,
+              closingSessions: state.workspace.closingSessions.map((c) =>
+                c.id === closing.id
+                  ? { ...c, portfolioImages: c.portfolioImages.filter((img) => img.id !== imageId), updatedAt: nowIso() }
+                  : c,
+              ),
+            },
+          }
+        })
+      },
+
+      updateClientFeedback: (weddingId, patch) => {
+        set((state) => {
+          const wedding = state.workspace.weddings.find((w) => w.id === weddingId)
+          const closing = state.workspace.closingSessions.find((c) => c.id === wedding?.closingSessionId)
+          if (!closing) return { workspace: state.workspace }
+          return {
+            workspace: {
+              ...state.workspace,
+              closingSessions: state.workspace.closingSessions.map((c) =>
+                c.id === closing.id ? { ...c, ...patch, updatedAt: nowIso() } : c,
+              ),
+            },
+          }
+        })
       },
 
       updateBusinessConfig: (patch) => {

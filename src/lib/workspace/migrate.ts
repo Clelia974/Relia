@@ -160,6 +160,14 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
    * transformation de données existantes.
    */
   7: (data) => ({ ...data, schemaVersion: 8 }),
+
+  /**
+   * v8 → v9 (Phase 5) : ajoute la clôture et le bilan post-mariage
+   * (ClosingSession) — nouvelle entité, plus `closingSessionId` facultatif
+   * sur Wedding. Purement additif, aucune transformation de données
+   * existantes : aucun mariage existant n'est marqué clôturé.
+   */
+  8: (data) => ({ ...data, schemaVersion: 9, closingSessions: [] }),
 }
 
 /**

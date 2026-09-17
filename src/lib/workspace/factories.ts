@@ -32,6 +32,7 @@ export function createEmptyWorkspace(): Workspace {
     clientDecisions: [],
     invoices: [],
     equipmentItems: [],
+    closingSessions: [],
     uiPreferences: { theme: 'system' },
     ignoredConflictIds: [],
   }
@@ -605,6 +606,7 @@ export function createDemoWorkspace(): Workspace {
     clientDecisions,
     invoices: [],
     equipmentItems: [],
+    closingSessions: [],
     uiPreferences: { theme: 'system' },
     ignoredConflictIds: [],
   }

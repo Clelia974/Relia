@@ -6,6 +6,8 @@
 export type {
   BusinessConfig,
   ClientDecision,
+  ClosingSession,
+  ClosingSessionSummary,
   DayPhase,
   EquipmentAcquisitionMode,
   EquipmentDestination,
@@ -15,6 +17,7 @@ export type {
   ExpenseCategory,
   ExpenseStatus,
   Invoice,
+  PortfolioImage,
   PostponeEntry,
   Proposal,
   ProposalLineItem,

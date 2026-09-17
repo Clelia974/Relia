@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
+import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 
 /**
  * Migration v4→v5 (Phase 1) : ajoute soldServices, un tableau vide au départ
@@ -18,8 +19,8 @@ describe('migration v4 -> v5 (prestations vendues)', () => {
     const result = migrateWorkspace(buildV4Workspace())
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    // La migration ne s'arrête pas à v5 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION (v8 depuis Phase 4).
-    expect(result.workspace.schemaVersion).toBe(8)
+    // La migration ne s'arrête pas à v5 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION.
+    expect(result.workspace.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.workspace.soldServices).toEqual([])
   })
 

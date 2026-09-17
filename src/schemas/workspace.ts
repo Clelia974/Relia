@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 8 as const
+export const CURRENT_SCHEMA_VERSION = 9 as const
 
 const isoDate = z
   .string()
@@ -122,6 +122,8 @@ export const WeddingSchema = z.object({
   notes: z.string().optional(),
   /** Marge minimale recommandée entre deux moments du planning (minutes) — remplace la valeur globale par défaut si renseignée. */
   minBufferMinutes: z.number().int().nonnegative().optional(),
+  /** Renseigné une fois la clôture (Phase 5) effectuée — cf. ClosingSessionSchema. Présence = mariage verrouillé (édition non recommandée hors réouverture explicite). */
+  closingSessionId: id.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })
@@ -494,6 +496,56 @@ export const EquipmentItemSchema = z.object({
   updatedAt: isoDate,
 })
 
+export const PortfolioImageSchema = z.object({
+  id,
+  caption: z.string().optional(),
+  /** Image encodée en base64 — jamais téléversée ailleurs qu'en LocalStorage (cf. Phase 5, hors périmètre volontaire : pas de stockage cloud). */
+  dataUrl: z.string().startsWith('data:image'),
+  uploadedAt: isoDate,
+})
+
+/**
+ * Bilan figé au moment de la clôture — une photographie, jamais recalculée
+ * après coup : un mariage rouvert puis réédité (coût ajouté, tâche
+ * complétée...) ne doit jamais changer silencieusement un bilan déjà archivé.
+ * Réutilise les mêmes calculs que l'onglet Finances (cf.
+ * src/features/finances/calculations.ts) plutôt que d'inventer un second
+ * modèle budget/réel : `approvedRevenue`/`totalCosts`/`profit`/`marginPct`
+ * ont exactement le même sens qu'ailleurs dans l'app.
+ */
+export const ClosingSessionSummarySchema = z.object({
+  completedTasks: z.number().int().nonnegative(),
+  totalTasks: z.number().int().nonnegative(),
+  recoveredEquipment: z.number().int().nonnegative(),
+  totalEquipment: z.number().int().nonnegative(),
+  damagedEquipment: z.number().int().nonnegative(),
+  /** Élément matériel jamais marqué "récupéré" au moment de la clôture. */
+  pendingEquipment: z.number().int().nonnegative(),
+  approvedRevenue: z.number(),
+  totalCosts: z.number(),
+  profit: z.number(),
+  marginPct: z.number(),
+})
+
+/**
+ * Clôture d'UN mariage — au plus une par mariage (cf. Wedding.closingSessionId).
+ * Une réouverture (reopenWedding) efface la référence côté Wedding mais
+ * conserve cet enregistrement tel quel : jamais supprimé silencieusement,
+ * une nouvelle clôture ultérieure en créera un second.
+ */
+export const ClosingSessionSchema = z.object({
+  id,
+  weddingId: id,
+  closingDate: isoDate,
+  clientFeedback: z.string().optional(),
+  clientRating: z.number().min(1).max(5).optional(),
+  /** Max 5 images côté UI — non recontrôlé ici (cf. ClosingPortfolio). */
+  portfolioImages: z.array(PortfolioImageSchema).default([]),
+  summary: ClosingSessionSummarySchema,
+  createdAt: isoDate,
+  updatedAt: isoDate,
+})
+
 export const UiPreferencesSchema = z.object({
   theme: z.enum(['system', 'light', 'dark']).default('system'),
 })
@@ -517,6 +569,7 @@ export const WorkspaceSchema = z
     clientDecisions: z.array(ClientDecisionSchema),
     invoices: z.array(InvoiceSchema),
     equipmentItems: z.array(EquipmentItemSchema).default([]),
+    closingSessions: z.array(ClosingSessionSchema).default([]),
     uiPreferences: UiPreferencesSchema,
     /** Identifiants déterministes (cf. detectTimelineConflicts) des alertes de planning écartées par l'utilisatrice. */
     ignoredConflictIds: z.array(z.string()).default([]),
@@ -596,6 +649,17 @@ export const WorkspaceSchema = z
       }
     })
     workspace.equipmentItems.forEach((e, i) => checkWeddingRef(['equipmentItems', i, 'weddingId'], e.weddingId))
+    const closingSessionIds = new Set(workspace.closingSessions.map((c) => c.id))
+    workspace.closingSessions.forEach((c, i) => checkWeddingRef(['closingSessions', i, 'weddingId'], c.weddingId))
+    workspace.weddings.forEach((w, i) => {
+      if (w.closingSessionId && !closingSessionIds.has(w.closingSessionId)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['weddings', i, 'closingSessionId'],
+          message: `closingSessionId "${w.closingSessionId}" ne correspond à aucune clôture.`,
+        })
+      }
+    })
   })
 
 export type TaskStatus = z.infer<typeof TaskStatusSchema>
@@ -635,5 +699,8 @@ export type EquipmentAcquisitionMode = z.infer<typeof EquipmentAcquisitionModeSc
 export type EquipmentDestination = z.infer<typeof EquipmentDestinationSchema>
 export type EquipmentStatus = z.infer<typeof EquipmentStatusSchema>
 export type EquipmentItem = z.infer<typeof EquipmentItemSchema>
+export type PortfolioImage = z.infer<typeof PortfolioImageSchema>
+export type ClosingSessionSummary = z.infer<typeof ClosingSessionSummarySchema>
+export type ClosingSession = z.infer<typeof ClosingSessionSchema>
 export type UiPreferences = z.infer<typeof UiPreferencesSchema>
 export type Workspace = z.infer<typeof WorkspaceSchema>

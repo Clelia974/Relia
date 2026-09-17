@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
+import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 
 /**
  * Migration v3→v4 : le coût prestataire passe de Vendor.estimatedCost/actualCost
@@ -37,8 +38,8 @@ describe('migration v3 -> v4 (coût prestataire par relation)', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    // La migration ne s'arrête pas à v4 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION (v8 depuis Phase 4).
-    expect(result.workspace.schemaVersion).toBe(8)
+    // La migration ne s'arrête pas à v4 : elle enchaîne jusqu'à CURRENT_SCHEMA_VERSION.
+    expect(result.workspace.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.workspace.vendors[0]).not.toHaveProperty('estimatedCost')
     expect(result.workspace.vendors[0]).not.toHaveProperty('actualCost')
     expect(result.workspace.vendorWeddingLinks).toHaveLength(1)
