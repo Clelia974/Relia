@@ -2,6 +2,7 @@ import { addDays, differenceInCalendarDays, startOfDay } from 'date-fns'
 import { isDueToday, isOverdue } from '@/features/tasks/summary'
 import { getWeddingFinancials } from '@/features/finances/calculations'
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts } from '@/features/timeline/conflicts'
+import { selectActiveWeddingIds, selectActiveWeddings } from '@/features/weddings/activeWeddings'
 import { getWeddingRiskLevel, type WeddingRiskAssessment } from '@/features/weddings/risk'
 import { isVendorConfirmed } from '@/lib/vendorStatus'
 import type { ClientDecision, Task, Wedding, Workspace } from '@/types/entities'
@@ -49,8 +50,12 @@ function actionTier(task: Task, today: Date, soonLimit: Date): number | null {
 
 export function getTodayActions(workspace: Workspace, today: Date = new Date()): TodayActions {
   const soonLimit = addDays(startOfDay(today), 3)
+  const activeWeddingIds = selectActiveWeddingIds(workspace.weddings)
+  // Une tâche sans weddingId est une tâche générique, jamais concernée par
+  // l'archivage d'un mariage — elle reste toujours conservée.
+  const tasks = workspace.tasks.filter((t) => !t.weddingId || activeWeddingIds.has(t.weddingId))
 
-  const items = workspace.tasks
+  const items = tasks
     .map((task) => ({ task, tier: actionTier(task, today, soonLimit) }))
     .filter((x): x is { task: Task; tier: number } => x.tier !== null)
     .sort((a, b) => {
@@ -59,7 +64,7 @@ export function getTodayActions(workspace: Workspace, today: Date = new Date()):
     })
     .map((x) => x.task)
 
-  const waiting = workspace.tasks.filter((t) => t.status === 'en_attente')
+  const waiting = tasks.filter((t) => t.status === 'en_attente')
 
   return { items, waiting }
 }
@@ -73,8 +78,10 @@ export interface PendingResponses {
 }
 
 export function getPendingResponses(workspace: Workspace): PendingResponses {
-  const tasks = workspace.tasks.filter((t) => t.status === 'en_attente')
-  const decisions = workspace.clientDecisions.filter((d) => d.pending)
+  const activeWeddingIds = selectActiveWeddingIds(workspace.weddings)
+  const tasks = workspace.tasks.filter((t) => t.status === 'en_attente' && (!t.weddingId || activeWeddingIds.has(t.weddingId)))
+  // ClientDecision.weddingId est obligatoire dans le schéma : pas de cas générique à préserver ici.
+  const decisions = workspace.clientDecisions.filter((d) => d.pending && activeWeddingIds.has(d.weddingId))
   return { tasks, decisions, total: tasks.length + decisions.length }
 }
 
@@ -99,7 +106,7 @@ const DEFAULT_UPCOMING_LIMIT = 6
 /** Combine moments de planning, échéances de tâches et jours de mariage à venir, triés par date puis heure. */
 export function getUpcomingEvents(workspace: Workspace, today: Date = new Date(), limit = DEFAULT_UPCOMING_LIMIT): UpcomingEntry[] {
   const start = startOfDay(today)
-  const weddingNameById = new Map(workspace.weddings.map((w) => [w.id, w.coupleName]))
+  const weddingNameById = new Map(selectActiveWeddings(workspace.weddings).map((w) => [w.id, w.coupleName]))
   const entries: UpcomingEntry[] = []
 
   for (const event of workspace.timelineEvents) {

@@ -37,11 +37,13 @@ export function buildCalendarItems(
 
   for (const task of tasks) {
     if (!task.dueDate || !task.weddingId) continue
+    const weddingName = weddingNameById.get(task.weddingId)
+    if (!weddingName) continue
     items.push({
       kind: 'task',
       id: task.id,
       weddingId: task.weddingId,
-      weddingName: weddingNameById.get(task.weddingId) ?? '—',
+      weddingName,
       date: task.dueDate,
       task,
       isAlert: isOverdue(task),
@@ -49,13 +51,15 @@ export function buildCalendarItems(
   }
 
   for (const event of events) {
+    const weddingName = weddingNameById.get(event.weddingId)
+    if (!weddingName) continue
     const conflicts = conflictsByWedding.get(event.weddingId) ?? []
     const isAlert = conflicts.some((c) => !c.ignored && c.eventIds.includes(event.id))
     items.push({
       kind: 'event',
       id: event.id,
       weddingId: event.weddingId,
-      weddingName: weddingNameById.get(event.weddingId) ?? '—',
+      weddingName,
       date: event.date,
       event,
       isAlert,

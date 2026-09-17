@@ -24,6 +24,7 @@ import { TaskKanban } from '@/features/tasks/components/TaskKanban'
 import { TaskList } from '@/features/tasks/components/TaskList'
 import { isDueToday, isOverdue } from '@/features/tasks/summary'
 import type { TaskFormValues } from '@/features/tasks/taskForm.schema'
+import { selectActiveWeddingIds, selectActiveWeddings } from '@/features/weddings/activeWeddings'
 import { TASK_STATUS_LABELS } from '@/lib/taskStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { Task, TaskPriority, TaskStatus } from '@/types/entities'
@@ -84,8 +85,14 @@ export function TaskBoard({ scopeWeddingId }: TaskBoardProps) {
   const reportTask = useWorkspaceStore((s) => s.reportTask)
   const deleteTask = useWorkspaceStore((s) => s.deleteTask)
 
-  const weddings = allWeddings.filter((w) => !w.archived)
-  const tasksInScope = scopeWeddingId ? allTasks.filter((t) => t.weddingId === scopeWeddingId) : allTasks
+  const weddings = selectActiveWeddings(allWeddings)
+  const activeWeddingIds = selectActiveWeddingIds(allWeddings)
+  // Périmètre "un mariage" : comportement inchangé. Périmètre global : une
+  // tâche sans weddingId (générique) reste toujours visible, une tâche liée
+  // à un mariage archivé est exclue.
+  const tasksInScope = scopeWeddingId
+    ? allTasks.filter((t) => t.weddingId === scopeWeddingId)
+    : allTasks.filter((t) => !t.weddingId || activeWeddingIds.has(t.weddingId))
 
   const weddingNameById = useMemo(() => new Map(allWeddings.map((w) => [w.id, w.coupleName])), [allWeddings])
   const vendorNameById = useMemo(() => new Map(allVendors.map((v) => [v.id, v.name])), [allVendors])
