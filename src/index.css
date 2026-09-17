@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-sans: 'Public Sans', system-ui, sans-serif;
+    --font-heading: 'Source Serif 4', Georgia, serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    /* Relia — accent de marque ("fil conducteur"), distinct des couleurs sémantiques */
+    --color-thread: var(--thread);
+    /* Relia — couleurs sémantiques de statut, jamais utilisées comme accent décoratif */
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-success-bg: var(--success-bg);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-warning-bg: var(--warning-bg);
+    --color-risk: var(--risk);
+    --color-risk-foreground: var(--risk-foreground);
+    --color-risk-bg: var(--risk-bg);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    /* Relia — palette papier chaud / encre marine, cohérente avec le dossier de cadrage */
+    --background: #F7F4EF;
+    --foreground: #211F1C;
+    --card: #FFFFFF;
+    --card-foreground: #211F1C;
+    --popover: #FFFFFF;
+    --popover-foreground: #211F1C;
+    --primary: #1E2A3A;
+    --primary-foreground: #FBF9F5;
+    --secondary: #EFEAE1;
+    --secondary-foreground: #211F1C;
+    --muted: #F0EBE2;
+    --muted-foreground: #6B655C;
+    --accent: #F1E4D3;
+    --accent-foreground: #211F1C;
+    --destructive: #B3261E;
+    --destructive-foreground: #FBF9F5;
+    --border: #E3DDD1;
+    --input: #E3DDD1;
+    --ring: #1E2A3A;
+    --thread: #9C6B3F;
+    --success: #3F7D52;
+    --success-foreground: #FBF9F5;
+    --success-bg: #E7EEE3;
+    --warning: #96691F;
+    --warning-foreground: #FBF9F5;
+    --warning-bg: #F3E9D5;
+    --risk: #A33B3B;
+    --risk-foreground: #FBF9F5;
+    --risk-bg: #F3E1DF;
+    --chart-1: #1E2A3A;
+    --chart-2: #9C6B3F;
+    --chart-3: #6B655C;
+    --chart-4: #3F7D52;
+    --chart-5: #A33B3B;
+    --radius: 0.5rem;
+    --sidebar: #FBF9F5;
+    --sidebar-foreground: #211F1C;
+    --sidebar-primary: #1E2A3A;
+    --sidebar-primary-foreground: #FBF9F5;
+    --sidebar-accent: #F1E4D3;
+    --sidebar-accent-foreground: #211F1C;
+    --sidebar-border: #E3DDD1;
+    --sidebar-ring: #1E2A3A;
+}
+
+.dark {
+    --background: #171310;
+    --foreground: #F1ECE3;
+    --card: #201C16;
+    --card-foreground: #F1ECE3;
+    --popover: #201C16;
+    --popover-foreground: #F1ECE3;
+    --primary: #9DBAD6;
+    --primary-foreground: #12202E;
+    --secondary: #2B2620;
+    --secondary-foreground: #F1ECE3;
+    --muted: #2B2620;
+    --muted-foreground: #B6ACA0;
+    --accent: #332B1F;
+    --accent-foreground: #F1ECE3;
+    --destructive: #E08E8E;
+    --destructive-foreground: #34201D;
+    --border: #3A3227;
+    --input: #3A3227;
+    --ring: #9DBAD6;
+    --thread: #D0A164;
+    --success: #8FC492;
+    --success-foreground: #1B2A17;
+    --success-bg: #232D1E;
+    --warning: #D8AE5E;
+    --warning-foreground: #2E2411;
+    --warning-bg: #302816;
+    --risk: #E08E8E;
+    --risk-foreground: #34201D;
+    --risk-bg: #322019;
+    --chart-1: #9DBAD6;
+    --chart-2: #D0A164;
+    --chart-3: #B6ACA0;
+    --chart-4: #8FC492;
+    --chart-5: #E08E8E;
+    --sidebar: #201C16;
+    --sidebar-foreground: #F1ECE3;
+    --sidebar-primary: #9DBAD6;
+    --sidebar-primary-foreground: #12202E;
+    --sidebar-accent: #332B1F;
+    --sidebar-accent-foreground: #F1ECE3;
+    --sidebar-border: #3A3227;
+    --sidebar-ring: #9DBAD6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+    }
+  html {
+    @apply font-sans;
+    }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    text-wrap: balance;
+    }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+    }
+  .print-area {
+    margin: 0;
+    }
+  body {
+    background: #FFFFFF;
+    }
+}

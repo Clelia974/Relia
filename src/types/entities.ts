@@ -1,0 +1,41 @@
+/**
+ * Les schémas Zod (src/schemas/workspace.ts) sont la source de vérité du
+ * modèle de données ; ce fichier ne fait que ré-exporter les types inférés
+ * pour des imports plus courts côté composants (@/types/entities).
+ */
+export type {
+  BusinessConfig,
+  ClientDecision,
+  Expense,
+  ExpenseCategory,
+  ExpenseStatus,
+  Invoice,
+  PostponeEntry,
+  Proposal,
+  ProposalLineItem,
+  ProposalStatus,
+  ProposalTemplate,
+  ProposalTemplateLine,
+  ProposalTier,
+  ScopeChange,
+  ScopeChangeStatus,
+  Task,
+  TaskPriority,
+  TaskStatus,
+  TaskWaitingOn,
+  TimelineEvent,
+  TimelineEventStatus,
+  TimelineEventType,
+  UiPreferences,
+  UserProfile,
+  VatStatus,
+  Vendor,
+  VendorCategory,
+  VendorStatus,
+  VendorWeddingLink,
+  Wedding,
+  WeddingStatus,
+  Workspace,
+} from '@/schemas/workspace'
+
+export { CURRENT_SCHEMA_VERSION as SCHEMA_VERSION } from '@/schemas/workspace'
