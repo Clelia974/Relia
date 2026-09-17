@@ -12,6 +12,7 @@ import {
   type TimelineEventFormValues,
 } from '@/features/timeline/timelineEventForm.schema'
 import { resolveTimeRange } from '@/features/timeline/timeRange'
+import { DAY_PHASE_LABELS, DAY_PHASE_OPTIONS } from '@/lib/dayPhase'
 import { TIMELINE_EVENT_STATUS_LABELS, TIMELINE_EVENT_STATUS_OPTIONS } from '@/lib/timelineEventStatus'
 import type { TimelineEvent, Vendor } from '@/types/entities'
 
@@ -46,6 +47,7 @@ function toFormValues(event: TimelineEvent): TimelineEventFormValues {
     type: event.type,
     status: event.status,
     notes: event.notes ?? '',
+    phase: event.phase ?? '',
   }
 }
 
@@ -233,6 +235,22 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
               />
             </Field>
           </div>
+
+          <Field label="Phase du jour J" htmlFor="e-phase" optional>
+            <Select value={values.phase || 'aucune'} onValueChange={(v) => setField('phase', v === 'aucune' ? '' : v)}>
+              <SelectTrigger id="e-phase" className="w-full">
+                <SelectValue placeholder="Non classée" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aucune">Non classée</SelectItem>
+                {DAY_PHASE_OPTIONS.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {DAY_PHASE_LABELS[p]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
 
           <Field label="Notes" htmlFor="e-notes" optional>
             <Textarea id="e-notes" rows={2} value={values.notes} onChange={(e) => setField('notes', e.target.value)} />

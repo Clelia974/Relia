@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 4 as const
+export const CURRENT_SCHEMA_VERSION = 7 as const
 
 const isoDate = z
   .string()
@@ -25,6 +25,13 @@ export const TaskPrioritySchema = z.enum(['normale', 'haute', 'urgente'])
 
 /** À quoi une tâche "En attente" attend — jamais présentée comme en retard. */
 export const TaskWaitingOnSchema = z.enum(['client', 'prestataire', 'paiement', 'document', 'autre'])
+
+/**
+ * Phase du déroulé jour J — sert uniquement au filtrage de la Vue Jour J
+ * (Phase 3) ; facultative sur Task et TimelineEvent, jamais rétroactivement
+ * obligatoire (les tâches/moments déjà créés restent valides sans elle).
+ */
+export const DayPhaseSchema = z.enum(['installation', 'ceremonie', 'reception', 'demontage'])
 
 export const WeddingStatusSchema = z.enum([
   'prospect',
@@ -196,6 +203,8 @@ export const TaskSchema = z.object({
   notes: z.string().optional(),
   /** 'automatic' = créée par Relia (ex. confirmation prestataire), jamais par une saisie manuelle directe. */
   source: z.enum(['manual', 'automatic']).default('manual'),
+  /** Phase du jour J (Vue Jour J, Phase 3) — facultative, cf. DayPhaseSchema. */
+  phase: DayPhaseSchema.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })
@@ -224,6 +233,8 @@ export const TimelineEventSchema = z.object({
   type: TimelineEventTypeSchema,
   status: TimelineEventStatusSchema.default('prevu'),
   notes: z.string().optional(),
+  /** Phase du jour J (Vue Jour J, Phase 3) — facultative, cf. DayPhaseSchema. */
+  phase: DayPhaseSchema.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })
@@ -349,6 +360,41 @@ export const ProposalSchema = z.object({
 })
 
 /**
+ * "Incluse" = générée depuis une ligne de la proposition d'origine (ou
+ * confirmée telle quelle) ; "ajoutée ultérieurement" = service vendu après
+ * coup, hors proposition initiale (ex. upsell en cours de préparation) ;
+ * "retirée" = ne sera finalement pas fourni, mais on garde une trace plutôt
+ * que de supprimer silencieusement (utile si le client change d'avis).
+ */
+export const SoldServiceStatusSchema = z.enum(['incluse', 'ajoutee_ulterieurement', 'retiree'])
+
+/**
+ * Prestation vendue : ce que l'organisatrice s'est réellement engagée à
+ * fournir pour ce mariage, matérialisé une fois une proposition approuvée.
+ * Distinct de ProposalLineItem : la proposition peut encore changer après
+ * approbation (scope change), alors que SoldService fige ce qui a été
+ * préparé/communiqué — une modification ultérieure de la proposition ne doit
+ * jamais réécrire silencieusement ces enregistrements (cf.
+ * generateSoldServicesFromProposal, qui ne régénère jamais si des prestations
+ * existent déjà pour cette proposition).
+ */
+export const SoldServiceSchema = z.object({
+  id,
+  weddingId: id,
+  proposalId: id,
+  title: z.string().min(1, 'Veuillez renseigner un titre.'),
+  description: z.string().optional(),
+  quantity: z.number().positive('Veuillez saisir une quantité valide.').optional(),
+  soldPrice: z.number().nonnegative('Veuillez saisir un prix valide.'),
+  status: SoldServiceStatusSchema.default('incluse'),
+  notes: z.string().optional(),
+  /** Renseigné dès qu'une tâche de préparation a été créée depuis cette prestation — empêche toute recréation en double. */
+  taskId: id.optional(),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+})
+
+/**
  * Ligne préconfigurée d'une formule de devis — sert uniquement à initialiser
  * les lignes d'une nouvelle proposition (cf. src/features/proposals/templates.ts).
  * Modifiable par l'utilisatrice depuis Paramètres, indépendamment des
@@ -411,6 +457,33 @@ export const InvoiceSchema = z.object({
   updatedAt: isoDate,
 })
 
+/**
+ * Mode d'obtention d'un élément matériel pour CE mariage — jamais un
+ * mouvement de stock ni une réservation : Relia ne gère pas d'inventaire
+ * global partagé entre mariages (cf. Phase 2, hors périmètre volontaire).
+ */
+export const EquipmentAcquisitionModeSchema = z.enum(['stock_personnel', 'achat', 'location', 'fabrication', 'autre'])
+
+export const EquipmentStatusSchema = z.enum(['a_prevoir', 'pret', 'charge', 'installe', 'recupere'])
+
+/**
+ * Élément de la checklist matériel d'UN mariage — jamais partagé ni
+ * comptabilisé avec un autre mariage (pas d'inventaire global, cf. Phase 2).
+ */
+export const EquipmentItemSchema = z.object({
+  id,
+  weddingId: id,
+  name: z.string().min(1, 'Veuillez renseigner un nom.'),
+  quantity: z.number().positive('Veuillez saisir une quantité valide.'),
+  /** Catégorie ou zone (ex. "Décoration", "Réception") — champ libre, comme Vendor.category. */
+  category: z.string().optional(),
+  acquisitionMode: EquipmentAcquisitionModeSchema,
+  status: EquipmentStatusSchema.default('a_prevoir'),
+  notes: z.string().optional(),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+})
+
 export const UiPreferencesSchema = z.object({
   theme: z.enum(['system', 'light', 'dark']).default('system'),
 })
@@ -428,10 +501,12 @@ export const WorkspaceSchema = z
     expenses: z.array(ExpenseSchema),
     scopeChanges: z.array(ScopeChangeSchema),
     proposals: z.array(ProposalSchema),
+    soldServices: z.array(SoldServiceSchema).default([]),
     /** Formules de devis personnalisables — jamais vide en pratique (cf. migrateWorkspace, qui réinjecte les 3 formules par défaut si absentes). */
     proposalTemplates: z.array(ProposalTemplateSchema).default([]),
     clientDecisions: z.array(ClientDecisionSchema),
     invoices: z.array(InvoiceSchema),
+    equipmentItems: z.array(EquipmentItemSchema).default([]),
     uiPreferences: UiPreferencesSchema,
     /** Identifiants déterministes (cf. detectTimelineConflicts) des alertes de planning écartées par l'utilisatrice. */
     ignoredConflictIds: z.array(z.string()).default([]),
@@ -500,11 +575,23 @@ export const WorkspaceSchema = z
       }
     })
     workspace.proposals.forEach((p, i) => checkWeddingRef(['proposals', i, 'weddingId'], p.weddingId))
+    const taskIds = new Set(workspace.tasks.map((t) => t.id))
+    workspace.soldServices.forEach((s, i) => {
+      checkWeddingRef(['soldServices', i, 'weddingId'], s.weddingId)
+      if (!proposalIds.has(s.proposalId)) {
+        ctx.addIssue({ code: 'custom', path: ['soldServices', i, 'proposalId'], message: `proposalId "${s.proposalId}" ne correspond à aucune proposition.` })
+      }
+      if (s.taskId && !taskIds.has(s.taskId)) {
+        ctx.addIssue({ code: 'custom', path: ['soldServices', i, 'taskId'], message: `taskId "${s.taskId}" ne correspond à aucune tâche.` })
+      }
+    })
+    workspace.equipmentItems.forEach((e, i) => checkWeddingRef(['equipmentItems', i, 'weddingId'], e.weddingId))
   })
 
 export type TaskStatus = z.infer<typeof TaskStatusSchema>
 export type TaskPriority = z.infer<typeof TaskPrioritySchema>
 export type TaskWaitingOn = z.infer<typeof TaskWaitingOnSchema>
+export type DayPhase = z.infer<typeof DayPhaseSchema>
 export type WeddingStatus = z.infer<typeof WeddingStatusSchema>
 export type ProposalTier = z.infer<typeof ProposalTierSchema>
 export type VendorCategory = z.infer<typeof VendorCategorySchema>
@@ -528,9 +615,14 @@ export type ScopeChange = z.infer<typeof ScopeChangeSchema>
 export type ProposalLineItem = z.infer<typeof ProposalLineItemSchema>
 export type ProposalStatus = z.infer<typeof ProposalStatusSchema>
 export type Proposal = z.infer<typeof ProposalSchema>
+export type SoldServiceStatus = z.infer<typeof SoldServiceStatusSchema>
+export type SoldService = z.infer<typeof SoldServiceSchema>
 export type ProposalTemplateLine = z.infer<typeof ProposalTemplateLineSchema>
 export type ProposalTemplate = z.infer<typeof ProposalTemplateSchema>
 export type ClientDecision = z.infer<typeof ClientDecisionSchema>
 export type Invoice = z.infer<typeof InvoiceSchema>
+export type EquipmentAcquisitionMode = z.infer<typeof EquipmentAcquisitionModeSchema>
+export type EquipmentStatus = z.infer<typeof EquipmentStatusSchema>
+export type EquipmentItem = z.infer<typeof EquipmentItemSchema>
 export type UiPreferences = z.infer<typeof UiPreferencesSchema>
 export type Workspace = z.infer<typeof WorkspaceSchema>

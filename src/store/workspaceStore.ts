@@ -9,6 +9,8 @@ import { createSafeWorkspaceStorage } from '@/lib/workspace/safeStorage'
 import { usePersistenceStatus } from '@/store/persistenceStatus'
 import type {
   BusinessConfig,
+  EquipmentItem,
+  EquipmentStatus,
   Expense,
   Invoice,
   Proposal,
@@ -16,6 +18,8 @@ import type {
   ProposalTemplate,
   ProposalTier,
   ScopeChange,
+  SoldService,
+  SoldServiceStatus,
   Task,
   TaskStatus,
   TimelineEvent,
@@ -67,6 +71,7 @@ type NewTaskInput = Pick<Task, 'title'> &
       | 'waitingReason'
       | 'notes'
       | 'source'
+      | 'phase'
     >
   >
 
@@ -86,6 +91,7 @@ type NewTimelineEventInput = Pick<TimelineEvent, 'weddingId' | 'title' | 'date' 
       | 'bufferAfterMinutes'
       | 'status'
       | 'notes'
+      | 'phase'
     >
   >
 
@@ -98,8 +104,14 @@ type NewScopeChangeInput = Pick<ScopeChange, 'weddingId' | 'description' | 'date
 type NewProposalInput = Pick<Proposal, 'weddingId' | 'template' | 'title' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total' | 'depositAmount' | 'balanceAmount'> &
   Partial<Pick<Proposal, 'clientName' | 'validUntil' | 'vatRate' | 'depositPercentage' | 'status' | 'notes'>>
 
+type NewSoldServiceInput = Pick<SoldService, 'weddingId' | 'proposalId' | 'title' | 'soldPrice'> &
+  Partial<Pick<SoldService, 'description' | 'quantity' | 'status' | 'notes'>>
+
 type NewInvoiceInput = Pick<Invoice, 'weddingId' | 'invoiceNumber' | 'date' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total'> &
   Partial<Pick<Invoice, 'proposalId' | 'clientName' | 'vatRate' | 'depositAmount' | 'balanceAmount' | 'legalMentions'>>
+
+type NewEquipmentItemInput = Pick<EquipmentItem, 'weddingId' | 'name' | 'quantity' | 'acquisitionMode'> &
+  Partial<Pick<EquipmentItem, 'category' | 'status' | 'notes'>>
 
 interface WorkspaceStoreState {
   workspace: Workspace
@@ -162,9 +174,34 @@ interface WorkspaceStoreState {
   duplicateProposal: (id: string) => string | null
   deleteProposal: (id: string) => void
 
+  /**
+   * Génère les prestations vendues à partir des lignes incluses d'une
+   * proposition APPROUVÉE. Idempotent : si des prestations existent déjà
+   * pour cette proposition, ne régénère rien (retourne []) — pour ne jamais
+   * écraser un travail de préparation déjà en cours si la proposition est
+   * modifiée après coup. Retourne [] aussi si la proposition est introuvable,
+   * pas approuvée, ou n'a aucune ligne incluse.
+   */
+  generateSoldServicesFromProposal: (proposalId: string) => string[]
+  addSoldService: (input: NewSoldServiceInput) => string
+  updateSoldService: (id: string, patch: Partial<Omit<SoldService, 'id' | 'weddingId' | 'proposalId' | 'createdAt'>>) => void
+  updateSoldServiceStatus: (id: string, status: SoldServiceStatus) => void
+  deleteSoldService: (id: string) => void
+  /**
+   * Crée une tâche de préparation à partir d'une prestation vendue.
+   * Idempotent : si une tâche a déjà été créée pour cette prestation
+   * (soldService.taskId renseigné), ne recrée rien et retourne l'id existant.
+   */
+  createTaskFromSoldService: (id: string) => string | null
+
   createInvoicePreview: (input: NewInvoiceInput) => string
   updateInvoicePreview: (id: string, patch: Partial<Omit<Invoice, 'id' | 'weddingId' | 'createdAt'>>) => void
   deleteInvoicePreview: (id: string) => void
+
+  addEquipmentItem: (input: NewEquipmentItemInput) => string
+  updateEquipmentItem: (id: string, patch: Partial<Omit<EquipmentItem, 'id' | 'weddingId' | 'createdAt'>>) => void
+  updateEquipmentItemStatus: (id: string, status: EquipmentStatus) => void
+  deleteEquipmentItem: (id: string) => void
 
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
@@ -234,14 +271,17 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       deleteWedding: (id) => {
         set((state) => {
           const w = state.workspace
+          // Un prestataire qui n'était lié qu'à ce mariage devient orphelin
+          // une fois son seul lien retiré — même règle que removeVendorFromWedding,
+          // qui supprime déjà le Vendor dans ce cas précis.
+          const vendors = w.vendors
+            .map((vendor) => ({ ...vendor, weddingIds: vendor.weddingIds.filter((wid) => wid !== id) }))
+            .filter((vendor) => vendor.weddingIds.length > 0)
           return {
             workspace: {
               ...w,
               weddings: w.weddings.filter((wedding) => wedding.id !== id),
-              vendors: w.vendors.map((vendor) => ({
-                ...vendor,
-                weddingIds: vendor.weddingIds.filter((wid) => wid !== id),
-              })),
+              vendors,
               vendorWeddingLinks: w.vendorWeddingLinks.filter((link) => link.weddingId !== id),
               tasks: w.tasks.filter((t) => t.weddingId !== id),
               timelineEvents: w.timelineEvents.filter((e) => e.weddingId !== id),
@@ -250,6 +290,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
               clientDecisions: w.clientDecisions.filter((d) => d.weddingId !== id),
               proposals: w.proposals.filter((p) => p.weddingId !== id),
               invoices: w.invoices.filter((i) => i.weddingId !== id),
+              soldServices: w.soldServices.filter((s) => s.weddingId !== id),
+              equipmentItems: w.equipmentItems.filter((e) => e.weddingId !== id),
             },
           }
         })
@@ -380,6 +422,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           waitingReason: input.waitingReason,
           notes: input.notes,
           source: input.source ?? 'manual',
+          phase: input.phase,
           createdAt: timestamp,
           updatedAt: timestamp,
         }
@@ -455,6 +498,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           type: input.type,
           status: input.status ?? 'prevu',
           notes: input.notes,
+          phase: input.phase,
           createdAt: timestamp,
           updatedAt: timestamp,
         }
@@ -642,8 +686,103 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             ...state.workspace,
             proposals: state.workspace.proposals.filter((p) => p.id !== id),
             invoices: state.workspace.invoices.map((inv) => (inv.proposalId === id ? { ...inv, proposalId: undefined } : inv)),
+            // Une prestation vendue référence toujours une proposition (proposalId non
+            // facultatif, cf. schéma) : impossible de simplement délier comme pour une
+            // facture — elle doit disparaître avec la proposition qui l'a fait naître.
+            soldServices: state.workspace.soldServices.filter((s) => s.proposalId !== id),
           },
         }))
+      },
+
+      generateSoldServicesFromProposal: (proposalId) => {
+        const state = get()
+        const proposal = state.workspace.proposals.find((p) => p.id === proposalId)
+        if (!proposal || proposal.status !== 'approuvee') return []
+        const alreadyGenerated = state.workspace.soldServices.some((s) => s.proposalId === proposalId)
+        if (alreadyGenerated) return []
+
+        const timestamp = nowIso()
+        const created: SoldService[] = proposal.lineItems
+          .filter((line) => line.included)
+          .map((line) => ({
+            id: generateId(),
+            weddingId: proposal.weddingId,
+            proposalId: proposal.id,
+            title: line.description,
+            quantity: line.quantity,
+            soldPrice: line.total,
+            status: 'incluse',
+            notes: line.notes,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }))
+        if (created.length === 0) return []
+
+        set((s) => ({ workspace: { ...s.workspace, soldServices: [...s.workspace.soldServices, ...created] } }))
+        return created.map((c) => c.id)
+      },
+
+      addSoldService: (input) => {
+        const id = generateId()
+        const timestamp = nowIso()
+        const soldService: SoldService = {
+          id,
+          weddingId: input.weddingId,
+          proposalId: input.proposalId,
+          title: input.title,
+          description: input.description,
+          quantity: input.quantity,
+          soldPrice: input.soldPrice,
+          status: input.status ?? 'ajoutee_ulterieurement',
+          notes: input.notes,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }
+        set((state) => ({ workspace: { ...state.workspace, soldServices: [...state.workspace.soldServices, soldService] } }))
+        return id
+      },
+
+      updateSoldService: (id, patch) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            soldServices: state.workspace.soldServices.map((s) => (s.id === id ? { ...s, ...patch, updatedAt: nowIso() } : s)),
+          },
+        }))
+      },
+
+      updateSoldServiceStatus: (id, status) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            soldServices: state.workspace.soldServices.map((s) => (s.id === id ? { ...s, status, updatedAt: nowIso() } : s)),
+          },
+        }))
+      },
+
+      deleteSoldService: (id) => {
+        set((state) => ({
+          workspace: { ...state.workspace, soldServices: state.workspace.soldServices.filter((s) => s.id !== id) },
+        }))
+      },
+
+      createTaskFromSoldService: (id) => {
+        const soldService = get().workspace.soldServices.find((s) => s.id === id)
+        if (!soldService) return null
+        if (soldService.taskId) return soldService.taskId
+
+        const taskId = get().addTask({
+          title: soldService.title,
+          description: soldService.description,
+          weddingId: soldService.weddingId,
+        })
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            soldServices: state.workspace.soldServices.map((s) => (s.id === id ? { ...s, taskId, updatedAt: nowIso() } : s)),
+          },
+        }))
+        return taskId
       },
 
       createInvoicePreview: (input) => {
@@ -684,6 +823,49 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
 
       deleteInvoicePreview: (id) => {
         set((state) => ({ workspace: { ...state.workspace, invoices: state.workspace.invoices.filter((inv) => inv.id !== id) } }))
+      },
+
+      addEquipmentItem: (input) => {
+        const id = generateId()
+        const timestamp = nowIso()
+        const item: EquipmentItem = {
+          id,
+          weddingId: input.weddingId,
+          name: input.name,
+          quantity: input.quantity,
+          category: input.category,
+          acquisitionMode: input.acquisitionMode,
+          status: input.status ?? 'a_prevoir',
+          notes: input.notes,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }
+        set((state) => ({ workspace: { ...state.workspace, equipmentItems: [...state.workspace.equipmentItems, item] } }))
+        return id
+      },
+
+      updateEquipmentItem: (id, patch) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            equipmentItems: state.workspace.equipmentItems.map((e) => (e.id === id ? { ...e, ...patch, updatedAt: nowIso() } : e)),
+          },
+        }))
+      },
+
+      updateEquipmentItemStatus: (id, status) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            equipmentItems: state.workspace.equipmentItems.map((e) => (e.id === id ? { ...e, status, updatedAt: nowIso() } : e)),
+          },
+        }))
+      },
+
+      deleteEquipmentItem: (id) => {
+        set((state) => ({
+          workspace: { ...state.workspace, equipmentItems: state.workspace.equipmentItems.filter((e) => e.id !== id) },
+        }))
       },
 
       updateBusinessConfig: (patch) => {

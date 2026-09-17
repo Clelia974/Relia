@@ -8,8 +8,8 @@ import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { WeddingTasksTab } from '@/pages/mariages/WeddingTasksTab'
 import { WeddingVendorsTab } from '@/pages/mariages/WeddingVendorsTab'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
-import { ParametresPage } from '@/pages/ParametresPage'
 import { PrestatairesGlobalPage } from '@/pages/PrestatairesGlobalPage'
 import { RootGate } from '@/pages/RootGate'
 import { TachesGlobalPage } from '@/pages/TachesGlobalPage'
@@ -28,6 +28,15 @@ const WeddingFinancesTab = lazy(() =>
 const WeddingDocumentsTab = lazy(() =>
   import('@/pages/mariages/WeddingDocumentsTab').then((m) => ({ default: m.WeddingDocumentsTab })),
 )
+const WeddingSoldServicesTab = lazy(() =>
+  import('@/pages/mariages/WeddingSoldServicesTab').then((m) => ({ default: m.WeddingSoldServicesTab })),
+)
+const WeddingEquipmentTab = lazy(() =>
+  import('@/pages/mariages/WeddingEquipmentTab').then((m) => ({ default: m.WeddingEquipmentTab })),
+)
+const WeddingDayOfTab = lazy(() =>
+  import('@/pages/mariages/WeddingDayOfTab').then((m) => ({ default: m.WeddingDayOfTab })),
+)
 const ProposalBuilderPage = lazy(() =>
   import('@/pages/mariages/ProposalBuilderPage').then((m) => ({ default: m.ProposalBuilderPage })),
 )
@@ -39,6 +48,9 @@ const FinancesGlobalPage = lazy(() =>
 )
 const PropositionsGlobalPage = lazy(() =>
   import('@/pages/PropositionsGlobalPage').then((m) => ({ default: m.PropositionsGlobalPage })),
+)
+const ParametresPage = lazy(() =>
+  import('@/pages/ParametresPage').then((m) => ({ default: m.ParametresPage })),
 )
 
 export function AppRouter() {
@@ -60,6 +72,9 @@ export function AppRouter() {
             <Route path="prestataires" element={<WeddingVendorsTab />} />
             <Route path="finances" element={<WeddingFinancesTab />} />
             <Route path="documents" element={<WeddingDocumentsTab />} />
+            <Route path="prestations" element={<WeddingSoldServicesTab />} />
+            <Route path="materiel" element={<WeddingEquipmentTab />} />
+            <Route path="jour-j" element={<WeddingDayOfTab />} />
             <Route path="documents/propositions/:proposalId" element={<ProposalBuilderPage />} />
             <Route path="documents/factures/:invoiceId" element={<InvoicePreviewPage />} />
           </Route>
@@ -71,6 +86,7 @@ export function AppRouter() {
         <Route path="propositions" element={<PropositionsGlobalPage />} />
         <Route path="finances" element={<FinancesGlobalPage />} />
         <Route path="parametres" element={<ParametresPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   )

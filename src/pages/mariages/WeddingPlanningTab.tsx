@@ -46,6 +46,7 @@ function toEventPatch(values: TimelineEventFormValues) {
     type: values.type as TimelineEvent['type'],
     status: values.status as TimelineEvent['status'],
     notes: values.notes.trim() || undefined,
+    phase: values.phase ? (values.phase as TimelineEvent['phase']) : undefined,
   }
 }
 

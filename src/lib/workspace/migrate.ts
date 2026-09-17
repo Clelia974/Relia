@@ -126,6 +126,32 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
       vendorWeddingLinks: [...(Array.isArray(data.vendorWeddingLinks) ? data.vendorWeddingLinks : []), ...links],
     }
   },
+
+  /**
+   * v4 → v5 (Phase 1) : ajoute les prestations vendues (SoldService), qui
+   * matérialisent — une fois une proposition approuvée — ce qui a réellement
+   * été vendu au client, distinct des lignes de la proposition (qui peuvent
+   * encore changer après approbation via un scope change). Aucune donnée
+   * existante n'est concernée : le tableau démarre vide, à peupler ensuite
+   * depuis une proposition approuvée.
+   */
+  4: (data) => ({ ...data, schemaVersion: 5, soldServices: [] }),
+
+  /**
+   * v5 → v6 (Phase 2) : ajoute la checklist matériel (EquipmentItem) par
+   * mariage. Aucune donnée existante n'est concernée : le tableau démarre
+   * vide.
+   */
+  5: (data) => ({ ...data, schemaVersion: 6, equipmentItems: [] }),
+
+  /**
+   * v6 → v7 (Phase 3) : ajoute un champ `phase` facultatif (installation /
+   * cérémonie / réception / démontage) sur Task et TimelineEvent, pour le
+   * filtrage de la Vue Jour J. Purement additif — aucune transformation de
+   * données existantes, `phase` reste simplement absent sur les tâches et
+   * moments déjà créés.
+   */
+  6: (data) => ({ ...data, schemaVersion: 7 }),
 }
 
 /**

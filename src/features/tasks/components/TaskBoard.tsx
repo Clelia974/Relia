@@ -48,6 +48,7 @@ function toTaskPatch(values: TaskFormValues) {
     waitingOn: values.status === 'en_attente' && values.waitingOn ? (values.waitingOn as Task['waitingOn']) : undefined,
     waitingReason: values.status === 'en_attente' ? values.waitingReason.trim() || undefined : undefined,
     notes: values.notes.trim() || undefined,
+    phase: values.phase ? (values.phase as Task['phase']) : undefined,
   }
 }
 

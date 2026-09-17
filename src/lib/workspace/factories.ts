@@ -27,9 +27,11 @@ export function createEmptyWorkspace(): Workspace {
     expenses: [],
     scopeChanges: [],
     proposals: [],
+    soldServices: [],
     proposalTemplates: createDefaultProposalTemplates(),
     clientDecisions: [],
     invoices: [],
+    equipmentItems: [],
     uiPreferences: { theme: 'system' },
     ignoredConflictIds: [],
   }
@@ -598,9 +600,11 @@ export function createDemoWorkspace(): Workspace {
     expenses,
     scopeChanges,
     proposals: [],
+    soldServices: [],
     proposalTemplates: createDefaultProposalTemplates(),
     clientDecisions,
     invoices: [],
+    equipmentItems: [],
     uiPreferences: { theme: 'system' },
     ignoredConflictIds: [],
   }

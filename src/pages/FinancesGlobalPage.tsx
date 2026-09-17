@@ -30,11 +30,17 @@ export function FinancesGlobalPage() {
       .sort((a, b) => a.wedding.date.localeCompare(b.wedding.date))
   }, [weddings, vendors, vendorWeddingLinks, expenses, scopeChanges])
 
+  // Un mariage sans coût renseigné a totalCosts=0 par construction (cf.
+  // calculations.ts) : l'inclure dans les totaux gonflerait artificiellement
+  // le profit affiché. Les totaux agrégés ne portent donc que sur les
+  // mariages "calculables" — même périmètre que la marge moyenne, pour que
+  // revenu/coûts/profit restent cohérents entre eux.
   const calculable = rows.filter((r) => r.financials.marginStatus !== null)
+  const incompleteCount = rows.length - calculable.length
   const totals = {
-    revenue: rows.reduce((sum, r) => sum + r.financials.approvedRevenue, 0),
-    costs: rows.reduce((sum, r) => sum + r.financials.totalCosts, 0),
-    profit: rows.reduce((sum, r) => sum + r.financials.profit, 0),
+    revenue: calculable.reduce((sum, r) => sum + r.financials.approvedRevenue, 0),
+    costs: calculable.reduce((sum, r) => sum + r.financials.totalCosts, 0),
+    profit: calculable.reduce((sum, r) => sum + r.financials.profit, 0),
     averageMarginPct: calculable.length > 0 ? calculable.reduce((sum, r) => sum + r.financials.marginPct, 0) / calculable.length : 0,
   }
 
@@ -57,6 +63,13 @@ export function FinancesGlobalPage() {
             <SummaryCard label="Profit prévisionnel" value={currency.format(totals.profit)} />
             <SummaryCard label="Marge moyenne" value={calculable.length > 0 ? `${Math.round(totals.averageMarginPct)} %` : '—'} />
           </div>
+
+          {incompleteCount > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Dont {incompleteCount} mariage{incompleteCount > 1 ? 's' : ''} à données incomplètes, non comptabilisé
+              {incompleteCount > 1 ? 's' : ''} dans les totaux ci-dessus.
+            </p>
+          )}
 
           <div className="flex flex-col gap-2.5">
             {rows.map(({ wedding, financials }) => (

@@ -29,6 +29,8 @@ export const TaskFormSchema = z.object({
   waitingOn: z.string(),
   waitingReason: z.string().trim(),
   notes: z.string().trim(),
+  /** Phase du jour J (Vue Jour J, Phase 3) — chaîne vide = non classée, jamais obligatoire. */
+  phase: z.string(),
 })
 
 export type TaskFormValues = z.infer<typeof TaskFormSchema>
@@ -47,5 +49,6 @@ export function emptyTaskFormValues(defaultWeddingId?: string): TaskFormValues {
     waitingOn: '',
     waitingReason: '',
     notes: '',
+    phase: '',
   }
 }

@@ -28,6 +28,8 @@ export const TimelineEventFormSchema = z
     type: z.enum(['jalon', 'jour_j', 'livraison_prestataire']),
     status: z.string().min(1),
     notes: z.string().trim(),
+    /** Phase du jour J (Vue Jour J, Phase 3) — chaîne vide = non classée, jamais obligatoire. */
+    phase: z.string(),
   })
   .refine((values) => values.startTime === '' || values.endTime === '' || values.endTime !== values.startTime, {
     // Une heure de fin antérieure à l'heure de début est désormais valide :
@@ -56,5 +58,6 @@ export function emptyTimelineEventFormValues(defaultDate?: string): TimelineEven
     type: 'jalon',
     status: 'prevu',
     notes: '',
+    phase: '',
   }
 }

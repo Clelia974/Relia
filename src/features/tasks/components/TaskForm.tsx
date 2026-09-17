@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { emptyTaskFormValues, TaskFormSchema, type TaskFormValues } from '@/features/tasks/taskForm.schema'
+import { DAY_PHASE_LABELS, DAY_PHASE_OPTIONS } from '@/lib/dayPhase'
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_OPTIONS } from '@/lib/taskPriority'
 import { TASK_STATUS_LABELS, TASK_STATUS_OPTIONS } from '@/lib/taskStatus'
 import { TASK_WAITING_ON_LABELS, TASK_WAITING_ON_OPTIONS } from '@/lib/taskWaitingOn'
@@ -37,6 +38,7 @@ function toFormValues(task: Task): TaskFormValues {
     waitingOn: task.waitingOn ?? '',
     waitingReason: task.waitingReason ?? '',
     notes: task.notes ?? '',
+    phase: task.phase ?? '',
   }
 }
 
@@ -249,6 +251,22 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
               </Field>
             </div>
           )}
+
+          <Field label="Phase du jour J" htmlFor="t-phase" optional>
+            <Select value={values.phase || 'aucune'} onValueChange={(v) => setField('phase', v === 'aucune' ? '' : v)}>
+              <SelectTrigger id="t-phase" className="w-full">
+                <SelectValue placeholder="Non classée" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="aucune">Non classée</SelectItem>
+                {DAY_PHASE_OPTIONS.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {DAY_PHASE_LABELS[p]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
 
           <Field label="Notes" htmlFor="t-notes" optional>
             <Textarea id="t-notes" rows={2} value={values.notes} onChange={(e) => setField('notes', e.target.value)} />
