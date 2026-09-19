@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
+import { EmptyState } from '@/components/EmptyState'
 import { getWeddingFinancials } from '@/features/finances/calculations'
 import { MarginStatusBadge } from '@/features/finances/components/MarginStatusBadge'
+import { currency } from '@/lib/currency'
 import { useWorkspaceStore } from '@/store/workspaceStore'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 export function FinancesGlobalPage() {
   const weddings = useWorkspaceStore((s) => s.workspace.weddings)
@@ -52,12 +52,10 @@ export function FinancesGlobalPage() {
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucun mariage actif pour l'instant.
-        </p>
+        <EmptyState description="Aucun mariage actif pour l'instant." />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard label="Chiffre d'affaires approuvé" value={currency.format(totals.revenue)} />
             <SummaryCard label="Coûts totaux" value={currency.format(totals.costs)} />
             <SummaryCard label="Profit prévisionnel" value={currency.format(totals.profit)} />

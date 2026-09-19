@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react'
+import { useMemo, type MouseEvent, type ReactNode } from 'react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useShallow } from 'zustand/react/shallow'
 import { Button } from '@/components/ui/button'
 import { BlockerList } from '@/features/dashboard/components/BlockerList'
 import { ProfitOverview } from '@/features/dashboard/components/ProfitOverview'
@@ -12,15 +13,30 @@ import { UpcomingEvents } from '@/features/dashboard/components/UpcomingEvents'
 import { getDashboardSummary } from '@/features/dashboard/summary'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
-function StatCard({ href, value, label }: { href: string; value: number; label: string }) {
+function StatCard({ targetId, value, label }: { targetId: string; value: number; label: string }) {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    const target = document.getElementById(targetId)
+    if (!target) return
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Classe ajoutée/retirée avec un reflow forcé entre les deux : garantit
+    // que l'animation rejoue même en recliquant la même carte deux fois de
+    // suite (sinon le navigateur ignore une classe déjà présente).
+    target.classList.remove('dashboard-target-flash')
+    void target.offsetWidth
+    target.classList.add('dashboard-target-flash')
+  }
+
   return (
-    <Link
-      to={href}
-      className="flex flex-col gap-0.5 rounded-lg border border-border bg-card p-4 transition-colors hover:border-thread/50 hover:bg-accent"
+    <a
+      href={`#${targetId}`}
+      onClick={handleClick}
+      className="flex flex-col gap-0.5 rounded-lg border border-border bg-card p-4 transition-colors hover:border-thread/50 hover:bg-accent active:scale-[0.98]"
     >
       <span className="font-heading text-2xl font-semibold tabular-nums text-foreground">{value}</span>
       <span className="text-xs text-muted-foreground">{label}</span>
-    </Link>
+    </a>
   )
 }
 
@@ -29,10 +45,23 @@ function Column({ children }: { children: ReactNode }) {
 }
 
 export function AujourdHuiPage() {
-  const workspace = useWorkspaceStore((s) => s.workspace)
-  const displayName = workspace.userProfile.displayName.trim()
-  const today = new Date()
-  const summary = getDashboardSummary(workspace, today)
+  const displayName = useWorkspaceStore((s) => s.workspace.userProfile.displayName.trim())
+  const dashboardWorkspace = useWorkspaceStore(
+    useShallow((s) => ({
+      weddings: s.workspace.weddings,
+      tasks: s.workspace.tasks,
+      clientDecisions: s.workspace.clientDecisions,
+      vendors: s.workspace.vendors,
+      timelineEvents: s.workspace.timelineEvents,
+      ignoredConflictIds: s.workspace.ignoredConflictIds,
+      vendorWeddingLinks: s.workspace.vendorWeddingLinks,
+    })),
+  )
+  // Figé au montage plutôt que recréé à chaque rendu : une nouvelle Date() à
+  // chaque rendu casserait la mémoïsation de `summary` ci-dessous (dépendance
+  // toujours différente), sans bénéfice réel sur une session d'une journée.
+  const today = useMemo(() => new Date(), [])
+  const summary = useMemo(() => getDashboardSummary(dashboardWorkspace, today), [dashboardWorkspace, today])
 
   if (!summary.hasAnyWedding) {
     return (
@@ -54,27 +83,31 @@ export function AujourdHuiPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div>
         <h1 className="font-heading text-2xl font-semibold text-foreground">Bonjour{displayName && ` ${displayName}`}</h1>
-        <p className="mt-1 text-sm capitalize text-muted-foreground">{format(today, 'EEEE d MMMM', { locale: fr })}</p>
-        <p className="mt-1 text-sm text-muted-foreground">Voici ce qui mérite votre attention aujourd'hui.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          <span className="capitalize">{format(today, 'EEEE d MMMM', { locale: fr })}</span>
+          {' · '}Voici ce qui mérite votre attention aujourd'hui.
+        </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard href="#actions-du-jour" value={summary.todayActionsCount} label={`action${summary.todayActionsCount !== 1 ? 's' : ''} aujourd'hui`} />
-        <StatCard href="#actions-du-jour" value={summary.pendingResponsesCount} label={`réponse${summary.pendingResponsesCount !== 1 ? 's' : ''} en attente`} />
-        <StatCard href="#alertes" value={summary.planningAlertsCount} label={`alerte${summary.planningAlertsCount !== 1 ? 's' : ''} planning`} />
-        <StatCard href="#mariages-a-surveiller" value={summary.watchedWeddingsCount} label={`mariage${summary.watchedWeddingsCount !== 1 ? 's' : ''} à surveiller`} />
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard targetId="actions-du-jour" value={summary.todayActionsCount} label={`action${summary.todayActionsCount !== 1 ? 's' : ''} aujourd'hui`} />
+        <StatCard targetId="actions-du-jour" value={summary.pendingResponsesCount} label={`réponse${summary.pendingResponsesCount !== 1 ? 's' : ''} en attente`} />
+        <StatCard targetId="alertes" value={summary.planningAlertsCount} label={`alerte${summary.planningAlertsCount !== 1 ? 's' : ''} planning`} />
+        <StatCard targetId="mariages-a-surveiller" value={summary.watchedWeddingsCount} label={`mariage${summary.watchedWeddingsCount !== 1 ? 's' : ''} à surveiller`} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         <Column>
           <TaskDigest />
-          <RiskWatch />
         </Column>
         <Column>
+          <RiskWatch />
           <UpcomingEvents />
+        </Column>
+        <Column>
           <BlockerList />
           <ProfitOverview />
         </Column>

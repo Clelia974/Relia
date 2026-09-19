@@ -2,22 +2,35 @@ import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
-import { MariagesListPage } from '@/pages/mariages/MariagesListPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
-import { WeddingTasksTab } from '@/pages/mariages/WeddingTasksTab'
-import { WeddingVendorsTab } from '@/pages/mariages/WeddingVendorsTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
-import { PrestatairesGlobalPage } from '@/pages/PrestatairesGlobalPage'
 import { RootGate } from '@/pages/RootGate'
-import { TachesGlobalPage } from '@/pages/TachesGlobalPage'
 
 // Chargées à la demande : pages lourdes (Gantt, calculs de proposition/facture,
 // calendrier) peu visitées au premier chargement — cf. Phase 10.
 const CalendrierGlobalPage = lazy(() =>
   import('@/pages/CalendrierGlobalPage').then((m) => ({ default: m.CalendrierGlobalPage })),
+)
+// Chargées à la demande : pas la route d'atterrissage, jamais importées
+// ailleurs que par ce routeur (cf. audit de performance) — sûres à retirer
+// du chunk initial sans risque de rendu synchrone dupliqué.
+const MariagesListPage = lazy(() =>
+  import('@/pages/mariages/MariagesListPage').then((m) => ({ default: m.MariagesListPage })),
+)
+const WeddingTasksTab = lazy(() =>
+  import('@/pages/mariages/WeddingTasksTab').then((m) => ({ default: m.WeddingTasksTab })),
+)
+const WeddingVendorsTab = lazy(() =>
+  import('@/pages/mariages/WeddingVendorsTab').then((m) => ({ default: m.WeddingVendorsTab })),
+)
+const TachesGlobalPage = lazy(() =>
+  import('@/pages/TachesGlobalPage').then((m) => ({ default: m.TachesGlobalPage })),
+)
+const PrestatairesGlobalPage = lazy(() =>
+  import('@/pages/PrestatairesGlobalPage').then((m) => ({ default: m.PrestatairesGlobalPage })),
 )
 const WeddingPlanningTab = lazy(() =>
   import('@/pages/mariages/WeddingPlanningTab').then((m) => ({ default: m.WeddingPlanningTab })),

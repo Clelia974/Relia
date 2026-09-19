@@ -1,9 +1,20 @@
 import { Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { type BadgeTone, toneClass } from '@/lib/badgeTone'
 import { EQUIPMENT_ACQUISITION_MODE_LABELS } from '@/lib/equipmentAcquisitionMode'
 import { EQUIPMENT_STATUS_LABELS, EQUIPMENT_STATUS_OPTIONS } from '@/lib/equipmentStatus'
+import { cn } from '@/lib/utils'
 import type { EquipmentItem, EquipmentStatus } from '@/types/entities'
+
+const STATUS_TONE: Record<EquipmentStatus, BadgeTone> = {
+  a_prevoir: 'muted',
+  pret: 'warning',
+  charge: 'warning',
+  installe: 'success',
+  recupere: 'success',
+}
 
 interface EquipmentItemCardProps {
   item: EquipmentItem
@@ -25,7 +36,7 @@ export function EquipmentItemCard({ item, onEdit, onStatusChange, onDelete }: Eq
             type="button"
             aria-label={`Supprimer ${item.name}`}
             onClick={() => onDelete(item)}
-            className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-risk"
+            className="shrink-0 relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
           >
             <Trash2 className="size-4" aria-hidden="true" />
           </button>
@@ -35,6 +46,10 @@ export function EquipmentItemCard({ item, onEdit, onStatusChange, onDelete }: Eq
           <span>Quantité : {item.quantity}</span>
           <span>{EQUIPMENT_ACQUISITION_MODE_LABELS[item.acquisitionMode]}</span>
         </div>
+
+        <Badge className={cn('w-fit border-transparent font-medium', toneClass(STATUS_TONE[item.status]))}>
+          {EQUIPMENT_STATUS_LABELS[item.status]}
+        </Badge>
 
         {item.notes && <p className="text-xs text-muted-foreground">{item.notes}</p>}
 

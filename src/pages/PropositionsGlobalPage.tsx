@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
 import { FilterPills, type FilterOption } from '@/components/FilterPills'
+import { EmptyState } from '@/components/EmptyState'
 import { ProposalStatusBadge } from '@/features/proposals/components/ProposalStatusBadge'
+import { currency } from '@/lib/currency'
+import { formatShortDate } from '@/lib/dateFormat'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { ProposalStatus } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 type FilterKey = 'toutes' | ProposalStatus
 
@@ -49,9 +48,7 @@ export function PropositionsGlobalPage() {
       <FilterPills options={FILTERS} value={filter} onChange={setFilter} ariaLabel="Filtrer les propositions" />
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucune proposition ne correspond à ce filtre.
-        </p>
+        <EmptyState description="Aucune proposition ne correspond à ce filtre." />
       ) : (
         <div className="flex flex-col gap-2.5">
           {rows.map(({ proposal, wedding }) => (
@@ -67,7 +64,7 @@ export function PropositionsGlobalPage() {
               <span className="text-muted-foreground">{wedding ? wedding.coupleName : 'Mariage supprimé'}</span>
               <ProposalStatusBadge status={proposal.status} />
               <span className="font-medium tabular-nums text-foreground">{currency.format(proposal.total)}</span>
-              <span className="text-xs text-muted-foreground">Mis à jour le {format(new Date(proposal.updatedAt), 'd MMM yyyy', { locale: fr })}</span>
+              <span className="text-xs text-muted-foreground">Mis à jour le {formatShortDate(proposal.updatedAt)}</span>
             </Link>
           ))}
         </div>

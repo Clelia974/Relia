@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { EmptyState } from '@/components/EmptyState'
 import { FilterPills } from '@/components/FilterPills'
 import { MariageCard } from '@/features/weddings/components/MariageCard'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -127,11 +128,9 @@ export function MariagesListPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucun mariage ne correspond à votre recherche.
-        </p>
+        <EmptyState description="Aucun mariage ne correspond à votre recherche." />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((wedding) => (
             <MariageCard
               key={wedding.id}

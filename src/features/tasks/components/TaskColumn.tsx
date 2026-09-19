@@ -32,6 +32,7 @@ export function TaskColumn({
   onDropTask,
 }: TaskColumnProps) {
   const [dragOver, setDragOver] = useState(false)
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null)
 
   return (
     <div
@@ -64,7 +65,13 @@ export function TaskColumn({
             onDragStart={(e) => {
               e.dataTransfer.setData('text/plain', task.id)
               e.dataTransfer.effectAllowed = 'move'
+              setDraggingTaskId(task.id)
             }}
+            onDragEnd={() => setDraggingTaskId(null)}
+            className={cn(
+              'cursor-grab transition-opacity active:cursor-grabbing',
+              draggingTaskId === task.id && 'opacity-50 shadow-lg',
+            )}
           >
             <TaskCard
               task={task}

@@ -1,13 +1,12 @@
 import { useOutletContext } from 'react-router-dom'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { buildClosingReport, computeClosingSummary } from '@/features/closing/closingSummary'
 import { ClosingFeedbackForm } from '@/features/closing/components/ClosingFeedbackForm'
 import { ClosingPortfolio } from '@/features/closing/components/ClosingPortfolio'
 import { ClosingSummaryStats } from '@/features/closing/components/ClosingSummaryStats'
+import { formatShortDate } from '@/lib/dateFormat'
 import { downloadJson } from '@/lib/downloadFile'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
@@ -78,7 +77,7 @@ export function WeddingClosingTab() {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground">Clôture &amp; bilan</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Clôturé le {format(new Date(closing.closingDate), 'd MMM yyyy', { locale: fr })}
+            Clôturé le {formatShortDate(closing.closingDate)}
           </p>
         </div>
         <div className="flex gap-2">

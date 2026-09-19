@@ -1,5 +1,3 @@
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { MoreHorizontal } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,19 +8,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { type BadgeTone, toneClass } from '@/lib/badgeTone'
+import { currencyAbsolute as currency } from '@/lib/currency'
+import { formatShortDate } from '@/lib/dateFormat'
 import { SCOPE_CHANGE_STATUS_LABELS, isScopeChangeBillable } from '@/lib/scopeChangeStatus'
 import { cn } from '@/lib/utils'
 import type { ScopeChange } from '@/types/entities'
 
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0, signDisplay: 'never' })
-
-const STATUS_TONE: Record<ScopeChange['status'], string> = {
-  proposee: 'bg-muted text-muted-foreground',
-  a_envoyer: 'bg-muted text-muted-foreground',
-  en_attente_approbation: 'bg-warning-bg text-warning',
-  approuvee: 'bg-success-bg text-success',
-  realisee: 'bg-success-bg text-success',
-  rejetee: 'bg-risk-bg text-risk',
+const STATUS_TONE: Record<ScopeChange['status'], BadgeTone> = {
+  proposee: 'muted',
+  a_envoyer: 'muted',
+  en_attente_approbation: 'warning',
+  approuvee: 'success',
+  realisee: 'success',
+  rejetee: 'risk',
 }
 
 const PENDING_STATUSES: ScopeChange['status'][] = ['proposee', 'a_envoyer', 'en_attente_approbation']
@@ -47,18 +47,23 @@ export function ScopeChangeCard({ scopeChange, impact, onApprove, onReject, onEd
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="font-medium text-foreground">{scopeChange.description}</p>
-            <p className="text-xs text-muted-foreground">{format(new Date(scopeChange.date), 'd MMM yyyy', { locale: fr })}</p>
+            <p className="text-xs text-muted-foreground">{formatShortDate(scopeChange.date)}</p>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label={`Actions pour ${scopeChange.description}`}
-                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              >
-                <MoreHorizontal className="size-4" aria-hidden="true" />
-              </button>
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`Actions pour ${scopeChange.description}`}
+                    className="shrink-0 relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <MoreHorizontal className="size-4" aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Actions</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => onEdit(scopeChange)}>Modifier</DropdownMenuItem>
               <DropdownMenuItem variant="destructive" onSelect={() => onDelete(scopeChange)}>
@@ -68,11 +73,11 @@ export function ScopeChangeCard({ scopeChange, impact, onApprove, onReject, onEd
           </DropdownMenu>
         </div>
 
-        <Badge className={cn('w-fit border-transparent font-medium', STATUS_TONE[scopeChange.status])}>
+        <Badge className={cn('w-fit border-transparent font-medium', toneClass(STATUS_TONE[scopeChange.status]))}>
           {SCOPE_CHANGE_STATUS_LABELS[scopeChange.status]}
         </Badge>
 
-        <dl className="grid grid-cols-3 gap-2 text-sm">
+        <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
           <div>
             <dt className="text-xs text-muted-foreground">Coût fournisseur</dt>
             <dd className="tabular-nums text-foreground">{currency.format(scopeChange.vendorCost)}</dd>

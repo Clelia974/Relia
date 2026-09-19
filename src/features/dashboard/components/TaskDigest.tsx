@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CircleCheck, Clock3 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { useShallow } from 'zustand/react/shallow'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +22,8 @@ import type { TaskFormValues } from '@/features/tasks/taskForm.schema'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { Task, TaskPriority, TaskStatus } from '@/types/entities'
 
+const MAX_VISIBLE = 5
+
 function toTaskPatch(values: TaskFormValues) {
   return {
     title: values.title.trim(),
@@ -38,16 +42,18 @@ function toTaskPatch(values: TaskFormValues) {
 }
 
 export function TaskDigest() {
-  const workspace = useWorkspaceStore((s) => s.workspace)
+  const { weddings: allWeddings, vendors, tasks } = useWorkspaceStore(
+    useShallow((s) => ({ weddings: s.workspace.weddings, vendors: s.workspace.vendors, tasks: s.workspace.tasks })),
+  )
   const updateTask = useWorkspaceStore((s) => s.updateTask)
   const updateTaskStatus = useWorkspaceStore((s) => s.updateTaskStatus)
   const completeTask = useWorkspaceStore((s) => s.completeTask)
   const reportTask = useWorkspaceStore((s) => s.reportTask)
   const deleteTask = useWorkspaceStore((s) => s.deleteTask)
 
-  const weddingNameById = new Map(workspace.weddings.map((w) => [w.id, w.coupleName]))
-  const vendorNameById = new Map(workspace.vendors.map((v) => [v.id, v.name]))
-  const weddings = workspace.weddings.filter((w) => !w.archived)
+  const weddingNameById = useMemo(() => new Map(allWeddings.map((w) => [w.id, w.coupleName])), [allWeddings])
+  const vendorNameById = useMemo(() => new Map(vendors.map((v) => [v.id, v.name])), [vendors])
+  const weddings = useMemo(() => allWeddings.filter((w) => !w.archived), [allWeddings])
 
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [formOpen, setFormOpen] = useState(false)
@@ -55,7 +61,8 @@ export function TaskDigest() {
   const [postponeOpen, setPostponeOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<Task | null>(null)
 
-  const { items, waiting } = getTodayActions(workspace)
+  const { items, waiting } = useMemo(() => getTodayActions({ weddings: allWeddings, tasks }), [allWeddings, tasks])
+  const visibleItems = items.slice(0, MAX_VISIBLE)
 
   const openEdit = (task: Task) => {
     setEditingTask(task)
@@ -108,7 +115,7 @@ export function TaskDigest() {
         <CardTitle>Que dois-je faire aujourd'hui ?</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        {workspace.tasks.length === 0 ? (
+        {tasks.length === 0 ? (
           <div>
             <p className="text-sm font-medium text-foreground">Tout est calme pour aujourd'hui.</p>
             <p className="mt-1 text-sm text-muted-foreground">Aucune action urgente pour le moment.</p>
@@ -119,7 +126,14 @@ export function TaskDigest() {
             Tout est à jour pour aujourd'hui ✓
           </p>
         ) : (
-          <TaskList tasks={items} weddingNameById={weddingNameById} vendorNameById={vendorNameById} {...cardActions} />
+          <>
+            <TaskList tasks={visibleItems} weddingNameById={weddingNameById} vendorNameById={vendorNameById} {...cardActions} />
+            {items.length > MAX_VISIBLE && (
+              <p className="text-xs text-muted-foreground">
+                +{items.length - MAX_VISIBLE} autre{items.length - MAX_VISIBLE !== 1 ? 's' : ''} action{items.length - MAX_VISIBLE !== 1 ? 's' : ''} aujourd'hui.
+              </p>
+            )}
+          </>
         )}
 
         {waiting.length > 0 && (
@@ -128,6 +142,10 @@ export function TaskDigest() {
             {waiting.length} élément{waiting.length !== 1 ? 's' : ''} attend{waiting.length !== 1 ? 'ent' : ''} une réponse.
           </p>
         )}
+
+        <Link to="/taches" className="text-sm text-foreground underline-offset-4 hover:underline">
+          Voir toutes les tâches →
+        </Link>
       </CardContent>
 
       <TaskForm
@@ -136,7 +154,7 @@ export function TaskDigest() {
         onOpenChange={setFormOpen}
         task={editingTask}
         weddings={weddings}
-        vendors={workspace.vendors}
+        vendors={vendors}
         onSubmit={handleSubmit}
       />
 

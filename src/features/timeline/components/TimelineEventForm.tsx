@@ -104,7 +104,7 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
             />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Type de moment" htmlFor="e-type">
               <Select value={values.type} onValueChange={(v) => setField('type', v as TimelineEventFormValues['type'])}>
                 <SelectTrigger id="e-type" className="w-full">
@@ -135,7 +135,7 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Field label="Date" htmlFor="e-date" error={errors.date}>
               <Input
                 id="e-date"
@@ -175,7 +175,7 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
               : 'calculée automatiquement une fois les deux heures renseignées.'}
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Lieu" htmlFor="e-location" optional>
               <Input id="e-location" value={values.location} onChange={(e) => setField('location', e.target.value)} />
             </Field>
@@ -211,7 +211,7 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
             </Label>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Marge de sécurité avant" htmlFor="e-buffer-before" error={errors.bufferBeforeMinutes} optional>
               <Input
                 id="e-buffer-before"

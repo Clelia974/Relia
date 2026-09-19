@@ -24,6 +24,7 @@ export function ClosingPortfolio({ weddingId, closing }: ClosingPortfolioProps) 
 
   const images = closing.portfolioImages
   const canAddMore = images.length < MAX_IMAGES
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleFileChosen = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -37,9 +38,14 @@ export function ClosingPortfolio({ weddingId, closing }: ClosingPortfolioProps) 
       toast.error('Cette image doit faire moins de 500 Ko.')
       return
     }
-    const dataUrl = await readFileAsDataUrl(file)
-    addPortfolioImage(weddingId, dataUrl, caption.trim() || undefined)
-    setCaption('')
+    setIsUploading(true)
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
+      addPortfolioImage(weddingId, dataUrl, caption.trim() || undefined)
+      setCaption('')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return (
@@ -53,7 +59,7 @@ export function ClosingPortfolio({ weddingId, closing }: ClosingPortfolioProps) 
             onChange={(e) => setCaption(e.target.value)}
           />
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChosen} className="hidden" />
-          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="w-fit">
+          <Button type="button" variant="outline" loading={isUploading} onClick={() => fileInputRef.current?.click()} className="w-fit">
             Choisir une image
           </Button>
         </div>
@@ -66,7 +72,7 @@ export function ClosingPortfolio({ weddingId, closing }: ClosingPortfolioProps) 
           Aucune image pour l'instant.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {images.map((img) => (
             <div key={img.id} className="flex flex-col gap-2 overflow-hidden rounded-lg border border-border bg-card">
               <img src={img.dataUrl} alt={img.caption ?? ''} className="h-40 w-full object-cover" />

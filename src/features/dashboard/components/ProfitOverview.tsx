@@ -1,12 +1,21 @@
+import { useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getProfitOverview } from '@/features/dashboard/summary'
+import { currency } from '@/lib/currency'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
-
 export function ProfitOverview() {
-  const workspace = useWorkspaceStore((s) => s.workspace)
-  const data = getProfitOverview(workspace)
+  const profitWorkspace = useWorkspaceStore(
+    useShallow((s) => ({
+      weddings: s.workspace.weddings,
+      vendors: s.workspace.vendors,
+      vendorWeddingLinks: s.workspace.vendorWeddingLinks,
+      expenses: s.workspace.expenses,
+      scopeChanges: s.workspace.scopeChanges,
+    })),
+  )
+  const data = useMemo(() => getProfitOverview(profitWorkspace), [profitWorkspace])
 
   return (
     <Card>
@@ -19,7 +28,7 @@ export function ProfitOverview() {
             Votre résumé de rentabilité apparaîtra après l'ajout de montants et de coûts.
           </p>
         ) : (
-          <dl className="grid grid-cols-2 gap-4 text-sm">
+          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-xs text-muted-foreground">Marge moyenne</dt>
               <dd className="font-heading text-xl font-semibold tabular-nums text-foreground">

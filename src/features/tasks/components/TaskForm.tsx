@@ -1,6 +1,4 @@
 import { type FormEvent, useState } from 'react'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -9,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { emptyTaskFormValues, TaskFormSchema, type TaskFormValues } from '@/features/tasks/taskForm.schema'
 import { DAY_PHASE_LABELS, DAY_PHASE_OPTIONS } from '@/lib/dayPhase'
+import { formatShortDate } from '@/lib/dateFormat'
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_OPTIONS } from '@/lib/taskPriority'
 import { TASK_STATUS_LABELS, TASK_STATUS_OPTIONS } from '@/lib/taskStatus'
 import { TASK_WAITING_ON_LABELS, TASK_WAITING_ON_OPTIONS } from '@/lib/taskWaitingOn'
@@ -110,7 +109,7 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
             />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Mariage associé" htmlFor="t-wedding" error={errors.weddingId}>
               <Select value={values.weddingId} onValueChange={handleWeddingChange}>
                 <SelectTrigger
@@ -152,7 +151,7 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Field label="Date d'échéance" htmlFor="t-due" error={errors.dueDate}>
               <Input
                 id="t-due"
@@ -179,15 +178,15 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
                 .reverse()
                 .map((entry, i) => (
                   <p key={i}>
-                    Du {format(new Date(entry.fromDate), 'd MMM yyyy', { locale: fr })} au{' '}
-                    {format(new Date(entry.toDate), 'd MMM yyyy', { locale: fr })}
+                    Du {formatShortDate(entry.fromDate)} au{' '}
+                    {formatShortDate(entry.toDate)}
                     {entry.reason ? ` — ${entry.reason}` : ''}
                   </p>
                 ))}
             </div>
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Priorité" htmlFor="t-priority" error={errors.priority}>
               <Select value={values.priority} onValueChange={(v) => setField('priority', v)}>
                 <SelectTrigger
@@ -230,7 +229,7 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
           </div>
 
           {values.status === 'en_attente' && (
-            <div className="grid gap-4 rounded-lg border border-border bg-muted/40 p-3 sm:grid-cols-2">
+            <div className="grid gap-4 rounded-lg border border-border bg-muted/40 p-3 grid-cols-1 sm:grid-cols-2">
               <Field label="En attente de" htmlFor="t-waiting-on" optional>
                 <Select value={values.waitingOn || 'aucun'} onValueChange={(v) => setField('waitingOn', v === 'aucun' ? '' : v)}>
                   <SelectTrigger id="t-waiting-on" className="w-full">

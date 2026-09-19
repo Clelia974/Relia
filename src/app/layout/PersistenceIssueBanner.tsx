@@ -15,7 +15,6 @@ export function PersistenceIssueBanner() {
   const persistenceIssue = usePersistenceStatus((s) => s.persistenceIssue)
   const clearPersistenceIssue = usePersistenceStatus((s) => s.clearPersistenceIssue)
   const retryPersist = useWorkspaceStore((s) => s.retryPersist)
-  const workspace = useWorkspaceStore((s) => s.workspace)
 
   if (!persistenceIssue) return null
 
@@ -29,7 +28,7 @@ export function PersistenceIssueBanner() {
             <Button size="sm" variant="outline" onClick={retryPersist}>
               Réessayer
             </Button>
-            <Button size="sm" onClick={() => exportWorkspaceToFile(workspace)}>
+            <Button size="sm" onClick={() => exportWorkspaceToFile(useWorkspaceStore.getState().workspace)}>
               Exporter une sauvegarde
             </Button>
             <Button size="sm" variant="ghost" onClick={clearPersistenceIssue}>

@@ -1,5 +1,7 @@
+import { useMemo } from 'react'
 import { ShieldCheck, TriangleAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useShallow } from 'zustand/react/shallow'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getWeddingRisks } from '@/features/dashboard/summary'
@@ -10,9 +12,20 @@ import { useWorkspaceStore } from '@/store/workspaceStore'
 const MAX_VISIBLE = 3
 
 export function RiskWatch() {
-  const workspace = useWorkspaceStore((s) => s.workspace)
-  const risks = getWeddingRisks(workspace).filter((r) => r.level !== 'faible')
-  const visible = risks.slice(0, MAX_VISIBLE)
+  const riskWorkspace = useWorkspaceStore(
+    useShallow((s) => ({
+      weddings: s.workspace.weddings,
+      vendors: s.workspace.vendors,
+      tasks: s.workspace.tasks,
+      clientDecisions: s.workspace.clientDecisions,
+      timelineEvents: s.workspace.timelineEvents,
+      ignoredConflictIds: s.workspace.ignoredConflictIds,
+    })),
+  )
+  const visible = useMemo(
+    () => getWeddingRisks(riskWorkspace).filter((r) => r.level !== 'faible').slice(0, MAX_VISIBLE),
+    [riskWorkspace],
+  )
 
   return (
     <Card id="mariages-a-surveiller">

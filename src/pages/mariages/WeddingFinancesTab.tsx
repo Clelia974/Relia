@@ -29,11 +29,10 @@ import { ScopeChangeCard } from '@/features/finances/components/ScopeChangeCard'
 import { ScopeChangeForm } from '@/features/finances/components/ScopeChangeForm'
 import type { ExpenseFormValues } from '@/features/finances/expenseForm.schema'
 import type { ScopeChangeFormValues } from '@/features/finances/scopeChangeForm.schema'
+import { currency } from '@/lib/currency'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { Expense, ExpenseCategory, ExpenseStatus, ScopeChange, ScopeChangeStatus } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 function toExpensePatch(weddingId: string, values: ExpenseFormValues) {
   return {
@@ -101,7 +100,7 @@ export function WeddingFinancesTab() {
     }
     if (parsed === wedding.soldAmount) return
     updateWedding(wedding.id, { soldAmount: parsed })
-    toast.success('Montant vendu mis à jour.')
+    toast.success('Montant du contrat mis à jour.')
   }
 
   const openCreateExpense = () => {
@@ -191,11 +190,11 @@ export function WeddingFinancesTab() {
         <p className="mt-1 text-sm text-muted-foreground">Suivez la rentabilité de ce mariage.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardContent className="flex flex-col gap-1.5">
             <Label htmlFor="sold-amount" className="text-xs text-muted-foreground">
-              Montant vendu
+              Montant du contrat
             </Label>
             <Input
               id="sold-amount"
@@ -230,7 +229,7 @@ export function WeddingFinancesTab() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {financials.hasSoldAmount ? 'Ajoutez vos premiers coûts.' : 'Ajoutez votre montant vendu.'}
+                    {financials.hasSoldAmount ? 'Ajoutez vos premiers coûts.' : 'Ajoutez votre montant du contrat.'}
                   </p>
                 )}
               </CardContent>
@@ -248,7 +247,7 @@ export function WeddingFinancesTab() {
 
       {showEmptyState && (
         <p className="rounded-lg border border-dashed border-border px-6 py-8 text-center text-sm text-muted-foreground">
-          Ajoutez votre montant vendu et vos premiers coûts pour suivre votre marge.
+          Ajoutez votre montant du contrat et vos premiers coûts pour suivre votre marge.
         </p>
       )}
 
@@ -268,7 +267,7 @@ export function WeddingFinancesTab() {
           <p className="text-sm text-muted-foreground">Aucun prestataire associé à ce mariage.</p>
         ) : (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {vendors.map((vendor) => {
                 const link = linkByVendorId.get(vendor.id)
                 const hasEstimated = link?.estimatedCost !== undefined
@@ -278,7 +277,7 @@ export function WeddingFinancesTab() {
                   <Card key={vendor.id}>
                     <CardContent className="flex flex-col gap-2">
                       <p className="font-medium text-foreground">{vendor.name}</p>
-                      <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
                         <div>
                           <dt className="text-xs text-muted-foreground">Coût estimé</dt>
                           <dd className="tabular-nums text-foreground">{hasEstimated ? currency.format(link!.estimatedCost!) : '—'}</dd>
@@ -312,7 +311,7 @@ export function WeddingFinancesTab() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-lg font-semibold text-foreground">Autres dépenses</h2>
           <Button size="sm" onClick={openCreateExpense}>
             <Plus className="size-4" aria-hidden="true" />
@@ -322,7 +321,7 @@ export function WeddingFinancesTab() {
         {expenses.length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucune autre dépense pour ce mariage.</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {expenses.map((expense) => (
               <ExpenseCard key={expense.id} expense={expense} onEdit={openEditExpense} onDelete={setPendingDeleteExpense} />
             ))}
@@ -331,7 +330,7 @@ export function WeddingFinancesTab() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-lg font-semibold text-foreground">Changements de périmètre</h2>
           <Button size="sm" onClick={openCreateScopeChange}>
             <Plus className="size-4" aria-hidden="true" />
@@ -350,7 +349,7 @@ export function WeddingFinancesTab() {
         {scopeChanges.length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucun changement de périmètre pour ce mariage.</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {scopeChanges.map((sc) => (
               <ScopeChangeCard
                 key={sc.id}

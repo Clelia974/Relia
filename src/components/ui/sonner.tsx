@@ -2,8 +2,11 @@ import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
 /**
- * Pas de next-themes : le thème suit prefers-color-scheme via nos tokens CSS
- * (--popover, --border, etc. ci-dessous), donc "system" convient toujours ici.
+ * Pas de next-themes : le thème résolu (system/light/dark) vient de
+ * useResolvedTheme et est passé explicitement via la prop `theme` par
+ * l'appelant (cf. AppLayout), pour rester synchronisé avec la classe .dark
+ * qui pilote nos tokens CSS (--popover, --border, etc. ci-dessous).
+ * "system" ici ne sert que de repli si jamais Toaster est monté sans prop.
  */
 const Toaster = ({ ...props }: ToasterProps) => {
   return (

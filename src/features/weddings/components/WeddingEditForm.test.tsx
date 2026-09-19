@@ -40,7 +40,7 @@ describe('WeddingEditForm', () => {
     )
     fireEvent.change(screen.getByLabelText('Nom du couple'), { target: { value: 'Camille & Julien' } })
     fireEvent.change(screen.getByLabelText(/lieu du mariage/i), { target: { value: 'Château du Lac' } })
-    fireEvent.change(screen.getByLabelText(/montant vendu/i), { target: { value: '16000' } })
+    fireEvent.change(screen.getByLabelText(/montant du contrat/i), { target: { value: '16000' } })
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
     expect(onSubmit).toHaveBeenCalledWith(

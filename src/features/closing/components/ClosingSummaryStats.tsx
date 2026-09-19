@@ -1,8 +1,7 @@
 import { getMarginStatus } from '@/features/finances/calculations'
 import { MarginStatusBadge } from '@/features/finances/components/MarginStatusBadge'
+import { currency } from '@/lib/currency'
 import type { ClosingSessionSummary } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 interface ClosingSummaryStatsProps {
   summary: ClosingSessionSummary

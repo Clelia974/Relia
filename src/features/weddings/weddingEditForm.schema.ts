@@ -21,6 +21,7 @@ export function weddingToEditFormValues(wedding: Wedding): WeddingEditFormValues
     soldAmount: String(wedding.soldAmount),
     clientBudget: String(wedding.clientBudget),
     status: wedding.status,
+    notes: wedding.notes ?? '',
     archived: wedding.archived,
   }
 }

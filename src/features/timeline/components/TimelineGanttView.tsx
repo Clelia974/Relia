@@ -1,5 +1,6 @@
 import { format, isSameDay } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { EmptyState } from '@/components/EmptyState'
 import { cn } from '@/lib/utils'
 import { TIMELINE_EVENT_STATUS_LABELS } from '@/lib/timelineEventStatus'
 import type { TimelineConflict } from '@/features/timeline/conflicts'
@@ -46,9 +47,7 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
 
   if (dates.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-        Aucun moment avec horaire pour l'instant — ajoutez un moment avec une heure de début et de fin pour construire le diagramme de Gantt.
-      </p>
+      <EmptyState description="Aucun moment avec horaire pour l'instant — ajoutez un moment avec une heure de début et de fin pour construire le diagramme de Gantt." />
     )
   }
 
@@ -94,7 +93,7 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
                     {hourTicks.map((t) => (
                       <span
                         key={t}
-                        className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 text-[11px] tabular-nums text-muted-foreground"
+                        className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs tabular-nums text-muted-foreground"
                         style={{ left: `${((t - rangeStart) / totalMinutes) * 100}%` }}
                       >
                         {minutesToLabel(t)}

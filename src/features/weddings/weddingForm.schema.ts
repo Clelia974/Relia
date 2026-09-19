@@ -18,10 +18,11 @@ export const WeddingFormSchema = z.object({
   soldAmount: optionalAmount,
   clientBudget: optionalAmount,
   status: WeddingStatusSchema,
+  notes: z.string(),
 })
 
 export type WeddingFormValues = z.infer<typeof WeddingFormSchema>
 
 export function emptyWeddingFormValues(): WeddingFormValues {
-  return { coupleName: '', date: '', venue: '', soldAmount: '', clientBudget: '', status: 'signe' }
+  return { coupleName: '', date: '', venue: '', soldAmount: '', clientBudget: '', status: 'signe', notes: '' }
 }

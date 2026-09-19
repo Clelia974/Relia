@@ -79,7 +79,7 @@ export function ExpenseForm({ open, onOpenChange, expense, defaultDate, onSubmit
             />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Catégorie" htmlFor="ex-category" error={errors.category}>
               <Select value={values.category} onValueChange={(v) => setField('category', v)}>
                 <SelectTrigger
@@ -112,7 +112,7 @@ export function ExpenseForm({ open, onOpenChange, expense, defaultDate, onSubmit
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Date" htmlFor="ex-date" error={errors.date}>
               <Input
                 id="ex-date"

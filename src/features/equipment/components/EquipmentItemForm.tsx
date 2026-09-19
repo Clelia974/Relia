@@ -80,7 +80,7 @@ export function EquipmentItemForm({ open, onOpenChange, item, onSubmit }: Equipm
             />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Quantité nécessaire" htmlFor="eq-quantity" error={errors.quantity}>
               <Input
                 id="eq-quantity"
@@ -101,7 +101,7 @@ export function EquipmentItemForm({ open, onOpenChange, item, onSubmit }: Equipm
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Mode d'obtention" htmlFor="eq-acquisition" error={errors.acquisitionMode}>
               <Select value={values.acquisitionMode} onValueChange={(v) => setField('acquisitionMode', v)}>
                 <SelectTrigger

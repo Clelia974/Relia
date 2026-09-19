@@ -110,7 +110,7 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
         </DialogHeader>
 
         <form className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1" onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="tpl-label">Nom de la formule</Label>
               <Input id="tpl-label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex. Silver" />
@@ -123,7 +123,7 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-heading text-sm font-semibold text-foreground">Lignes préconfigurées</h3>
             <Button type="button" variant="outline" size="sm" onClick={addLine}>
               <Plus className="size-4" aria-hidden="true" />
@@ -141,7 +141,7 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
                       type="button"
                       aria-label="Supprimer cette ligne"
                       onClick={() => removeLine(line.id)}
-                      className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-risk"
+                      className="relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
                     >
                       <Trash2 className="size-4" aria-hidden="true" />
                     </button>
@@ -157,7 +157,7 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
                     />
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                     <div className="flex flex-col gap-1.5">
                       <Label htmlFor={`tpl-${line.id}-category`}>Catégorie</Label>
                       <Input

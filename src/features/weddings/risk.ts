@@ -33,7 +33,11 @@ export interface WeddingRiskAssessment {
  * pas encore un problème, à J-3 il l'est. Retourne null pour un mariage déjà
  * passé — rien à surveiller.
  */
-export function getWeddingRiskLevel(wedding: Wedding, workspace: Workspace, today: Date = new Date()): WeddingRiskAssessment | null {
+export function getWeddingRiskLevel(
+  wedding: Wedding,
+  workspace: Pick<Workspace, 'vendors' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
+  today: Date = new Date(),
+): WeddingRiskAssessment | null {
   const daysUntil = differenceInCalendarDays(new Date(wedding.date), today)
   if (daysUntil < 0) return null
 

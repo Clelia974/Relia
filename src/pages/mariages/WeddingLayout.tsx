@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
+import { differenceInCalendarDays } from 'date-fns'
 import { Link, Outlet, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { WeddingTabs } from '@/features/weddings/components/WeddingTabs'
+import { formatDaysUntil } from '@/lib/dateFormat'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { Wedding } from '@/types/entities'
 
@@ -35,7 +37,12 @@ export function WeddingLayout() {
             Mariages
           </Link>
         </p>
-        <h1 className="font-heading text-2xl font-semibold text-foreground">{wedding.coupleName}</h1>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="font-heading text-2xl font-semibold text-foreground">{wedding.coupleName}</h1>
+          <span className="text-sm font-medium tabular-nums text-thread">
+            {formatDaysUntil(differenceInCalendarDays(new Date(wedding.date), new Date()))}
+          </span>
+        </div>
       </div>
 
       <div className="no-print">

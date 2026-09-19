@@ -23,11 +23,10 @@ import { emptyLineItemFormValues, ProposalLineItemFormSchema, type ProposalLineI
 import { InvoiceDocumentPreview } from '@/features/invoices/components/InvoiceDocumentPreview'
 import { InvoicePreviewFormSchema } from '@/features/invoices/invoicePreviewForm.schema'
 import { copyTextToClipboard } from '@/lib/clipboard'
+import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 function toNumericLines(lines: ProposalLineItemFormValues[]) {
   return lines.map((l) => ({
@@ -217,7 +216,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
         <div className="no-print flex flex-col gap-6">
           <Card>
             <CardContent className="flex flex-col gap-4">
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
                 <Field label="Numéro de facture" htmlFor="inv-number" error={errors.invoiceNumber}>
                   <Input
                     id="inv-number"
@@ -247,7 +246,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
             </CardContent>
           </Card>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-heading text-lg font-semibold text-foreground">Lignes</h2>
             <Button variant="outline" size="sm" onClick={addLine}>
               Ajouter une ligne

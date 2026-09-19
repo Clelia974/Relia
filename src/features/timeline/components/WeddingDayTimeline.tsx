@@ -1,5 +1,6 @@
 import { format, isSameDay } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { EmptyState } from '@/components/EmptyState'
 import { TimelineEventCard } from '@/features/timeline/components/TimelineEventCard'
 import { TaskPriorityBadge } from '@/features/tasks/components/TaskPriorityBadge'
 import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
@@ -36,11 +37,7 @@ export function WeddingDayTimeline({ wedding, events, tasks, vendorNameById, con
   const conflictedEventIds = new Set(conflicts.flatMap((c) => c.eventIds))
 
   if (dates.length === 0) {
-    return (
-      <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-        Aucun moment planifié pour l'instant — ajoutez un moment pour construire le déroulé du jour J.
-      </p>
-    )
+    return <EmptyState description="Aucun moment planifié pour l'instant — ajoutez un moment pour construire le déroulé du jour J." />
   }
 
   return (
@@ -64,7 +61,7 @@ export function WeddingDayTimeline({ wedding, events, tasks, vendorNameById, con
             </div>
 
             {dateEvents.length > 0 && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                 {dateEvents.map((event) => (
                   <TimelineEventCard
                     key={event.id}

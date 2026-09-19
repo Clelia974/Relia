@@ -1,10 +1,9 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { ProposalTotals } from '@/features/proposals/calculations'
+import { currency } from '@/lib/currency'
 import { VAT_STATUS_LABELS, vatApplies } from '@/lib/vatStatus'
 import type { BusinessConfig, ProposalLineItem, VatStatus, Wedding } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 interface ProposalDocumentPreviewProps {
   businessConfig: BusinessConfig
@@ -69,7 +68,7 @@ export function ProposalDocumentPreview({
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2">
+      <section className="grid gap-4 grid-cols-1 sm:grid-cols-2">
         <div>
           <p className="text-xs text-muted-foreground">Couple</p>
           <p className="text-sm font-medium text-foreground">{clientName || wedding.coupleName}</p>

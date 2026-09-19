@@ -78,7 +78,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
         </DialogHeader>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Nom du prestataire" htmlFor="v-name" error={errors.name}>
               <Input
                 id="v-name"
@@ -99,7 +99,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Catégorie" htmlFor="v-category" error={errors.category}>
               <Select value={values.category} onValueChange={(v) => setField('category', v)}>
                 <SelectTrigger
@@ -140,7 +140,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
             </Field>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Téléphone" htmlFor="v-phone" optional>
               <Input
                 id="v-phone"
@@ -165,7 +165,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
 
           {costForThisWedding?.needsCostReview && <CostReviewBadge />}
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Field label="Coût estimé" htmlFor="v-estimated" error={errors.estimatedCost} optional>
               <Input
                 id="v-estimated"

@@ -1,11 +1,19 @@
 import { Check, ClipboardPlus, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { type BadgeTone, toneClass } from '@/lib/badgeTone'
+import { currency } from '@/lib/currency'
 import { SOLD_SERVICE_STATUS_LABELS, SOLD_SERVICE_STATUS_OPTIONS } from '@/lib/soldServiceStatus'
+import { cn } from '@/lib/utils'
 import type { SoldService, SoldServiceStatus } from '@/types/entities'
 
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+const STATUS_TONE: Record<SoldServiceStatus, BadgeTone> = {
+  incluse: 'success',
+  ajoutee_ulterieurement: 'warning',
+  retiree: 'risk',
+}
 
 interface SoldServiceCardProps {
   soldService: SoldService
@@ -31,7 +39,7 @@ export function SoldServiceCard({ soldService, onStatusChange, onCreateTask, onD
             type="button"
             aria-label={`Supprimer ${soldService.title}`}
             onClick={() => onDelete(soldService)}
-            className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-risk"
+            className="shrink-0 relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
           >
             <Trash2 className="size-4" aria-hidden="true" />
           </button>
@@ -41,6 +49,10 @@ export function SoldServiceCard({ soldService, onStatusChange, onCreateTask, onD
           {soldService.quantity !== undefined && <span className="text-muted-foreground">Quantité : {soldService.quantity}</span>}
           <span className="font-medium tabular-nums text-foreground">{currency.format(soldService.soldPrice)}</span>
         </div>
+
+        <Badge className={cn('w-fit border-transparent font-medium', toneClass(STATUS_TONE[soldService.status]))}>
+          {SOLD_SERVICE_STATUS_LABELS[soldService.status]}
+        </Badge>
 
         {soldService.notes && <p className="text-xs text-muted-foreground">{soldService.notes}</p>}
 

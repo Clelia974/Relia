@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EmptyState } from '@/components/EmptyState'
 import { EquipmentItemCard } from '@/features/equipment/components/EquipmentItemCard'
 import { EquipmentItemForm } from '@/features/equipment/components/EquipmentItemForm'
 import type { EquipmentItemFormValues } from '@/features/equipment/equipmentForm.schema'
@@ -108,9 +109,7 @@ export function WeddingEquipmentTab() {
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucun élément pour l'instant — ajoutez ce dont vous avez besoin pour ce mariage.
-        </p>
+        <EmptyState description="Aucun élément pour l'instant — ajoutez ce dont vous avez besoin pour ce mariage." />
       ) : (
         <>
           <div className="no-print flex flex-wrap gap-3">
@@ -146,11 +145,9 @@ export function WeddingEquipmentTab() {
           </div>
 
           {filtered.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-              Aucun élément pour ces filtres.
-            </p>
+            <EmptyState description="Aucun élément pour ces filtres." />
           ) : (
-            <div className="print-area grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="print-area grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((item) => (
                 <EquipmentItemCard
                   key={item.id}

@@ -41,7 +41,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     const { wedding } = setup()
     renderWithWedding(wedding)
 
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     expect(screen.getByText('Modifier le mariage')).toBeTruthy()
   })
 
@@ -49,7 +49,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     const { weddingId, wedding } = setup()
     renderWithWedding(wedding)
 
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     fireEvent.change(screen.getByLabelText('Nom du couple'), { target: { value: 'Camille & Julien' } })
     fireEvent.change(screen.getByLabelText(/lieu du mariage/i), { target: { value: 'Château du Lac' } })
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
@@ -64,7 +64,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     const { weddingId, wedding } = setup()
     renderWithWedding(wedding)
 
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     fireEvent.click(screen.getByRole('checkbox', { name: 'Archiver ce mariage' }))
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
@@ -77,7 +77,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     const { weddingId, wedding } = setup({ archived: true })
     renderWithWedding(wedding)
 
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     fireEvent.click(screen.getByRole('checkbox', { name: 'Archiver ce mariage' }))
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
@@ -89,7 +89,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     const { weddingId, wedding } = setup()
     renderWithWedding(wedding)
 
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     fireEvent.click(screen.getByRole('button', { name: 'Annuler' }))
 
     const untouched = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
@@ -105,7 +105,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
       .addTask({ weddingId, title: 'Confirmer le traiteur', dueDate: '2026-09-01T00:00:00.000Z', status: 'a_preparer', priority: 'normale', vendorId })
 
     renderWithWedding(wedding)
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     fireEvent.change(screen.getByLabelText('Nom du couple'), { target: { value: 'Camille & Julien' } })
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
@@ -127,7 +127,7 @@ describe('WeddingOverviewTab — modification du mariage', () => {
     })
 
     renderWithWedding(wedding)
-    fireEvent.click(screen.getByRole('button', { name: /modifier/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les informations du mariage' }))
     expect(screen.queryByText(/planning existant ne sera pas automatiquement décalé/i)).toBeNull()
 
     fireEvent.change(screen.getByLabelText('Date du mariage'), { target: { value: '2026-11-01' } })

@@ -1,13 +1,14 @@
 import { CircleCheck, OctagonAlert, TrendingDown, TriangleAlert } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { MARGIN_STATUS_LABELS, type MarginStatus } from '@/features/finances/calculations'
+import { type BadgeTone, toneClass } from '@/lib/badgeTone'
 import { cn } from '@/lib/utils'
 
-const TONE: Record<MarginStatus, string> = {
-  saine: 'bg-success-bg text-success',
-  a_surveiller: 'bg-warning-bg text-warning',
-  faible: 'bg-risk-bg text-risk',
-  critique: 'bg-risk-bg text-risk',
+const TONE: Record<MarginStatus, BadgeTone> = {
+  saine: 'success',
+  a_surveiller: 'warning',
+  faible: 'risk',
+  critique: 'risk',
 }
 
 const ICON: Record<MarginStatus, typeof CircleCheck> = {
@@ -21,7 +22,7 @@ const ICON: Record<MarginStatus, typeof CircleCheck> = {
 export function MarginStatusBadge({ status }: { status: MarginStatus }) {
   const Icon = ICON[status]
   return (
-    <Badge className={cn('border-transparent font-medium', TONE[status])}>
+    <Badge className={cn('border-transparent font-medium', toneClass(TONE[status]))}>
       <Icon className="size-3.5" aria-hidden="true" />
       {MARGIN_STATUS_LABELS[status]}
     </Badge>

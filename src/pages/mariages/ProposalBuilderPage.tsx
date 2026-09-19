@@ -29,13 +29,12 @@ import {
   type ProposalLineItemFormValues,
 } from '@/features/proposals/proposalForm.schema'
 import { copyTextToClipboard } from '@/lib/clipboard'
+import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
 import { PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_OPTIONS } from '@/lib/proposalStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { ProposalStatus } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 function toNumericLines(lines: ProposalLineItemFormValues[]) {
   return lines.map((l) => ({
@@ -305,11 +304,11 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
       </div>
 
       {view === 'editeur' ? (
-        <div className="no-print grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="no-print grid gap-6 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="flex flex-col gap-6">
             <Card>
               <CardContent className="flex flex-col gap-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <Field label="Titre de la proposition" htmlFor="pb-title" error={errors.title}>
                     <Input
                       id="pb-title"
@@ -323,7 +322,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
                     <Input id="pb-client" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder={wedding.coupleName} />
                   </Field>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <Field label="Date de validité" htmlFor="pb-valid-until" optional error={errors.validUntil}>
                     <Input
                       id="pb-valid-until"
@@ -352,9 +351,9 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
               </CardContent>
             </Card>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-heading text-lg font-semibold text-foreground">Lignes</h2>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" onClick={addLine}>
                   <Plus className="size-4" aria-hidden="true" />
                   Ajouter une ligne

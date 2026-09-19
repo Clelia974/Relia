@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { emptyWeddingFormValues, WeddingFormSchema, type WeddingFormValues } from '@/features/weddings/weddingForm.schema'
 import { WEDDING_STATUS_LABELS, WEDDING_STATUS_OPTIONS } from '@/lib/weddingStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -43,6 +44,7 @@ export function NewWeddingPage() {
       soldAmount: result.data.soldAmount === '' ? 0 : Number(result.data.soldAmount),
       clientBudget: result.data.clientBudget === '' ? 0 : Number(result.data.clientBudget),
       status: result.data.status,
+      notes: result.data.notes.trim() || undefined,
     })
 
     toast.success('Votre mariage a été créé.')
@@ -93,8 +95,8 @@ export function NewWeddingPage() {
               />
             </Field>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Montant vendu" htmlFor="soldAmount" error={errors.soldAmount} optional>
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+              <Field label="Montant du contrat" htmlFor="soldAmount" error={errors.soldAmount} optional>
                 <Input
                   id="soldAmount"
                   inputMode="decimal"
@@ -132,6 +134,16 @@ export function NewWeddingPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </Field>
+
+            <Field label="Notes" htmlFor="notes" optional>
+              <Textarea
+                id="notes"
+                rows={3}
+                placeholder="Ex. préférences du couple, contraintes particulières…"
+                value={values.notes}
+                onChange={(e) => setField('notes', e.target.value)}
+              />
             </Field>
 
             <div className="flex justify-end gap-3 pt-2">

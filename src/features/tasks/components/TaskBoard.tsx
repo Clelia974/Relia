@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { EmptyState } from '@/components/EmptyState'
 import { PostponeTaskDialog } from '@/features/tasks/components/PostponeTaskDialog'
 import { TaskEmptyState } from '@/features/tasks/components/TaskEmptyState'
 import { TaskFilters } from '@/features/tasks/components/TaskFilters'
@@ -250,9 +251,7 @@ export function TaskBoard({ scopeWeddingId }: TaskBoardProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucune tâche ne correspond à ces filtres.
-        </p>
+        <EmptyState description="Aucune tâche ne correspond à ces filtres." />
       ) : view === 'kanban' ? (
         <TaskKanban tasks={filtered} weddingNameById={weddingNameById} vendorNameById={vendorNameById} {...cardActions} />
       ) : (

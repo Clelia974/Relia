@@ -6,17 +6,17 @@ import { Link, useLocation, useNavigate, useOutletContext } from 'react-router-d
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 import { VendorEmptyState } from '@/features/vendors/components/VendorEmptyState'
 import { countConfirmed, countTotal, findNextVendorToContact, hasUrgentVendor } from '@/features/vendors/summary'
 import { TaskEmptyState } from '@/features/tasks/components/TaskEmptyState'
 import { computeWeddingTaskStats, findNextPriorityTask } from '@/features/tasks/summary'
 import { WeddingEditForm } from '@/features/weddings/components/WeddingEditForm'
 import type { WeddingEditFormValues } from '@/features/weddings/weddingEditForm.schema'
+import { currency } from '@/lib/currency'
 import { WEDDING_STATUS_LABELS } from '@/lib/weddingStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 const NEXT_STEPS = [
   { to: 'prestataires', label: 'Ajouter des prestataires', icon: Users },
@@ -47,6 +47,7 @@ export function WeddingOverviewTab() {
   const hasTimelineEvents = allTimelineEvents.some((e) => e.weddingId === wedding.id)
   const updateWedding = useWorkspaceStore((s) => s.updateWedding)
   const [editOpen, setEditOpen] = useState(false)
+  const [editFocusField, setEditFocusField] = useState<'notes' | undefined>(undefined)
 
   const handleEditSubmit = (values: WeddingEditFormValues) => {
     updateWedding(wedding.id, {
@@ -56,6 +57,7 @@ export function WeddingOverviewTab() {
       soldAmount: values.soldAmount === '' ? 0 : Number(values.soldAmount),
       clientBudget: values.clientBudget === '' ? 0 : Number(values.clientBudget),
       status: values.status,
+      notes: values.notes.trim() || undefined,
       archived: values.archived,
     })
     setEditOpen(false)
@@ -72,7 +74,7 @@ export function WeddingOverviewTab() {
               <h2 className="font-heading text-lg font-semibold text-foreground">Votre mariage est créé.</h2>
               <p className="mt-1 text-sm text-muted-foreground">Que souhaitez-vous ajouter maintenant ?</p>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
               {NEXT_STEPS.map((step) => (
                 <Button key={step.to} asChild variant="outline" className="justify-start bg-card">
                   <Link to={`/mariages/${wedding.id}/${step.to}`}>
@@ -94,21 +96,58 @@ export function WeddingOverviewTab() {
         <CardHeader>
           <CardTitle>Informations du mariage</CardTitle>
           <CardAction>
-            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label="Modifier les informations du mariage"
+              onClick={() => {
+                setEditFocusField(undefined)
+                setEditOpen(true)
+              }}
+            >
               <Pencil className="size-4" aria-hidden="true" />
               Modifier
             </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
-          <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+          <dl className="grid gap-x-6 gap-y-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Date du mariage" value={format(new Date(wedding.date), 'd MMMM yyyy', { locale: fr })} />
             <Field label="Lieu du mariage" value={wedding.venue || '—'} />
-            <Field label="Montant vendu" value={currency.format(wedding.soldAmount)} />
+            <Field label="Montant du contrat" value={currency.format(wedding.soldAmount)} />
             <Field label="Budget client" value={currency.format(wedding.clientBudget)} />
             <Field label="Statut du mariage" value={WEDDING_STATUS_LABELS[wedding.status]} />
             <Field label="Créé le" value={format(new Date(wedding.createdAt), 'd MMMM yyyy', { locale: fr })} />
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notes</CardTitle>
+          <CardAction>
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label="Modifier les notes"
+              onClick={() => {
+                setEditFocusField('notes')
+                setEditOpen(true)
+              }}
+            >
+              <Pencil className="size-4" aria-hidden="true" />
+              Modifier
+            </Button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          {wedding.notes ? (
+            <p className="whitespace-pre-wrap text-sm text-foreground">{wedding.notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aucune note pour ce mariage. Ajoutez les préférences du couple ou toute contrainte particulière.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -118,6 +157,7 @@ export function WeddingOverviewTab() {
         onOpenChange={setEditOpen}
         wedding={wedding}
         hasTimelineEvents={hasTimelineEvents}
+        focusField={editFocusField}
         onSubmit={handleEditSubmit}
       />
 
@@ -176,6 +216,13 @@ export function WeddingOverviewTab() {
             />
           ) : (
             <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <Progress value={(taskStats.done / taskStats.total) * 100} className="max-w-56" />
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {taskStats.done} sur {taskStats.total} terminée{taskStats.total !== 1 ? 's' : ''}
+                </span>
+              </div>
+
               <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
                 <span className="text-foreground">
                   {taskStats.open} tâche{taskStats.open !== 1 ? 's' : ''} ouverte{taskStats.open !== 1 ? 's' : ''}
@@ -186,9 +233,6 @@ export function WeddingOverviewTab() {
                   </span>
                 )}
                 {taskStats.waiting > 0 && <span className="text-warning">{taskStats.waiting} en attente</span>}
-                <span className="text-muted-foreground">
-                  {taskStats.done} terminée{taskStats.done !== 1 ? 's' : ''}
-                </span>
               </div>
 
               {nextTask && (

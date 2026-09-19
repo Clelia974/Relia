@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Check, Circle, History, TriangleAlert } from 'lucide-react'
+import { EmptyState } from '@/components/EmptyState'
 import { TaskPriorityBadge } from '@/features/tasks/components/TaskPriorityBadge'
 import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
 import { isOverdue } from '@/features/tasks/summary'
@@ -64,9 +65,7 @@ export function TimelinePreparation({ wedding, tasks, dayEvents, vendorNameById 
       </div>
 
       {!hasAnyTask && dayEvents.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucune tâche avec échéance ni moment du jour J pour l'instant — la frise se remplira au fil de vos ajouts.
-        </p>
+        <EmptyState description="Aucune tâche avec échéance ni moment du jour J pour l'instant — la frise se remplira au fil de vos ajouts." />
       ) : (
         <div className="flex flex-col">
           {PREPARATION_MILESTONES.filter((m) => m !== 0).map((milestone) => {

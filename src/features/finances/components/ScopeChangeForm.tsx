@@ -85,7 +85,7 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
             />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Coût fournisseur" htmlFor="sc-vendor-cost" error={errors.vendorCost}>
               <Input
                 id="sc-vendor-cost"
@@ -114,7 +114,7 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
             Profit potentiel de ce changement : <span className="tabular-nums text-foreground">{(clientPriceNum - vendorCostNum).toLocaleString('fr-FR')} €</span>
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Date" htmlFor="sc-date" error={errors.date}>
               <Input
                 id="sc-date"

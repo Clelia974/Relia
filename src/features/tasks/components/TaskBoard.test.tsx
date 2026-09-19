@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { TaskBoard } from '@/features/tasks/components/TaskBoard'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -28,7 +29,11 @@ describe('TaskBoard — périmètre global (scopeWeddingId non défini)', () => 
     const archivedWeddingId = seedWedding('Mariage Archivé', true)
     useWorkspaceStore.getState().addTask({ title: 'Tâche du mariage archivé', weddingId: archivedWeddingId, dueDate: '2026-06-01T00:00:00.000Z' })
 
-    render(<TaskBoard />)
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
 
     expect(screen.queryByText('Tâche du mariage archivé')).not.toBeInTheDocument()
   })
@@ -37,7 +42,11 @@ describe('TaskBoard — périmètre global (scopeWeddingId non défini)', () => 
     const activeWeddingId = seedWedding('Mariage Actif', false)
     useWorkspaceStore.getState().addTask({ title: 'Tâche du mariage actif', weddingId: activeWeddingId, dueDate: '2026-06-01T00:00:00.000Z' })
 
-    render(<TaskBoard />)
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
 
     expect(screen.getByText('Tâche du mariage actif')).toBeInTheDocument()
   })
@@ -45,7 +54,11 @@ describe('TaskBoard — périmètre global (scopeWeddingId non défini)', () => 
   it('3. une tâche sans weddingId apparaît', () => {
     useWorkspaceStore.getState().addTask({ title: 'Tâche générique', dueDate: '2026-06-01T00:00:00.000Z' })
 
-    render(<TaskBoard />)
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
 
     expect(screen.getByText('Tâche générique')).toBeInTheDocument()
   })
@@ -57,7 +70,11 @@ describe('TaskBoard — périmètre global (scopeWeddingId non défini)', () => 
     useWorkspaceStore.getState().addTask({ title: 'Tâche archivée', weddingId: archivedWeddingId, dueDate: '2026-06-01T00:00:00.000Z' })
     useWorkspaceStore.getState().addTask({ title: 'Tâche générique', dueDate: '2026-06-01T00:00:00.000Z' })
 
-    render(<TaskBoard />)
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
 
     expect(screen.getByText('Tâche active')).toBeInTheDocument()
     expect(screen.getByText('Tâche générique')).toBeInTheDocument()
@@ -72,7 +89,11 @@ describe('TaskBoard — périmètre scopé (scopeWeddingId défini)', () => {
     useWorkspaceStore.getState().addTask({ title: 'Tâche du mariage archivé', weddingId: archivedWeddingId, dueDate: '2026-06-01T00:00:00.000Z' })
     useWorkspaceStore.getState().addTask({ title: 'Tâche autre mariage', weddingId: otherWeddingId, dueDate: '2026-06-01T00:00:00.000Z' })
 
-    render(<TaskBoard scopeWeddingId={archivedWeddingId} />)
+    render(
+      <TooltipProvider>
+        <TaskBoard scopeWeddingId={archivedWeddingId} />
+      </TooltipProvider>,
+    )
 
     // Depuis la fiche d'un mariage (même archivé), ses propres tâches restent visibles.
     expect(screen.getByText('Tâche du mariage archivé')).toBeInTheDocument()

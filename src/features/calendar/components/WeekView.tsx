@@ -23,7 +23,7 @@ export function WeekView({ items }: { items: CalendarItem[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-heading text-base font-semibold text-foreground">
           Semaine du {format(start, 'd MMMM', { locale: fr })} au {format(end, 'd MMMM yyyy', { locale: fr })}
         </h3>
@@ -37,7 +37,7 @@ export function WeekView({ items }: { items: CalendarItem[] }) {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const key = format(day, 'yyyy-MM-dd')
           const dayItems = byDate.get(key) ?? []

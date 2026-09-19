@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
+import { EmptyState } from '@/components/EmptyState'
 import { VendorFilters, type VendorFilterOption } from '@/features/vendors/components/VendorFilters'
 import { VendorStatusBadge } from '@/features/vendors/components/VendorStatusBadge'
+import { currency } from '@/lib/currency'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { VendorStatus } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 type FilterKey = 'tous' | VendorStatus
 
@@ -70,9 +70,7 @@ export function PrestatairesGlobalPage() {
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucun prestataire ne correspond à votre recherche.
-        </p>
+        <EmptyState description="Aucun prestataire ne correspond à votre recherche." />
       ) : (
         <div className="flex flex-col gap-2.5">
           {rows.map(({ vendor, weddingId }) => (

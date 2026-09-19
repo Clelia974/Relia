@@ -114,7 +114,7 @@ export const WeddingSchema = z.object({
   coupleName: z.string().min(1, 'Le nom du couple est obligatoire.'),
   date: isoDate,
   venue: z.string(),
-  soldAmount: z.number().nonnegative('Le montant vendu ne peut pas être négatif.'),
+  soldAmount: z.number().nonnegative('Le montant du contrat ne peut pas être négatif.'),
   clientBudget: z.number().nonnegative('Le budget client ne peut pas être négatif.'),
   status: WeddingStatusSchema,
   archived: z.boolean().default(false),

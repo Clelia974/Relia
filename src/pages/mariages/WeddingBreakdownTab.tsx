@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EmptyState } from '@/components/EmptyState'
 import { BreakdownItemCard } from '@/features/breakdown/components/BreakdownItemCard'
 import { BreakdownSummaryStats } from '@/features/breakdown/components/BreakdownSummaryStats'
 import { buildBreakdownSummary, groupEquipmentByZone, selectPendingEquipmentItems } from '@/features/breakdown/breakdownSummary'
@@ -46,9 +47,7 @@ export function WeddingBreakdownTab() {
           <h1 className="font-heading text-2xl font-semibold text-foreground">Désinstallation</h1>
           <p className="mt-1 text-sm text-muted-foreground">Suivi de la récupération du matériel après le mariage.</p>
         </div>
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucun élément matériel pour ce mariage — ajoutez-en d'abord dans l'onglet Matériel.
-        </p>
+        <EmptyState description="Aucun élément matériel pour ce mariage — ajoutez-en d'abord dans l'onglet Matériel." />
       </div>
     )
   }
@@ -73,7 +72,7 @@ export function WeddingBreakdownTab() {
           <p className="text-xs text-muted-foreground">
             Crée une tâche de démontage par zone restant à récupérer ({byZone.size} zone{byZone.size > 1 ? 's' : ''}).
           </p>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Field label="Date" htmlFor="bd-date">
               <Input id="bd-date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </Field>
@@ -105,15 +104,13 @@ export function WeddingBreakdownTab() {
       <BreakdownSummaryStats summary={summary} />
 
       {pending.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Tous les éléments ont été récupérés.
-        </p>
+        <EmptyState description="Tous les éléments ont été récupérés." />
       ) : (
         <div className="flex flex-col gap-6">
           {[...byZone.entries()].map(([zone, zoneItems]) => (
             <div key={zone} className="flex flex-col gap-3">
               <h2 className="font-heading text-base font-semibold text-foreground">{zone}</h2>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {zoneItems.map((item) => (
                   <BreakdownItemCard key={item.id} item={item} />
                 ))}

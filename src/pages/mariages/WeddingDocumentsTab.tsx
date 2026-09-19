@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Plus } from 'lucide-react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import {
@@ -15,14 +14,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { EmptyState } from '@/components/EmptyState'
 import { computeProposalTotals } from '@/features/proposals/calculations'
 import { ProposalStatusBadge } from '@/features/proposals/components/ProposalStatusBadge'
+import { currency } from '@/lib/currency'
+import { formatShortDate } from '@/lib/dateFormat'
 import { generateId } from '@/lib/id'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { ProposalTier } from '@/types/entities'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 export function WeddingDocumentsTab() {
   const { wedding } = useOutletContext<WeddingOutletContext>()
@@ -133,11 +133,9 @@ export function WeddingDocumentsTab() {
           </div>
 
           {proposals.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-              Aucune proposition pour l'instant — choisissez une formule pour commencer.
-            </p>
+            <EmptyState description="Aucune proposition pour l'instant — choisissez une formule pour commencer." />
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {proposals.map((p) => (
                 <Link key={p.id} to={`/mariages/${wedding.id}/documents/propositions/${p.id}`}>
                   <Card className="h-full transition-colors hover:border-thread/50">
@@ -148,7 +146,7 @@ export function WeddingDocumentsTab() {
                       <p className="font-medium text-foreground">{p.title}</p>
                       <ProposalStatusBadge status={p.status} />
                       <p className="mt-1 font-heading text-lg font-semibold tabular-nums text-foreground">{currency.format(p.total)}</p>
-                      <p className="text-xs text-muted-foreground">Mis à jour le {format(new Date(p.updatedAt), 'd MMM yyyy', { locale: fr })}</p>
+                      <p className="text-xs text-muted-foreground">Mis à jour le {formatShortDate(p.updatedAt)}</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -166,11 +164,9 @@ export function WeddingDocumentsTab() {
           </div>
 
           {invoices.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-              Aucune facture indicative pour l'instant.
-            </p>
+            <EmptyState description="Aucune facture indicative pour l'instant." />
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {invoices.map((inv) => (
                 <Link key={inv.id} to={`/mariages/${wedding.id}/documents/factures/${inv.id}`}>
                   <Card className="h-full transition-colors hover:border-thread/50">
@@ -178,7 +174,7 @@ export function WeddingDocumentsTab() {
                       <p className="text-xs uppercase tracking-wide text-thread">Facture n° {inv.invoiceNumber}</p>
                       <p className="font-medium text-foreground">{inv.clientName || wedding.coupleName}</p>
                       <p className="font-heading text-lg font-semibold tabular-nums text-foreground">{currency.format(inv.total)}</p>
-                      <p className="text-xs text-muted-foreground">{format(new Date(inv.date), 'd MMM yyyy', { locale: fr })}</p>
+                      <p className="text-xs text-muted-foreground">{formatShortDate(inv.date)}</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -194,7 +190,7 @@ export function WeddingDocumentsTab() {
             <DialogTitle>Choisir une formule</DialogTitle>
             <DialogDescription>Chaque formule est entièrement personnalisable une fois créée.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
             {proposalTemplates.map((template) => {
               const totals = computeProposalTotals(
                 template.lines.map((l) => ({ id: l.id, description: l.description, category: l.category, quantity: l.quantity, unitPrice: l.unitPrice, total: l.quantity * l.unitPrice, included: l.included, optional: l.optional })),

@@ -48,7 +48,7 @@ function actionTier(task: Task, today: Date, soonLimit: Date): number | null {
   return null
 }
 
-export function getTodayActions(workspace: Workspace, today: Date = new Date()): TodayActions {
+export function getTodayActions(workspace: Pick<Workspace, 'weddings' | 'tasks'>, today: Date = new Date()): TodayActions {
   const soonLimit = addDays(startOfDay(today), 3)
   const activeWeddingIds = selectActiveWeddingIds(workspace.weddings)
   // Une tâche sans weddingId est une tâche générique, jamais concernée par
@@ -77,7 +77,7 @@ export interface PendingResponses {
   total: number
 }
 
-export function getPendingResponses(workspace: Workspace): PendingResponses {
+export function getPendingResponses(workspace: Pick<Workspace, 'weddings' | 'tasks' | 'clientDecisions'>): PendingResponses {
   const activeWeddingIds = selectActiveWeddingIds(workspace.weddings)
   const tasks = workspace.tasks.filter((t) => t.status === 'en_attente' && (!t.weddingId || activeWeddingIds.has(t.weddingId)))
   // ClientDecision.weddingId est obligatoire dans le schéma : pas de cas générique à préserver ici.
@@ -104,7 +104,11 @@ export interface UpcomingEntry {
 const DEFAULT_UPCOMING_LIMIT = 6
 
 /** Combine moments de planning, échéances de tâches et jours de mariage à venir, triés par date puis heure. */
-export function getUpcomingEvents(workspace: Workspace, today: Date = new Date(), limit = DEFAULT_UPCOMING_LIMIT): UpcomingEntry[] {
+export function getUpcomingEvents(
+  workspace: Pick<Workspace, 'weddings' | 'timelineEvents' | 'tasks'>,
+  today: Date = new Date(),
+  limit = DEFAULT_UPCOMING_LIMIT,
+): UpcomingEntry[] {
   const start = startOfDay(today)
   const weddingNameById = new Map(selectActiveWeddings(workspace.weddings).map((w) => [w.id, w.coupleName]))
   const entries: UpcomingEntry[] = []
@@ -178,7 +182,10 @@ const RISK_LEVEL_RANK: Record<WeddingRiskAssessment['level'], number> = {
 }
 
 /** Risque de tous les mariages actifs, triés du plus critique au plus calme. */
-export function getWeddingRisks(workspace: Workspace, today: Date = new Date()): WeddingRiskEntry[] {
+export function getWeddingRisks(
+  workspace: Pick<Workspace, 'weddings' | 'vendors' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
+  today: Date = new Date(),
+): WeddingRiskEntry[] {
   return workspace.weddings
     .filter((w) => !w.archived)
     .map((wedding) => {
@@ -230,7 +237,10 @@ const COST_PROXIMITY_LIMIT_DAYS = 45
  * Éléments qui nécessitent une action, tous mariages actifs confondus. Ne
  * remonte jamais un conflit ignoré (cf. workspace.ignoredConflictIds).
  */
-export function getDashboardAlerts(workspace: Workspace, today: Date = new Date()): DashboardAlert[] {
+export function getDashboardAlerts(
+  workspace: Pick<Workspace, 'weddings' | 'vendors' | 'tasks' | 'timelineEvents' | 'ignoredConflictIds' | 'clientDecisions' | 'vendorWeddingLinks'>,
+  today: Date = new Date(),
+): DashboardAlert[] {
   const alerts: DashboardAlert[] = []
 
   for (const wedding of workspace.weddings.filter((w) => !w.archived)) {
@@ -356,7 +366,9 @@ export interface ProfitOverviewData {
  * moins un coût renseignés) — jamais un chiffre inventé pour un mariage sans
  * données. Cf. src/features/finances/calculations.ts pour le détail par mariage.
  */
-export function getProfitOverview(workspace: Workspace): ProfitOverviewData {
+export function getProfitOverview(
+  workspace: Pick<Workspace, 'weddings' | 'vendors' | 'vendorWeddingLinks' | 'expenses' | 'scopeChanges'>,
+): ProfitOverviewData {
   const weddings = workspace.weddings.filter((w) => !w.archived)
   const financials = weddings.map((wedding) => {
     const vendors = workspace.vendors.filter((v) => v.weddingIds.includes(wedding.id))
@@ -390,7 +402,13 @@ export interface DashboardSummary {
   watchedWeddingsCount: number
 }
 
-export function getDashboardSummary(workspace: Workspace, today: Date = new Date()): DashboardSummary {
+export function getDashboardSummary(
+  workspace: Pick<
+    Workspace,
+    'weddings' | 'tasks' | 'clientDecisions' | 'vendors' | 'timelineEvents' | 'ignoredConflictIds' | 'vendorWeddingLinks'
+  >,
+  today: Date = new Date(),
+): DashboardSummary {
   const activeWeddings = workspace.weddings.filter((w) => !w.archived)
   const { items } = getTodayActions(workspace, today)
   const pending = getPendingResponses(workspace)

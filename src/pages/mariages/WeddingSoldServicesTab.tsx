@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EmptyState } from '@/components/EmptyState'
 import { SoldServiceCard } from '@/features/soldServices/components/SoldServiceCard'
 import { SoldServiceForm } from '@/features/soldServices/components/SoldServiceForm'
 import type { SoldServiceFormValues } from '@/features/soldServices/soldServiceForm.schema'
@@ -108,13 +109,17 @@ export function WeddingSoldServicesTab() {
 
       {soldServices.length === 0 ? (
         approvedProposals.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-            Aucune proposition approuvée pour ce mariage —{' '}
-            <Link to={`/mariages/${wedding.id}/documents`} className="text-foreground underline">
-              approuvez une proposition
-            </Link>{' '}
-            pour générer les prestations vendues.
-          </p>
+          <EmptyState
+            description={
+              <>
+                Aucune proposition approuvée pour ce mariage —{' '}
+                <Link to={`/mariages/${wedding.id}/documents`} className="text-foreground underline">
+                  approuvez une proposition
+                </Link>{' '}
+                pour générer les prestations vendues.
+              </>
+            }
+          />
         ) : (
           <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border px-6 py-12 text-center">
             <p className="text-sm text-muted-foreground">Générez les prestations vendues à partir d'une proposition approuvée.</p>
@@ -151,11 +156,9 @@ export function WeddingSoldServicesTab() {
           </div>
 
           {filtered.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-              Aucune prestation pour ce statut.
-            </p>
+            <EmptyState description="Aucune prestation pour ce statut." />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((soldService) => (
                 <SoldServiceCard
                   key={soldService.id}

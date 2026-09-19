@@ -5,9 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { calculateLineItemTotal } from '@/features/proposals/calculations'
 import { PROPOSAL_CATEGORY_SUGGESTIONS } from '@/features/proposals/templates'
+import { currency } from '@/lib/currency'
 import type { ProposalLineItemFormValues } from '@/features/proposals/proposalForm.schema'
-
-const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
 
 interface LineItemsEditorProps {
   lines: ProposalLineItemFormValues[]
@@ -42,7 +41,7 @@ export function LineItemsEditor({ lines, errors, onChange, onRemove }: LineItems
                   type="button"
                   aria-label="Supprimer cette ligne"
                   onClick={() => onRemove(line.id)}
-                  className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-risk"
+                  className="relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
                 >
                   <Trash2 className="size-4" aria-hidden="true" />
                 </button>
@@ -59,7 +58,7 @@ export function LineItemsEditor({ lines, errors, onChange, onRemove }: LineItems
                 />
               </Field>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                 <Field label="Catégorie" htmlFor={`li-${line.id}-category`} error={rowErrors.category}>
                   <Input
                     id={`li-${line.id}-category`}

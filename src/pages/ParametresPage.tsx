@@ -86,6 +86,7 @@ export function ParametresPage() {
   const [resetMode, setResetMode] = useState<'empty' | 'demo'>('empty')
 
   const logoInputRef = useRef<HTMLInputElement>(null)
+  const [isLogoUploading, setIsLogoUploading] = useState(false)
   const handleLogoChosen = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ''
@@ -98,8 +99,13 @@ export function ParametresPage() {
       toast.error('Le logo doit faire moins de 1 Mo.')
       return
     }
-    const dataUrl = await readFileAsDataUrl(file)
-    saveBusinessField({ logoDataUrl: dataUrl })
+    setIsLogoUploading(true)
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
+      saveBusinessField({ logoDataUrl: dataUrl })
+    } finally {
+      setIsLogoUploading(false)
+    }
   }
   const removeLogo = () => saveBusinessField({ logoDataUrl: undefined })
 
@@ -116,17 +122,23 @@ export function ParametresPage() {
     toast.success('Vos données ont été exportées.')
   }
 
+  const [isImporting, setIsImporting] = useState(false)
   const handleFileChosen = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
 
-    const result = await parseWorkspaceFile(file)
-    if (!result.ok) {
-      toast.error('Ce fichier ne semble pas être une sauvegarde Relia valide.', { description: result.reason })
-      return
+    setIsImporting(true)
+    try {
+      const result = await parseWorkspaceFile(file)
+      if (!result.ok) {
+        toast.error('Ce fichier ne semble pas être une sauvegarde Relia valide.', { description: result.reason })
+        return
+      }
+      setPendingImport(result.workspace)
+    } finally {
+      setIsImporting(false)
     }
-    setPendingImport(result.workspace)
   }
 
   const confirmImport = () => {
@@ -174,7 +186,7 @@ export function ParametresPage() {
           <CardDescription>Utilisé sur vos propositions et factures indicatives.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="biz-name">Nom de l'entreprise</Label>
               <Input
@@ -210,7 +222,7 @@ export function ParametresPage() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="biz-phone">
                 Téléphone <span className="font-normal text-muted-foreground">(facultatif)</span>
@@ -237,7 +249,7 @@ export function ParametresPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="biz-vat-status">Statut de TVA</Label>
               <Select value={workspace.businessConfig.vatStatus} onValueChange={handleVatStatusChange}>
@@ -286,7 +298,7 @@ export function ParametresPage() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="biz-logo">
                 Logo <span className="font-normal text-muted-foreground">(facultatif)</span>
@@ -303,8 +315,14 @@ export function ParametresPage() {
                     Aucun
                   </div>
                 )}
-                <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()}>
-                  <Upload className="size-4" aria-hidden="true" />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  loading={isLogoUploading}
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  {!isLogoUploading && <Upload className="size-4" aria-hidden="true" />}
                   {workspace.businessConfig.logoDataUrl ? 'Changer' : 'Ajouter un logo'}
                 </Button>
                 {workspace.businessConfig.logoDataUrl && (
@@ -335,7 +353,7 @@ export function ParametresPage() {
                   type="color"
                   value={workspace.businessConfig.brandColor ?? DEFAULT_BRAND_COLOR}
                   onChange={(e) => saveBusinessField({ brandColor: e.target.value })}
-                  className="h-9 w-14 rounded-md border border-border bg-transparent p-1"
+                  className="h-9 w-14 rounded-md border border-border bg-transparent p-1 outline-none transition-colors hover:border-foreground/25 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
                 {workspace.businessConfig.brandColor && (
                   <Button type="button" variant="outline" size="sm" onClick={() => saveBusinessField({ brandColor: undefined })}>
@@ -354,7 +372,7 @@ export function ParametresPage() {
           <CardTitle>Formules de devis</CardTitle>
           <CardDescription>Ces 3 formules préconfigurent les lignes proposées à la création d'un devis.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="grid gap-3 grid-cols-1 sm:grid-cols-3">
           {proposalTemplates.map((template) => (
             <Card key={template.tier}>
               <CardContent className="flex flex-col gap-2">
@@ -385,8 +403,8 @@ export function ParametresPage() {
             Exporter mes données
           </Button>
 
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="size-4" aria-hidden="true" />
+          <Button variant="outline" loading={isImporting} onClick={() => fileInputRef.current?.click()}>
+            {!isImporting && <Upload className="size-4" aria-hidden="true" />}
             Importer une sauvegarde
           </Button>
           <input

@@ -1,5 +1,3 @@
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Bot, Calendar, History, MoreHorizontal, RotateCcw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,9 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { TaskPriorityBadge } from '@/features/tasks/components/TaskPriorityBadge'
 import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
 import { isOverdue, isDueToday } from '@/features/tasks/summary'
+import { formatShortDate } from '@/lib/dateFormat'
 import { cn } from '@/lib/utils'
 import { KANBAN_COLUMNS, TASK_STATUS_LABELS } from '@/lib/taskStatus'
 import type { Task, TaskStatus } from '@/types/entities'
@@ -72,15 +72,20 @@ export function TaskCard({
             )}
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label={`Actions pour ${task.title}`}
-                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              >
-                <MoreHorizontal className="size-4" aria-hidden="true" />
-              </button>
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`Actions pour ${task.title}`}
+                    className="shrink-0 relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <MoreHorizontal className="size-4" aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Actions</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => onEdit(task)}>Modifier</DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onPostpone(task)}>Reporter</DropdownMenuItem>
@@ -130,7 +135,7 @@ export function TaskCard({
             )}
           >
             <Calendar className="size-3.5" aria-hidden="true" />
-            {format(new Date(task.dueDate), 'd MMM yyyy', { locale: fr })}
+            {formatShortDate(task.dueDate)}
             {overdue && ' · en retard'}
             {dueToday && ' · aujourd\'hui'}
           </p>
@@ -154,7 +159,7 @@ export function TaskCard({
 function lastPostponeSummary(task: Task): string | undefined {
   const last = task.postponeHistory.at(-1)
   if (!last) return undefined
-  const from = format(new Date(last.fromDate), 'd MMM yyyy', { locale: fr })
-  const to = format(new Date(last.toDate), 'd MMM yyyy', { locale: fr })
+  const from = formatShortDate(last.fromDate)
+  const to = formatShortDate(last.toDate)
   return last.reason ? `Reportée du ${from} au ${to} — ${last.reason}` : `Reportée du ${from} au ${to}`
 }

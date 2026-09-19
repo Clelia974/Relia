@@ -61,7 +61,7 @@ export function SoldServiceForm({ open, onOpenChange, onSubmit }: SoldServiceFor
             <Textarea id="ss-description" rows={2} value={values.description} onChange={(e) => setField('description', e.target.value)} />
           </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Quantité" htmlFor="ss-quantity" optional error={errors.quantity}>
               <Input
                 id="ss-quantity"

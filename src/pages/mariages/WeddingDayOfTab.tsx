@@ -4,10 +4,10 @@ import { fr } from 'date-fns/locale'
 import { TriangleAlert } from 'lucide-react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/EmptyState'
 import { DayOfItemCard } from '@/features/dayof/components/DayOfItemCard'
 import { buildDayOfTimeline, filterDayOfTimelineByPhase, findMismatchedDayOfEvents } from '@/features/dayof/dayOfTimeline'
 import { DAY_PHASE_LABELS, DAY_PHASE_OPTIONS } from '@/lib/dayPhase'
-import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { DayPhase } from '@/types/entities'
@@ -86,13 +86,9 @@ export function WeddingDayOfTab() {
       </div>
 
       {timeline.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          Aucune tâche ni aucun moment prévu pour le jour du mariage.
-        </p>
+        <EmptyState description="Aucune tâche ni aucun moment prévu pour le jour du mariage." />
       ) : filtered.length === 0 ? (
-        <p className={cn('rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground')}>
-          Aucun élément pour ces filtres.
-        </p>
+        <EmptyState description="Aucun élément pour ces filtres." />
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((item) => {

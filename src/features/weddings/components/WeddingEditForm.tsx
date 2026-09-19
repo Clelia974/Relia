@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useRef, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import {
   AlertDialog,
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import {
   weddingToEditFormValues,
   WeddingEditFormSchema,
@@ -30,6 +31,8 @@ interface WeddingEditFormProps {
   wedding: Wedding
   /** Au moins un événement de planning existe déjà pour ce mariage — sert à l'avertissement date. */
   hasTimelineEvents: boolean
+  /** Ouvre le formulaire avec le focus posé sur ce champ (ex. depuis le bouton "Modifier" de la carte Notes). */
+  focusField?: 'notes'
   onSubmit: (values: WeddingEditFormValues) => void
 }
 
@@ -38,11 +41,12 @@ interface WeddingEditFormProps {
  * mêmes conventions que VendorForm : état initial dérivé des props plutôt
  * que resynchronisé par un effect.
  */
-export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents, onSubmit }: WeddingEditFormProps) {
+export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents, focusField, onSubmit }: WeddingEditFormProps) {
   const [initialValues] = useState<WeddingEditFormValues>(() => weddingToEditFormValues(wedding))
   const [values, setValues] = useState<WeddingEditFormValues>(initialValues)
   const [errors, setErrors] = useState<Partial<Record<keyof WeddingEditFormValues, string>>>({})
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false)
+  const notesRef = useRef<HTMLTextAreaElement>(null)
 
   const isDirty = JSON.stringify(values) !== JSON.stringify(initialValues)
   const showPlanningWarning = hasTimelineEvents && values.date !== initialValues.date
@@ -79,7 +83,14 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
   return (
     <>
       <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(next) : requestClose())}>
-        <DialogContent className="max-w-lg">
+        <DialogContent
+          className="max-w-lg"
+          onOpenAutoFocus={(event) => {
+            if (focusField !== 'notes') return
+            event.preventDefault()
+            notesRef.current?.focus()
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Modifier le mariage</DialogTitle>
             <DialogDescription>Mettez à jour les informations de ce mariage.</DialogDescription>
@@ -121,8 +132,8 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
               <Input id="w-venue" value={values.venue} onChange={(e) => setField('venue', e.target.value)} />
             </Field>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Montant vendu" htmlFor="w-soldAmount" error={errors.soldAmount} optional>
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+              <Field label="Montant du contrat" htmlFor="w-soldAmount" error={errors.soldAmount} optional>
                 <Input
                   id="w-soldAmount"
                   inputMode="decimal"
@@ -158,6 +169,16 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
                   ))}
                 </SelectContent>
               </Select>
+            </Field>
+
+            <Field label="Notes" htmlFor="w-notes" optional>
+              <Textarea
+                id="w-notes"
+                ref={notesRef}
+                rows={3}
+                value={values.notes}
+                onChange={(e) => setField('notes', e.target.value)}
+              />
             </Field>
 
             <div className="flex flex-col gap-1.5">

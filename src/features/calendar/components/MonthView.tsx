@@ -37,7 +37,7 @@ export function MonthView({ items }: { items: CalendarItem[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-heading text-base font-semibold capitalize text-foreground">{format(month, 'MMMM yyyy', { locale: fr })}</h3>
         <div className="flex gap-1">
           <Button variant="outline" size="icon" onClick={() => setMonth((m) => subMonths(m, 1))} aria-label="Mois précédent">

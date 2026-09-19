@@ -25,6 +25,7 @@ import type {
   Task,
   TaskStatus,
   TimelineEvent,
+  UiPreferences,
   UserProfile,
   Vendor,
   VendorStatus,
@@ -239,6 +240,7 @@ interface WorkspaceStoreState {
   updateOnboardingAnswers: (patch: Partial<NonNullable<UserProfile['onboardingAnswers']>>) => void
   completeOnboarding: () => void
   updateUserProfile: (patch: Partial<Omit<UserProfile, 'id'>>) => void
+  setTheme: (theme: UiPreferences['theme']) => void
 
   replaceWorkspace: (workspace: Workspace) => void
   resetWorkspace: (mode: 'empty' | 'demo') => void
@@ -1076,6 +1078,12 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       updateUserProfile: (patch) => {
         set((state) => ({
           workspace: { ...state.workspace, userProfile: { ...state.workspace.userProfile, ...patch } },
+        }))
+      },
+
+      setTheme: (theme) => {
+        set((state) => ({
+          workspace: { ...state.workspace, uiPreferences: { ...state.workspace.uiPreferences, theme } },
         }))
       },
 
