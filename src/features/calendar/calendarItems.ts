@@ -74,3 +74,31 @@ export function buildCalendarItems(
     return aTime.localeCompare(bTime)
   })
 }
+
+export interface CalendarToggleFilters {
+  tasks: boolean
+  events: boolean
+  alertsOnly: boolean
+}
+
+/** Sélection multiple : un tableau vide signifie « pas de filtre » (tout est affiché). */
+export interface CalendarSelection {
+  weddingIds: string[]
+  vendorIds: string[]
+}
+
+export function calendarItemVendorId(item: CalendarItem): string | undefined {
+  return item.kind === 'task' ? item.task.vendorId : item.event.vendorId
+}
+
+export function filterCalendarItems(items: CalendarItem[], selection: CalendarSelection, toggles: CalendarToggleFilters): CalendarItem[] {
+  return items
+    .filter((item) => selection.weddingIds.length === 0 || selection.weddingIds.includes(item.weddingId))
+    .filter((item) => {
+      if (selection.vendorIds.length === 0) return true
+      const vendorId = calendarItemVendorId(item)
+      return vendorId !== undefined && selection.vendorIds.includes(vendorId)
+    })
+    .filter((item) => (item.kind === 'task' ? toggles.tasks : toggles.events))
+    .filter((item) => !toggles.alertsOnly || item.isAlert)
+}

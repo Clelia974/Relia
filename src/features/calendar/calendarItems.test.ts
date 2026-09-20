@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildCalendarItems } from '@/features/calendar/calendarItems'
+import { buildCalendarItems, filterCalendarItems, type CalendarToggleFilters } from '@/features/calendar/calendarItems'
 import type { Task, TimelineEvent, Wedding } from '@/types/entities'
 
 function makeWedding(overrides: Partial<Wedding> & Pick<Wedding, 'id'>): Wedding {
@@ -87,5 +87,42 @@ describe('buildCalendarItems — mariages absents de weddingNameById', () => {
     const items = buildCalendarItems(weddings, tasks, [], new Map())
 
     expect(items).toEqual([])
+  })
+})
+
+describe('filterCalendarItems — mariages et prestataires', () => {
+  const weddings = [makeWedding({ id: 'w1', coupleName: 'A' }), makeWedding({ id: 'w2', coupleName: 'B' }), makeWedding({ id: 'w3', coupleName: 'C' })]
+  const tasks = [
+    makeTask({ id: 't1', weddingId: 'w1', vendorId: 'v1' }),
+    makeTask({ id: 't2', weddingId: 'w2', vendorId: 'v2' }),
+    makeTask({ id: 't3', weddingId: 'w3' }),
+  ]
+  const events = [makeEvent({ id: 'e1', weddingId: 'w1', vendorId: 'v2' }), makeEvent({ id: 'e2', weddingId: 'w2' })]
+  const all = buildCalendarItems(weddings, tasks, events, new Map())
+  const toggles: CalendarToggleFilters = { tasks: true, events: true, alertsOnly: false }
+  const ids = (items: ReturnType<typeof filterCalendarItems>) => items.map((i) => i.id).sort()
+
+  it('sans sélection, tout est affiché', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: [], vendorIds: [] }, toggles))).toEqual(['e1', 'e2', 't1', 't2', 't3'])
+  })
+
+  it('sélection multiple de mariages', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: ['w1', 'w3'], vendorIds: [] }, toggles))).toEqual(['e1', 't1', 't3'])
+  })
+
+  it('filtre par prestataire : tâches et événements liés à ce prestataire seulement', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: [], vendorIds: ['v2'] }, toggles))).toEqual(['e1', 't2'])
+  })
+
+  it('un élément sans prestataire est exclu quand un prestataire est sélectionné', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: [], vendorIds: ['v1', 'v2'] }, toggles))).not.toContain('t3')
+  })
+
+  it('mariage + prestataire se cumulent (ET)', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: ['w1'], vendorIds: ['v2'] }, toggles))).toEqual(['e1'])
+  })
+
+  it('les bascules Tâches / Événements restent appliquées', () => {
+    expect(ids(filterCalendarItems(all, { weddingIds: [], vendorIds: [] }, { ...toggles, events: false }))).toEqual(['t1', 't2', 't3'])
   })
 })
