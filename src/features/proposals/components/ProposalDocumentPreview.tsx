@@ -10,7 +10,7 @@ interface ProposalDocumentPreviewProps {
   wedding: Wedding
   title: string
   proposalNumber: string
-  templateLabel: string
+  templateLabel?: string
   clientName: string
   validUntil?: string
   lineItems: ProposalLineItem[]
@@ -61,7 +61,8 @@ export function ProposalDocumentPreview({
         </div>
         <div className="text-right">
           <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread'}`} style={accentStyle}>
-            Proposition n° {proposalNumber} — {templateLabel}
+            Proposition n° {proposalNumber}
+            {templateLabel ? ` — ${templateLabel}` : ''}
           </p>
           <p className="font-heading text-xl font-semibold text-foreground">{title}</p>
           {validUntil && (

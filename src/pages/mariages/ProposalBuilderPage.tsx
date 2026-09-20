@@ -103,7 +103,10 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
     )
   }
 
-  const templateLabel = proposalTemplates.find((t) => t.tier === proposal.template)?.label ?? proposal.template
+  const proposalTemplate = proposalTemplates.find((t) => t.tier === proposal.template)
+  const templateLabel = proposalTemplate?.label ?? proposal.template
+  /** Nom de la formule montré au client — absent si l'organisatrice a choisi de ne pas l'afficher. */
+  const documentTemplateLabel = proposalTemplate?.showOnDocuments === false ? undefined : templateLabel
   /** Envoyée/en attente/approuvée/rejetée/expirée : lecture seule par défaut — cf. lib/proposalStatus.ts. */
   const editable = isProposalEditable(proposal.status)
   /** Approuvée/rejetée/expirée : issue définitive, plus aucun changement de statut (Phase 2b) — seule une nouvelle version peut corriger. */
@@ -212,7 +215,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
   const buildTextSummary = () => {
     const lines2 = [
       `${title} — ${wedding.coupleName}`,
-      `Formule : ${templateLabel}`,
+      ...(documentTemplateLabel ? [`Formule : ${documentTemplateLabel}`] : []),
       '',
       'Services inclus :',
       ...numericLines.filter((l) => l.included && !l.optional).map((l) => `- ${l.description} (${l.quantity} × ${currency.format(l.unitPrice)}) : ${currency.format(l.total)}`),
@@ -423,7 +426,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
             wedding={wedding}
             title={title}
             proposalNumber={proposal.proposalNumber}
-            templateLabel={templateLabel}
+            templateLabel={documentTemplateLabel}
             clientName={clientName || wedding.coupleName}
             validUntil={validUntil ? new Date(validUntil).toISOString() : undefined}
             lineItems={numericLines}

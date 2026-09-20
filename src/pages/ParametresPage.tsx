@@ -110,9 +110,9 @@ export function ParametresPage() {
   const removeLogo = () => saveBusinessField({ logoDataUrl: undefined })
 
   const [editingTemplate, setEditingTemplate] = useState<ProposalTemplate | null>(null)
-  const handleTemplateSubmit = (values: { label: string; tagline: string; lines: ProposalTemplate['lines'] }) => {
+  const handleTemplateSubmit = (values: { label: string; tagline: string; showOnDocuments: boolean; lines: ProposalTemplate['lines'] }) => {
     if (!editingTemplate) return
-    updateProposalTemplate(editingTemplate.tier, { label: values.label, tagline: values.tagline || undefined, lines: values.lines })
+    updateProposalTemplate(editingTemplate.tier, { label: values.label, tagline: values.tagline || undefined, showOnDocuments: values.showOnDocuments, lines: values.lines })
     setEditingTemplate(null)
     toast.success('Formule mise à jour.')
   }
@@ -370,7 +370,7 @@ export function ParametresPage() {
       <Card>
         <CardHeader>
           <CardTitle>Formules de devis</CardTitle>
-          <CardDescription>Ces 3 formules préconfigurent les lignes proposées à la création d'un devis.</CardDescription>
+          <CardDescription>Ces 3 formules préconfigurent les lignes proposées à la création d'un devis. Vous pouvez les renommer, ou choisir que leur nom n'apparaisse pas sur les devis.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 grid-cols-1 sm:grid-cols-3">
           {proposalTemplates.map((template) => (
@@ -378,11 +378,12 @@ export function ParametresPage() {
               <CardContent className="flex flex-col gap-2">
                 <p className="font-heading text-lg font-semibold text-foreground">{template.label}</p>
                 {template.tagline && <p className="text-sm text-muted-foreground">{template.tagline}</p>}
+                {template.showOnDocuments === false && <p className="text-xs text-muted-foreground">Nom masqué sur les devis</p>}
                 <p className="text-xs text-muted-foreground">
                   {template.lines.length} ligne{template.lines.length !== 1 ? 's' : ''} préconfigurée{template.lines.length !== 1 ? 's' : ''}
                 </p>
                 <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setEditingTemplate(template)}>
-                  Modifier les lignes
+                  Modifier la formule
                 </Button>
               </CardContent>
             </Card>

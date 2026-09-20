@@ -253,7 +253,7 @@ interface WorkspaceStoreState {
 
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
-  updateProposalTemplate: (tier: ProposalTier, patch: Pick<ProposalTemplate, 'label' | 'tagline' | 'lines'>) => void
+  updateProposalTemplate: (tier: ProposalTier, patch: Pick<ProposalTemplate, 'label' | 'tagline' | 'lines' | 'showOnDocuments'>) => void
 
   updateOnboardingAnswers: (patch: Partial<NonNullable<UserProfile['onboardingAnswers']>>) => void
   completeOnboarding: () => void

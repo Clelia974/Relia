@@ -10,7 +10,7 @@ import type { ProposalTemplate, ProposalTier } from '@/types/entities'
  */
 export const PROPOSAL_TIER_ORDER: ProposalTier[] = ['silver', 'gold', 'platinum']
 
-const DEFAULT_TEMPLATE_DATA: Record<ProposalTier, Omit<ProposalTemplate, 'tier' | 'lines'> & { lines: Omit<ProposalTemplate['lines'][number], 'id'>[] }> = {
+const DEFAULT_TEMPLATE_DATA: Record<ProposalTier, Omit<ProposalTemplate, 'tier' | 'lines' | 'showOnDocuments'> & { lines: Omit<ProposalTemplate['lines'][number], 'id'>[] }> = {
   silver: {
     label: 'Silver',
     tagline: 'Une formule essentielle pour un mariage élégant et maîtrisé.',
@@ -56,6 +56,7 @@ export function createDefaultProposalTemplates(): ProposalTemplate[] {
       tier,
       label: template.label,
       tagline: template.tagline,
+      showOnDocuments: true,
       lines: template.lines.map((line) => ({ ...line, id: generateId() })),
     }
   })

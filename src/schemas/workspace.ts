@@ -413,6 +413,8 @@ export const ProposalTemplateSchema = z.object({
   tier: ProposalTierSchema,
   label: z.string().min(1, 'Veuillez renseigner le nom de la formule.'),
   tagline: z.string().optional(),
+  /** Le nom de la formule est-il affiché sur les devis remis au client ? (Utile si l'organisatrice préfère ne pas nommer ses formules.) */
+  showOnDocuments: z.boolean().default(true),
   lines: z.array(ProposalTemplateLineSchema),
 })
 

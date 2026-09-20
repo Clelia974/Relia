@@ -40,13 +40,14 @@ interface ProposalTemplateFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   template: ProposalTemplate
-  onSubmit: (values: { label: string; tagline: string; lines: ProposalTemplateLine[] }) => void
+  onSubmit: (values: { label: string; tagline: string; showOnDocuments: boolean; lines: ProposalTemplateLine[] }) => void
 }
 
 /** Le parent doit remonter ce composant (prop `key`) à chaque ouverture — voir ExpenseForm pour la même convention. */
 export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }: ProposalTemplateFormProps) {
   const [label, setLabel] = useState(template.label)
   const [tagline, setTagline] = useState(template.tagline ?? '')
+  const [showOnDocuments, setShowOnDocuments] = useState(template.showOnDocuments !== false)
   const [lines, setLines] = useState<DraftLine[]>(() => template.lines.map(toDraftLine))
   const [error, setError] = useState<string | null>(null)
 
@@ -87,6 +88,7 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
     onSubmit({
       label: label.trim(),
       tagline: tagline.trim(),
+      showOnDocuments,
       lines: lines.map((l) => ({
         id: l.id,
         description: l.description.trim(),
@@ -121,6 +123,16 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
               </Label>
               <Input id="tpl-tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Ex. Une formule essentielle…" />
             </div>
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <Checkbox id="tpl-show" checked={showOnDocuments} onCheckedChange={(checked) => setShowOnDocuments(checked === true)} className="mt-0.5" />
+            <Label htmlFor="tpl-show" className="flex flex-col items-start gap-0.5 font-normal">
+              <span className="text-foreground">Afficher le nom de la formule sur les devis</span>
+              <span className="text-xs text-muted-foreground">
+                Décoché : le nom reste visible pour vous, mais n'apparaît ni dans le titre proposé ni sur le devis remis au client.
+              </span>
+            </Label>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">

@@ -58,7 +58,7 @@ export function WeddingDocumentsTab() {
     const id = createProposal({
       weddingId: wedding.id,
       template: tier,
-      title: `Proposition ${template.label} — ${wedding.coupleName}`,
+      title: template.showOnDocuments === false ? `Proposition — ${wedding.coupleName}` : `Proposition ${template.label} — ${wedding.coupleName}`,
       clientName: wedding.coupleName,
       lineItems,
       subtotal: totals.subtotal,
