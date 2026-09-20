@@ -109,6 +109,18 @@ export const UserProfileSchema = z.object({
     .optional(),
 })
 
+export const ContractStatusSchema = z.enum(['a_rediger', 'envoye', 'signe'])
+
+/** Suivi léger du contrat d'un mariage (statut et dates) — sans pièce jointe : le dépôt du PDF signé viendra avec un vrai stockage de fichiers. */
+export const ContractSchema = z.object({
+  status: ContractStatusSchema,
+  /** Renseignée quand le contrat a été envoyé au client. */
+  sentAt: isoDate.optional(),
+  /** Renseignée uniquement quand le contrat est signé. */
+  signedAt: isoDate.optional(),
+  notes: z.string().optional(),
+})
+
 export const WeddingSchema = z.object({
   id,
   coupleName: z.string().min(1, 'Le nom du couple est obligatoire.'),
@@ -117,6 +129,7 @@ export const WeddingSchema = z.object({
   /** Coordonnées du client — reprises par défaut sur les devis et factures (mentions attendues sur ces documents). */
   clientAddress: z.string().optional(),
   clientPhone: z.string().optional(),
+  contract: ContractSchema.optional(),
   soldAmount: z.number().nonnegative('Le montant du contrat ne peut pas être négatif.'),
   clientBudget: z.number().nonnegative('Le budget client ne peut pas être négatif.'),
   status: WeddingStatusSchema,
@@ -715,6 +728,8 @@ export type SoldService = z.infer<typeof SoldServiceSchema>
 export type ProposalTemplateLine = z.infer<typeof ProposalTemplateLineSchema>
 export type ProposalTemplate = z.infer<typeof ProposalTemplateSchema>
 export type ClientDecision = z.infer<typeof ClientDecisionSchema>
+export type ContractStatus = z.infer<typeof ContractStatusSchema>
+export type Contract = z.infer<typeof ContractSchema>
 export type InvoiceStatus = z.infer<typeof InvoiceStatusSchema>
 export type Invoice = z.infer<typeof InvoiceSchema>
 export type EquipmentAcquisitionMode = z.infer<typeof EquipmentAcquisitionModeSchema>

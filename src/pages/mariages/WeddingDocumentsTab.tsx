@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,8 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EmptyState } from '@/components/EmptyState'
+import { ContractPanel } from '@/features/contracts/components/ContractPanel'
+import { ContractStatusBadge } from '@/features/contracts/components/ContractStatusBadge'
 import { computeProposalTotals } from '@/features/proposals/calculations'
 import { ProposalStatusBadge } from '@/features/proposals/components/ProposalStatusBadge'
 import { currency } from '@/lib/currency'
@@ -32,6 +35,7 @@ export function WeddingDocumentsTab() {
   const allInvoices = useWorkspaceStore((s) => s.workspace.invoices)
   const createProposal = useWorkspaceStore((s) => s.createProposal)
   const createInvoicePreview = useWorkspaceStore((s) => s.createInvoicePreview)
+  const updateWedding = useWorkspaceStore((s) => s.updateWedding)
 
   const proposals = allProposals.filter((p) => p.weddingId === wedding.id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const invoices = allInvoices.filter((inv) => inv.weddingId === wedding.id).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
@@ -117,13 +121,17 @@ export function WeddingDocumentsTab() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold text-foreground">Documents</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Propositions et factures indicatives pour ce mariage.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Propositions, factures indicatives et contrat pour ce mariage.</p>
       </div>
 
       <Tabs defaultValue="propositions">
         <TabsList>
           <TabsTrigger value="propositions">Propositions</TabsTrigger>
           <TabsTrigger value="factures">Factures indicatives</TabsTrigger>
+          <TabsTrigger value="contrat" className="gap-2">
+            Contrat
+            {wedding.contract && <ContractStatusBadge status={wedding.contract.status} />}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="propositions" className="flex flex-col gap-4 pt-4">
@@ -183,6 +191,16 @@ export function WeddingDocumentsTab() {
               ))}
             </div>
           )}
+        </TabsContent>
+        <TabsContent value="contrat" className="pt-4">
+          <ContractPanel
+            key={wedding.id}
+            contract={wedding.contract}
+            onChange={(contract) => {
+              updateWedding(wedding.id, { contract })
+              toast.success('Contrat mis à jour.')
+            }}
+          />
         </TabsContent>
       </Tabs>
 

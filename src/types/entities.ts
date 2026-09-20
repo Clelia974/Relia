@@ -18,6 +18,8 @@ export type {
   ExpenseStatus,
   Invoice,
   InvoiceStatus,
+  Contract,
+  ContractStatus,
   PortfolioImage,
   PostponeEntry,
   Proposal,
