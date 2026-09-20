@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 9 as const
+export const CURRENT_SCHEMA_VERSION = 10 as const
 
 const isoDate = z
   .string()
@@ -437,6 +437,13 @@ export const ClientDecisionSchema = z.object({
  * ici — seul le contenu propre au document (numéro, lignes, montants) est
  * persisté.
  */
+/**
+ * brouillon = encore modifiable ; finalisee = verrouillée (cf. Phase 2b) —
+ * jamais un troisième état ici, contrairement à Proposal dont le cycle de
+ * vie (envoyée/approuvée/...) est un besoin distinct et plus riche.
+ */
+export const InvoiceStatusSchema = z.enum(['brouillon', 'finalisee'])
+
 export const InvoiceSchema = z.object({
   id,
   weddingId: id,
@@ -455,6 +462,10 @@ export const InvoiceSchema = z.object({
   balanceAmount: z.number().optional(),
   legalMentions: z.string().optional(),
   isIndicativePreview: z.literal(true),
+  /** Absent sur les factures créées avant la Phase 2b : le default couvre leur relecture (cf. migration v9→v10). */
+  status: InvoiceStatusSchema.default('brouillon'),
+  /** Renseigné uniquement quand status passe à 'finalisee' — jamais écrasé ensuite (facture verrouillée dès cet instant). */
+  finalizedAt: isoDate.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })
@@ -694,6 +705,7 @@ export type SoldService = z.infer<typeof SoldServiceSchema>
 export type ProposalTemplateLine = z.infer<typeof ProposalTemplateLineSchema>
 export type ProposalTemplate = z.infer<typeof ProposalTemplateSchema>
 export type ClientDecision = z.infer<typeof ClientDecisionSchema>
+export type InvoiceStatus = z.infer<typeof InvoiceStatusSchema>
 export type Invoice = z.infer<typeof InvoiceSchema>
 export type EquipmentAcquisitionMode = z.infer<typeof EquipmentAcquisitionModeSchema>
 export type EquipmentDestination = z.infer<typeof EquipmentDestinationSchema>

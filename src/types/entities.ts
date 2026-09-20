@@ -17,6 +17,7 @@ export type {
   ExpenseCategory,
   ExpenseStatus,
   Invoice,
+  InvoiceStatus,
   PortfolioImage,
   PostponeEntry,
   Proposal,

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Copy, FileJson, Plus, Printer, Trash2 } from 'lucide-react'
+import { Copy, FileJson, Lock, Plus, Printer, Trash2 } from 'lucide-react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -31,7 +32,7 @@ import {
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
-import { PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_OPTIONS } from '@/lib/proposalStatus'
+import { isProposalEditable, isProposalStatusLocked, PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_OPTIONS } from '@/lib/proposalStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { ProposalStatus } from '@/types/entities'
@@ -88,7 +89,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
   )
   const [errors, setErrors] = useState<Partial<Record<'title' | 'validUntil' | 'depositPercentage', string>>>({})
   const [rowErrors, setRowErrors] = useState<Record<string, Partial<Record<keyof ProposalLineItemFormValues, string>>>>({})
-  const [view, setView] = useState<'editeur' | 'apercu'>('editeur')
+  const [view, setView] = useState<'editeur' | 'apercu'>(proposal && !isProposalEditable(proposal.status) ? 'apercu' : 'editeur')
   const [pendingDelete, setPendingDelete] = useState(false)
 
   if (!proposal) {
@@ -103,6 +104,10 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
   }
 
   const templateLabel = proposalTemplates.find((t) => t.tier === proposal.template)?.label ?? proposal.template
+  /** Envoyée/en attente/approuvée/rejetée/expirée : lecture seule par défaut — cf. lib/proposalStatus.ts. */
+  const editable = isProposalEditable(proposal.status)
+  /** Approuvée/rejetée/expirée : issue définitive, plus aucun changement de statut (Phase 2b) — seule une nouvelle version peut corriger. */
+  const statusLocked = isProposalStatusLocked(proposal.status)
 
   const numericLines = toNumericLines(lines)
   const totals = computeProposalTotals(
@@ -121,9 +126,16 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
   const addLine = () => setLines((prev) => [...prev, emptyLineItemFormValues()])
   const addOption = () => setLines((prev) => [...prev, emptyLineItemFormValues({ included: false, optional: true })])
 
+  /**
+   * Une fois approuvée, rejetée ou expirée, le statut est définitif (Phase 2b,
+   * cf. isProposalStatusLocked) — le sélecteur est désactivé et cette
+   * fonction ne devrait jamais être appelée dans cet état ; le store refuse
+   * de toute façon silencieusement la mise à jour en second rempart.
+   */
   const handleStatusChange = (value: string) => {
-    updateProposalStatus(proposal.id, value as ProposalStatus)
-    toast.success(`Statut mis à jour : ${PROPOSAL_STATUS_LABELS[value as ProposalStatus]}.`)
+    const nextStatus = value as ProposalStatus
+    updateProposalStatus(proposal.id, nextStatus)
+    toast.success(`Statut mis à jour : ${PROPOSAL_STATUS_LABELS[nextStatus]}.`)
   }
 
   const handleSave = () => {
@@ -252,8 +264,8 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Select value={proposal.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-48">
+          <Select value={proposal.status} onValueChange={handleStatusChange} disabled={statusLocked}>
+            <SelectTrigger className="w-48" aria-label={statusLocked ? 'Statut verrouillé' : 'Statut de la proposition'}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -265,7 +277,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
             </SelectContent>
           </Select>
           <Button variant="outline" onClick={handleDuplicate}>
-            Dupliquer
+            {editable ? 'Dupliquer' : 'Créer une nouvelle version'}
           </Button>
           <Button variant="outline" className="text-risk hover:text-risk" onClick={() => setPendingDelete(true)}>
             <Trash2 className="size-4" aria-hidden="true" />
@@ -274,13 +286,27 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
         </div>
       </div>
 
+      {statusLocked && (
+        <Alert className="no-print border-warning/40 bg-warning-bg">
+          <Lock className="size-4 text-warning" aria-hidden="true" />
+          <AlertDescription className="text-warning">
+            Cette proposition est {PROPOSAL_STATUS_LABELS[proposal.status].toLowerCase()} et verrouillée — son statut et son contenu ne peuvent
+            plus être modifiés. Pour la corriger, créez une nouvelle version.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="no-print flex flex-wrap gap-2">
-        <Button variant={view === 'editeur' ? 'default' : 'outline'} size="sm" onClick={() => setView('editeur')}>
-          Éditeur
-        </Button>
-        <Button variant={view === 'apercu' ? 'default' : 'outline'} size="sm" onClick={() => setView('apercu')}>
-          Aperçu
-        </Button>
+        {editable && (
+          <>
+            <Button variant={view === 'editeur' ? 'default' : 'outline'} size="sm" onClick={() => setView('editeur')}>
+              Éditeur
+            </Button>
+            <Button variant={view === 'apercu' ? 'default' : 'outline'} size="sm" onClick={() => setView('apercu')}>
+              Aperçu
+            </Button>
+          </>
+        )}
         <div className="flex-1" />
         <Button variant="outline" size="sm" onClick={handleCopy}>
           <Copy className="size-4" aria-hidden="true" />
@@ -290,7 +316,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
           <FileJson className="size-4" aria-hidden="true" />
           Exporter en JSON
         </Button>
-        {view === 'apercu' ? (
+        {!editable || view === 'apercu' ? (
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <Printer className="size-4" aria-hidden="true" />
             Imprimer / Enregistrer en PDF
@@ -303,7 +329,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
         )}
       </div>
 
-      {view === 'editeur' ? (
+      {editable && view === 'editeur' ? (
         <div className="no-print grid gap-6 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="flex flex-col gap-6">
             <Card>
@@ -420,6 +446,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </div>
   )
 }

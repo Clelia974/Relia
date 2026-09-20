@@ -2,7 +2,9 @@ import { create } from 'zustand'
 import { persist, type PersistStorage } from 'zustand/middleware'
 import { computeClosingSummary } from '@/features/closing/closingSummary'
 import { generateId } from '@/lib/id'
+import { isInvoiceStatusLocked } from '@/lib/invoiceStatus'
 import { nowIso } from '@/lib/now'
+import { isProposalEditable, isProposalStatusLocked } from '@/lib/proposalStatus'
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
 import { createDemoWorkspace, createEmptyWorkspace } from '@/lib/workspace/factories'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
@@ -15,6 +17,7 @@ import type {
   EquipmentStatus,
   Expense,
   Invoice,
+  InvoiceStatus,
   Proposal,
   ProposalStatus,
   ProposalTemplate,
@@ -199,6 +202,8 @@ interface WorkspaceStoreState {
 
   createInvoicePreview: (input: NewInvoiceInput) => string
   updateInvoicePreview: (id: string, patch: Partial<Omit<Invoice, 'id' | 'weddingId' | 'createdAt'>>) => void
+  updateInvoiceStatus: (id: string, status: InvoiceStatus) => void
+  duplicateInvoicePreview: (id: string) => string | null
   deleteInvoicePreview: (id: string) => void
 
   addEquipmentItem: (input: NewEquipmentItemInput) => string
@@ -671,21 +676,25 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         return id
       },
 
+      /** Refuse silencieusement toute modification de contenu si le statut actuel n'est pas modifiable (cf. isProposalEditable, Phase 2b) — le contenu d'une proposition verrouillée ne doit jamais être écrasé, ni depuis l'UI (qui ne l'appelle déjà plus) ni depuis un appel direct. */
       updateProposal: (id, patch) => {
         set((state) => ({
           workspace: {
             ...state.workspace,
-            proposals: state.workspace.proposals.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: nowIso() } : p)),
+            proposals: state.workspace.proposals.map((p) =>
+              p.id === id && isProposalEditable(p.status) ? { ...p, ...patch, updatedAt: nowIso() } : p,
+            ),
           },
         }))
       },
 
+      /** Refuse silencieusement tout changement de statut si le statut actuel est final (approuvée/rejetée/expirée, cf. isProposalStatusLocked) — jamais de régression une fois l'issue tranchée ; seule une nouvelle version (duplicateProposal) permet de repartir d'un brouillon. */
       updateProposalStatus: (id, status) => {
         set((state) => ({
           workspace: {
             ...state.workspace,
             proposals: state.workspace.proposals.map((p) =>
-              p.id === id
+              p.id === id && !isProposalStatusLocked(p.status)
                 ? { ...p, status, approvedAt: status === 'approuvee' ? nowIso() : p.approvedAt, updatedAt: nowIso() }
                 : p,
             ),
@@ -837,6 +846,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           balanceAmount: input.balanceAmount,
           legalMentions: input.legalMentions,
           isIndicativePreview: true,
+          status: 'brouillon',
           createdAt: timestamp,
           updatedAt: timestamp,
         }
@@ -844,13 +854,49 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         return id
       },
 
+      /** Refuse silencieusement toute modification de contenu si la facture est finalisée (cf. isInvoiceEditable, Phase 2b) — jamais écrasée une fois verrouillée. */
       updateInvoicePreview: (id, patch) => {
         set((state) => ({
           workspace: {
             ...state.workspace,
-            invoices: state.workspace.invoices.map((inv) => (inv.id === id ? { ...inv, ...patch, updatedAt: nowIso() } : inv)),
+            invoices: state.workspace.invoices.map((inv) =>
+              inv.id === id && !isInvoiceStatusLocked(inv.status) ? { ...inv, ...patch, updatedAt: nowIso() } : inv,
+            ),
           },
         }))
+      },
+
+      /** Refuse silencieusement tout changement de statut si la facture est déjà finalisée (cf. isInvoiceStatusLocked) — jamais de retour à brouillon une fois verrouillée ; seule une nouvelle version (duplicateInvoicePreview) permet de corriger. */
+      updateInvoiceStatus: (id, status) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            invoices: state.workspace.invoices.map((inv) =>
+              inv.id === id && !isInvoiceStatusLocked(inv.status)
+                ? { ...inv, status, finalizedAt: status === 'finalisee' ? nowIso() : inv.finalizedAt, updatedAt: nowIso() }
+                : inv,
+            ),
+          },
+        }))
+      },
+
+      /** Toujours possible, même sur une facture finalisée : la copie repart en brouillon, indépendante de l'originale (jamais modifiée en retour). */
+      duplicateInvoicePreview: (id) => {
+        const source = get().workspace.invoices.find((inv) => inv.id === id)
+        if (!source) return null
+        const newId = generateId()
+        const timestamp = nowIso()
+        const duplicate: Invoice = {
+          ...source,
+          id: newId,
+          lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
+          status: 'brouillon',
+          finalizedAt: undefined,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }
+        set((state) => ({ workspace: { ...state.workspace, invoices: [...state.workspace.invoices, duplicate] } }))
+        return newId
       },
 
       deleteInvoicePreview: (id) => {

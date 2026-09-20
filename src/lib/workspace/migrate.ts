@@ -168,6 +168,18 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
    * existantes : aucun mariage existant n'est marqué clôturé.
    */
   8: (data) => ({ ...data, schemaVersion: 9, closingSessions: [] }),
+
+  /**
+   * v9 → v10 (Phase 2b) : ajoute Invoice.status ('brouillon' | 'finalisee')
+   * et Invoice.finalizedAt facultatif, pour verrouiller une facture finalisée
+   * exactement comme Proposal.status le fait déjà pour les propositions.
+   * Purement additif : InvoiceStatusSchema a un default('brouillon'), donc
+   * toute facture déjà existante (créée avant ce champ) est relue comme
+   * "brouillon" — jamais verrouillée rétroactivement, jamais traitée comme
+   * "finalisee" sans qu'une action explicite ne l'ait décidé.
+   */
+  9: (data) => ({ ...data, schemaVersion: 10 }),
+
 }
 
 /**

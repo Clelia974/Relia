@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Copy, FileJson, Printer, Trash2 } from 'lucide-react'
+import { Copy, FileJson, Lock, Printer, Trash2 } from 'lucide-react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -21,10 +22,12 @@ import { computeProposalTotals } from '@/features/proposals/calculations'
 import { LineItemsEditor } from '@/features/proposals/components/LineItemsEditor'
 import { emptyLineItemFormValues, ProposalLineItemFormSchema, type ProposalLineItemFormValues } from '@/features/proposals/proposalForm.schema'
 import { InvoiceDocumentPreview } from '@/features/invoices/components/InvoiceDocumentPreview'
+import { InvoiceStatusBadge } from '@/features/invoices/components/InvoiceStatusBadge'
 import { InvoicePreviewFormSchema } from '@/features/invoices/invoicePreviewForm.schema'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
+import { isInvoiceEditable } from '@/lib/invoiceStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 
@@ -53,6 +56,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const invoice = useWorkspaceStore((s) => s.workspace.invoices.find((inv) => inv.id === invoiceId))
   const updateInvoicePreview = useWorkspaceStore((s) => s.updateInvoicePreview)
+  const updateInvoiceStatus = useWorkspaceStore((s) => s.updateInvoiceStatus)
+  const duplicateInvoicePreview = useWorkspaceStore((s) => s.duplicateInvoicePreview)
   const deleteInvoicePreview = useWorkspaceStore((s) => s.deleteInvoicePreview)
 
   const [invoiceNumber, setInvoiceNumber] = useState(invoice?.invoiceNumber ?? '')
@@ -76,8 +81,9 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   )
   const [errors, setErrors] = useState<Partial<Record<'invoiceNumber' | 'date', string>>>({})
   const [rowErrors, setRowErrors] = useState<Record<string, Partial<Record<keyof ProposalLineItemFormValues, string>>>>({})
-  const [view, setView] = useState<'editeur' | 'apercu'>('editeur')
+  const [view, setView] = useState<'editeur' | 'apercu'>(invoice && !isInvoiceEditable(invoice.status) ? 'apercu' : 'editeur')
   const [pendingDelete, setPendingDelete] = useState(false)
+  const [pendingFinalize, setPendingFinalize] = useState(false)
 
   if (!invoice) {
     return (
@@ -89,6 +95,9 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
       </div>
     )
   }
+
+  /** Finalisée : lecture seule pour toujours (Phase 2b) — seule une nouvelle version (dupliquer) peut la corriger. */
+  const editable = isInvoiceEditable(invoice.status)
 
   const numericLines = toNumericLines(lines)
   const totals = computeProposalTotals(numericLines, invoice.vatMode, invoice.vatRate, undefined)
@@ -161,6 +170,20 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
     toast.success('Facture exportée en JSON.')
   }
 
+  const handleDuplicate = () => {
+    const newId = duplicateInvoicePreview(invoice.id)
+    if (newId) {
+      toast.success('Facture dupliquée.')
+      navigate(`/mariages/${wedding.id}/documents/factures/${newId}`)
+    }
+  }
+
+  const confirmFinalize = () => {
+    updateInvoiceStatus(invoice.id, 'finalisee')
+    toast.success('Facture finalisée — elle est maintenant en lecture seule.')
+    setPendingFinalize(false)
+  }
+
   const confirmDelete = () => {
     deleteInvoicePreview(invoice.id)
     toast.success('Facture supprimée.')
@@ -175,21 +198,49 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
             ← Documents
           </Link>
           <h1 className="font-heading text-2xl font-semibold text-foreground">Facture n° {invoiceNumber || invoice.invoiceNumber}</h1>
-          <p className="mt-1 rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning">Prévisualisation indicative</p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <InvoiceStatusBadge status={invoice.status} />
+            <span className="rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning">Prévisualisation indicative</span>
+          </div>
         </div>
-        <Button variant="outline" className="text-risk hover:text-risk" onClick={() => setPendingDelete(true)}>
-          <Trash2 className="size-4" aria-hidden="true" />
-          Supprimer
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {editable && (
+            <Button variant="outline" onClick={() => setPendingFinalize(true)}>
+              <Lock className="size-4" aria-hidden="true" />
+              Finaliser
+            </Button>
+          )}
+          <Button variant="outline" onClick={handleDuplicate}>
+            {editable ? 'Dupliquer' : 'Créer une nouvelle version'}
+          </Button>
+          <Button variant="outline" className="text-risk hover:text-risk" onClick={() => setPendingDelete(true)}>
+            <Trash2 className="size-4" aria-hidden="true" />
+            Supprimer
+          </Button>
+        </div>
       </div>
 
+      {!editable && (
+        <Alert className="no-print border-warning/40 bg-warning-bg">
+          <Lock className="size-4 text-warning" aria-hidden="true" />
+          <AlertDescription className="text-warning">
+            Cette facture est finalisée et verrouillée — son statut et son contenu ne peuvent plus être modifiés. Pour la corriger, créez une
+            nouvelle version.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="no-print flex flex-wrap gap-2">
-        <Button variant={view === 'editeur' ? 'default' : 'outline'} size="sm" onClick={() => setView('editeur')}>
-          Éditeur
-        </Button>
-        <Button variant={view === 'apercu' ? 'default' : 'outline'} size="sm" onClick={() => setView('apercu')}>
-          Aperçu
-        </Button>
+        {editable && (
+          <>
+            <Button variant={view === 'editeur' ? 'default' : 'outline'} size="sm" onClick={() => setView('editeur')}>
+              Éditeur
+            </Button>
+            <Button variant={view === 'apercu' ? 'default' : 'outline'} size="sm" onClick={() => setView('apercu')}>
+              Aperçu
+            </Button>
+          </>
+        )}
         <div className="flex-1" />
         <Button variant="outline" size="sm" onClick={handleCopy}>
           <Copy className="size-4" aria-hidden="true" />
@@ -199,7 +250,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           <FileJson className="size-4" aria-hidden="true" />
           Exporter en JSON
         </Button>
-        {view === 'apercu' ? (
+        {!editable || view === 'apercu' ? (
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <Printer className="size-4" aria-hidden="true" />
             Imprimer / Enregistrer en PDF
@@ -212,7 +263,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
         )}
       </div>
 
-      {view === 'editeur' ? (
+      {editable && view === 'editeur' ? (
         <div className="no-print flex flex-col gap-6">
           <Card>
             <CardContent className="flex flex-col gap-4">
@@ -286,6 +337,22 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           />
         </div>
       )}
+
+      <AlertDialog open={pendingFinalize} onOpenChange={setPendingFinalize}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Finaliser cette facture ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Une fois finalisée, cette facture devient définitivement en lecture seule : plus aucune modification de contenu ni retour en
+              arrière ne sera possible. Pour corriger quelque chose ensuite, vous devrez créer une nouvelle version.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmFinalize}>Finaliser</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={pendingDelete} onOpenChange={setPendingDelete}>
         <AlertDialogContent>
