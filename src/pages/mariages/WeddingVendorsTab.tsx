@@ -18,7 +18,10 @@ import { VendorCard } from '@/features/vendors/components/VendorCard'
 import { VendorEmptyState } from '@/features/vendors/components/VendorEmptyState'
 import { VendorForm } from '@/features/vendors/components/VendorForm'
 import { VendorSummary } from '@/features/vendors/components/VendorSummary'
-import type { VendorFormValues } from '@/features/vendors/vendorForm.schema'
+import { VendorAssignmentForm } from '@/features/vendors/components/VendorAssignmentForm'
+import { VendorProfileDialog } from '@/features/vendors/components/VendorProfileDialog'
+import { getWeddingAssignments, type VendorAssignment } from '@/features/vendors/assignments'
+import type { VendorAssignmentFormValues, VendorFormValues } from '@/features/vendors/vendorForm.schema'
 import { isVendorConfirmed } from '@/lib/vendorStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
@@ -31,14 +34,15 @@ function toVendorPatch(values: VendorFormValues) {
     category: values.category as VendorCategory,
     phone: values.phone.trim() || undefined,
     email: values.email.trim() || undefined,
-    arrivalTime: values.arrivalTime || undefined,
-    status: values.status as VendorStatus,
     notes: values.notes.trim() || undefined,
   }
 }
 
-function toCostPatch(values: VendorFormValues) {
+function toAssignmentPatch(values: VendorAssignmentFormValues) {
   return {
+    status: values.status as VendorStatus,
+    arrivalTime: values.arrivalTime || undefined,
+    notes: values.assignmentNotes.trim() || undefined,
     estimatedCost: values.estimatedCost === '' ? undefined : Number(values.estimatedCost),
     actualCost: values.actualCost === '' ? undefined : Number(values.actualCost),
   }
@@ -47,33 +51,24 @@ function toCostPatch(values: VendorFormValues) {
 export function WeddingVendorsTab() {
   const { wedding } = useOutletContext<WeddingOutletContext>()
   const allVendors = useWorkspaceStore((s) => s.workspace.vendors)
-  const vendors = allVendors.filter((v) => v.weddingIds.includes(wedding.id))
   const allVendorWeddingLinks = useWorkspaceStore((s) => s.workspace.vendorWeddingLinks)
-  const vendorLinks = allVendorWeddingLinks.filter((l) => l.weddingId === wedding.id)
-  const linkByVendorId = new Map(vendorLinks.map((l) => [l.vendorId, l]))
+  const assignments = getWeddingAssignments(allVendors, allVendorWeddingLinks, wedding.id)
   const tasks = useWorkspaceStore((s) => s.workspace.tasks)
   const addVendor = useWorkspaceStore((s) => s.addVendor)
-  const updateVendor = useWorkspaceStore((s) => s.updateVendor)
-  const setVendorCostForWedding = useWorkspaceStore((s) => s.setVendorCostForWedding)
+  const updateVendorAssignment = useWorkspaceStore((s) => s.updateVendorAssignment)
   const markVendorConfirmed = useWorkspaceStore((s) => s.markVendorConfirmed)
   const removeVendorFromWedding = useWorkspaceStore((s) => s.removeVendorFromWedding)
   const addTask = useWorkspaceStore((s) => s.addTask)
   const completeTask = useWorkspaceStore((s) => s.completeTask)
 
   const [formOpen, setFormOpen] = useState(false)
-  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null)
+  const [editingAssignment, setEditingAssignment] = useState<VendorAssignment | null>(null)
+  const [profileVendorId, setProfileVendorId] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<Vendor | null>(null)
   const [taskPromptVendor, setTaskPromptVendor] = useState<Vendor | null>(null)
   const [completeTaskPrompt, setCompleteTaskPrompt] = useState<{ vendorName: string; taskId: string; taskTitle: string } | null>(null)
 
-  const openCreate = () => {
-    setEditingVendor(null)
-    setFormOpen(true)
-  }
-  const openEdit = (vendor: Vendor) => {
-    setEditingVendor(vendor)
-    setFormOpen(true)
-  }
+  const openCreate = () => setFormOpen(true)
 
   const promptCompleteTaskIfNeeded = (vendor: Vendor) => {
     const openAutoTasks = tasks.filter((t) => t.vendorId === vendor.id && t.source === 'automatic' && t.status !== 'terminee')
@@ -82,34 +77,46 @@ export function WeddingVendorsTab() {
     }
   }
 
-  const handleSubmit = (values: VendorFormValues) => {
+  const handleCreateSubmit = (values: VendorFormValues) => {
+    const assignment = toAssignmentPatch({
+      status: values.status,
+      arrivalTime: values.arrivalTime,
+      estimatedCost: values.estimatedCost,
+      actualCost: values.actualCost,
+      assignmentNotes: values.assignmentNotes,
+    })
     const patch = toVendorPatch(values)
-    const costPatch = toCostPatch(values)
-
-    if (editingVendor) {
-      updateVendor(editingVendor.id, patch)
-      setVendorCostForWedding(editingVendor.id, wedding.id, costPatch)
-      toast.success('Prestataire mis à jour.')
-      setFormOpen(false)
-      if (!isVendorConfirmed(editingVendor.status) && isVendorConfirmed(patch.status)) {
-        promptCompleteTaskIfNeeded({ ...editingVendor, ...patch })
-      }
-      return
-    }
-
-    const id = addVendor({ ...patch, ...costPatch, weddingIds: [wedding.id] })
+    const id = addVendor({
+      ...patch,
+      status: assignment.status,
+      arrivalTime: assignment.arrivalTime,
+      assignmentNotes: assignment.notes,
+      estimatedCost: assignment.estimatedCost,
+      actualCost: assignment.actualCost,
+      weddingIds: [wedding.id],
+    })
     toast.success('Prestataire ajouté.')
     setFormOpen(false)
 
     const hasOpenAutoTask = tasks.some((t) => t.vendorId === id && t.source === 'automatic' && t.status !== 'terminee')
-    if (!isVendorConfirmed(patch.status) && !hasOpenAutoTask) {
+    if (!isVendorConfirmed(assignment.status) && !hasOpenAutoTask) {
       setTaskPromptVendor({ id, ...patch, weddingIds: [wedding.id] })
     }
   }
 
-  const handleMarkConfirmed = (vendor: Vendor) => {
-    markVendorConfirmed(vendor.id)
-    toast.success(`${vendor.name} marqué comme confirmé.`)
+  const handleAssignmentSubmit = (values: VendorAssignmentFormValues) => {
+    if (!editingAssignment) return
+    const { vendor, link } = editingAssignment
+    const patch = toAssignmentPatch(values)
+    updateVendorAssignment(vendor.id, wedding.id, patch)
+    toast.success('Affectation mise à jour.')
+    setEditingAssignment(null)
+    if (!isVendorConfirmed(link.status) && isVendorConfirmed(patch.status)) promptCompleteTaskIfNeeded(vendor)
+  }
+
+  const handleMarkConfirmed = ({ vendor }: VendorAssignment) => {
+    markVendorConfirmed(vendor.id, wedding.id)
+    toast.success(`${vendor.name} marqué comme confirmé pour ce mariage.`)
     promptCompleteTaskIfNeeded(vendor)
   }
 
@@ -150,12 +157,12 @@ export function WeddingVendorsTab() {
         <p className="mt-1 text-sm text-muted-foreground">Coordonnez les personnes qui donnent vie à ce mariage.</p>
       </div>
 
-      {vendors.length === 0 ? (
+      {assignments.length === 0 ? (
         <VendorEmptyState onAdd={openCreate} />
       ) : (
         <>
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <VendorSummary vendors={vendors} />
+            <VendorSummary vendors={assignments} />
             <Button onClick={openCreate}>
               <Plus className="size-4" aria-hidden="true" />
               Ajouter un prestataire
@@ -163,13 +170,13 @@ export function WeddingVendorsTab() {
           </div>
 
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {vendors.map((vendor) => (
+            {assignments.map((assignment) => (
               <VendorCard
-                key={vendor.id}
-                vendor={vendor}
+                key={assignment.vendor.id}
+                assignment={assignment}
                 weddingDate={wedding.date}
-                costForThisWedding={linkByVendorId.get(vendor.id)}
-                onEdit={openEdit}
+                onViewProfile={(vendor) => setProfileVendorId(vendor.id)}
+                onEditAssignment={setEditingAssignment}
                 onDelete={setPendingDelete}
                 onMarkConfirmed={handleMarkConfirmed}
               />
@@ -178,14 +185,20 @@ export function WeddingVendorsTab() {
         </>
       )}
 
-      <VendorForm
-        key={formOpen ? (editingVendor?.id ?? 'new') : 'closed'}
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        vendor={editingVendor}
-        costForThisWedding={editingVendor ? linkByVendorId.get(editingVendor.id) : undefined}
-        onSubmit={handleSubmit}
-      />
+      {formOpen && <VendorForm open onOpenChange={setFormOpen} withAssignment onSubmit={handleCreateSubmit} />}
+
+      {editingAssignment && (
+        <VendorAssignmentForm
+          key={editingAssignment.vendor.id}
+          open
+          onOpenChange={(open) => !open && setEditingAssignment(null)}
+          assignment={editingAssignment}
+          weddingName={wedding.coupleName}
+          onSubmit={handleAssignmentSubmit}
+        />
+      )}
+
+      <VendorProfileDialog vendorId={profileVendorId} onClose={() => setProfileVendorId(null)} />
 
       <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
         <AlertDialogContent>

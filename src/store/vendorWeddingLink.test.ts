@@ -70,10 +70,10 @@ describe('coût prestataire par relation — actions du store', () => {
     useWorkspaceStore.setState((state) => ({
       workspace: {
         ...state.workspace,
-        vendors: [{ id: 'v1', name: 'Test', category: 'Autre', status: 'a_contacter', weddingIds: [w1, w2] }],
+        vendors: [{ id: 'v1', name: 'Test', category: 'Autre', weddingIds: [w1, w2] }],
         vendorWeddingLinks: [
-          { id: 'l1', vendorId: 'v1', weddingId: w1, estimatedCost: 1000, needsCostReview: true },
-          { id: 'l2', vendorId: 'v1', weddingId: w2, estimatedCost: 1000, needsCostReview: true },
+          { id: 'l1', vendorId: 'v1', weddingId: w1, status: 'a_contacter' as const, estimatedCost: 1000, needsCostReview: true },
+          { id: 'l2', vendorId: 'v1', weddingId: w2, status: 'a_contacter' as const, estimatedCost: 1000, needsCostReview: true },
         ],
       },
     }))
@@ -89,10 +89,10 @@ describe('coût prestataire par relation — actions du store', () => {
     useWorkspaceStore.setState((state) => ({
       workspace: {
         ...state.workspace,
-        vendors: [{ id: 'v1', name: 'Test', category: 'Autre', status: 'a_contacter', weddingIds: [w1, w2] }],
+        vendors: [{ id: 'v1', name: 'Test', category: 'Autre', weddingIds: [w1, w2] }],
         vendorWeddingLinks: [
-          { id: 'l1', vendorId: 'v1', weddingId: w1, estimatedCost: 1000, needsCostReview: true },
-          { id: 'l2', vendorId: 'v1', weddingId: w2, estimatedCost: 2000, needsCostReview: true },
+          { id: 'l1', vendorId: 'v1', weddingId: w1, status: 'a_contacter' as const, estimatedCost: 1000, needsCostReview: true },
+          { id: 'l2', vendorId: 'v1', weddingId: w2, status: 'a_contacter' as const, estimatedCost: 2000, needsCostReview: true },
         ],
       },
     }))

@@ -69,8 +69,8 @@ describe('computeClosingSummary', () => {
 
   it('reprend les mêmes chiffres financiers que getWeddingFinancials (revenu, coûts, marge)', () => {
     const wedding = makeWedding({ soldAmount: 1000 })
-    const vendors: Vendor[] = [{ id: 'v1', name: 'Traiteur', category: 'Traiteur', status: 'confirme', weddingIds: ['w1'] }]
-    const vendorLinks = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', actualCost: 400 }]
+    const vendors: Vendor[] = [{ id: 'v1', name: 'Traiteur', category: 'Traiteur', weddingIds: ['w1'] }]
+    const vendorLinks = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, actualCost: 400 }]
 
     const summary = computeClosingSummary(wedding, [], [], vendors, vendorLinks, [], [])
 

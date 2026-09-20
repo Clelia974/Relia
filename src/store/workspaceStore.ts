@@ -54,9 +54,17 @@ let pendingReadUnavailable = false
 type NewWeddingInput = Pick<Wedding, 'coupleName' | 'date' | 'venue' | 'soldAmount' | 'clientBudget' | 'status'> &
   Partial<Pick<Wedding, 'notes' | 'vendorIds'>>
 
+/** Champs propres à UNE affectation mariage↔prestataire (jamais stockés sur Vendor). */
+export type VendorAssignmentPatch = Partial<
+  Pick<VendorWeddingLink, 'status' | 'arrivalTime' | 'notes' | 'estimatedCost' | 'actualCost' | 'needsCostReview'>
+>
+
 type NewVendorInput = Pick<Vendor, 'name' | 'category'> &
-  Partial<Pick<Vendor, 'company' | 'phone' | 'email' | 'status' | 'arrivalTime' | 'notes' | 'weddingIds'>> & {
-    /** Coût initial pour LE mariage de création (input.weddingIds[0]) — crée le VendorWeddingLink correspondant en une seule action. */
+  Partial<Pick<Vendor, 'company' | 'phone' | 'email' | 'notes' | 'weddingIds'>> & {
+    /** Affectation initiale, appliquée au mariage de création (input.weddingIds[0]) ; les autres mariages reçoivent une affectation par défaut. */
+    status?: VendorStatus
+    arrivalTime?: string
+    assignmentNotes?: string
     estimatedCost?: number
     actualCost?: number
   }
@@ -137,8 +145,12 @@ interface WorkspaceStoreState {
 
   addVendor: (input: NewVendorInput) => string
   updateVendor: (id: string, patch: Partial<Omit<Vendor, 'id'>>) => void
-  updateVendorStatus: (id: string, status: VendorStatus) => void
-  markVendorConfirmed: (id: string) => void
+  updateVendorStatus: (vendorId: string, weddingId: string, status: VendorStatus) => void
+  markVendorConfirmed: (vendorId: string, weddingId: string) => void
+  /** Modifie UNIQUEMENT l'affectation (vendorId, weddingId) ; ne touche ni la fiche globale ni les autres mariages. Sans effet si le prestataire n'est pas lié à ce mariage. */
+  updateVendorAssignment: (vendorId: string, weddingId: string, patch: VendorAssignmentPatch) => void
+  /** Lie un prestataire existant à un mariage (affectation par défaut) ; sans effet s'il l'est déjà. */
+  addVendorToWedding: (vendorId: string, weddingId: string) => void
   /** Coût d'un prestataire POUR UN mariage précis — upsert (crée le lien s'il n'existe pas, le met à jour sinon). Efface toujours needsCostReview sur ce lien, même si la valeur ne change pas : la vérification, pas le changement, compte. */
   setVendorCostForWedding: (vendorId: string, weddingId: string, cost: { estimatedCost?: number; actualCost?: number }) => void
   /**
@@ -344,29 +356,28 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           company: input.company,
           phone: input.phone,
           email: input.email,
-          status: input.status ?? 'a_contacter',
-          arrivalTime: input.arrivalTime,
           notes: input.notes,
           weddingIds,
         }
-        const hasInitialCost = input.estimatedCost !== undefined || input.actualCost !== undefined
-        const initialLink: VendorWeddingLink | null =
-          hasInitialCost && weddingIds[0]
+        const newLinks: VendorWeddingLink[] = weddingIds.map((weddingId, index) => ({
+          id: generateId(),
+          vendorId: id,
+          weddingId,
+          status: index === 0 ? (input.status ?? 'a_contacter') : 'a_contacter',
+          ...(index === 0
             ? {
-                id: generateId(),
-                vendorId: id,
-                weddingId: weddingIds[0],
+                arrivalTime: input.arrivalTime,
+                notes: input.assignmentNotes,
                 estimatedCost: input.estimatedCost,
                 actualCost: input.actualCost,
               }
-            : null
+            : {}),
+        }))
         set((state) => ({
           workspace: {
             ...state.workspace,
             vendors: [...state.workspace.vendors, vendor],
-            vendorWeddingLinks: initialLink
-              ? [...state.workspace.vendorWeddingLinks, initialLink]
-              : state.workspace.vendorWeddingLinks,
+            vendorWeddingLinks: [...state.workspace.vendorWeddingLinks, ...newLinks],
           },
         }))
         return id
@@ -381,27 +392,52 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         }))
       },
 
-      updateVendorStatus: (id, status) => {
-        set((state) => ({
-          workspace: { ...state.workspace, vendors: state.workspace.vendors.map((v) => (v.id === id ? { ...v, status } : v)) },
-        }))
-      },
-
-      markVendorConfirmed: (id) => get().updateVendorStatus(id, 'confirme'),
-
-      setVendorCostForWedding: (vendorId, weddingId, cost) => {
+      updateVendorAssignment: (vendorId, weddingId, patch) => {
         set((state) => {
-          const links = state.workspace.vendorWeddingLinks
-          const existing = links.find((l) => l.vendorId === vendorId && l.weddingId === weddingId)
-          const updatedLink: VendorWeddingLink = existing
-            ? { ...existing, ...cost, needsCostReview: undefined }
-            : { id: generateId(), vendorId, weddingId, ...cost }
+          const w = state.workspace
+          const vendor = w.vendors.find((v) => v.id === vendorId)
+          if (!vendor || !vendor.weddingIds.includes(weddingId)) return { workspace: w }
+          const existing = w.vendorWeddingLinks.find((l) => l.vendorId === vendorId && l.weddingId === weddingId)
+          const costTouched = 'estimatedCost' in patch || 'actualCost' in patch
+          const base: VendorWeddingLink = existing ?? { id: generateId(), vendorId, weddingId, status: 'a_contacter' }
+          const updated: VendorWeddingLink = {
+            ...base,
+            ...patch,
+            ...(costTouched && !('needsCostReview' in patch) ? { needsCostReview: undefined } : {}),
+          }
           return {
             workspace: {
-              ...state.workspace,
+              ...w,
               vendorWeddingLinks: existing
-                ? links.map((l) => (l.vendorId === vendorId && l.weddingId === weddingId ? updatedLink : l))
-                : [...links, updatedLink],
+                ? w.vendorWeddingLinks.map((l) => (l.id === existing.id ? updated : l))
+                : [...w.vendorWeddingLinks, updated],
+            },
+          }
+        })
+      },
+
+      updateVendorStatus: (vendorId, weddingId, status) => get().updateVendorAssignment(vendorId, weddingId, { status }),
+
+      markVendorConfirmed: (vendorId, weddingId) => get().updateVendorAssignment(vendorId, weddingId, { status: 'confirme' }),
+
+      setVendorCostForWedding: (vendorId, weddingId, cost) => get().updateVendorAssignment(vendorId, weddingId, cost),
+
+      addVendorToWedding: (vendorId, weddingId) => {
+        set((state) => {
+          const w = state.workspace
+          const vendor = w.vendors.find((v) => v.id === vendorId)
+          if (!vendor || !w.weddings.some((x) => x.id === weddingId) || vendor.weddingIds.includes(weddingId)) return { workspace: w }
+          const alreadyLinked = w.vendorWeddingLinks.some((l) => l.vendorId === vendorId && l.weddingId === weddingId)
+          return {
+            workspace: {
+              ...w,
+              vendors: w.vendors.map((v) => (v.id === vendorId ? { ...v, weddingIds: [...v.weddingIds, weddingId] } : v)),
+              vendorWeddingLinks: alreadyLinked
+                ? w.vendorWeddingLinks
+                : [...w.vendorWeddingLinks, { id: generateId(), vendorId, weddingId, status: 'a_contacter' }],
+              weddings: w.weddings.map((x) =>
+                x.id === weddingId && !x.vendorIds.includes(vendorId) ? { ...x, vendorIds: [...x.vendorIds, vendorId] } : x,
+              ),
             },
           }
         })

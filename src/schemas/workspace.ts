@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 10 as const
+export const CURRENT_SCHEMA_VERSION = 11 as const
 
 const isoDate = z
   .string()
@@ -128,15 +128,7 @@ export const WeddingSchema = z.object({
   updatedAt: isoDate,
 })
 
-/**
- * `status` et `arrivalTime` restent ici bien qu'ils soient conceptuellement
- * propres à la relation mariage↔prestataire (un prestataire peut être
- * "confirmé" pour un mariage et "à contacter" pour un autre, avec une heure
- * d'arrivée différente à chaque fois) — même défaut que celui corrigé pour
- * le coût ci-dessous. Non traités dans cette correction (scope limité au
- * coût, cf. VendorWeddingLinkSchema) : à migrer vers VendorWeddingLink dans
- * une phase ultérieure si confirmé.
- */
+/** Fiche catalogue globale : uniquement ce qui est identique pour tous les mariages. Statut, horaire, coûts et notes propres à un mariage vivent sur VendorWeddingLink. */
 export const VendorSchema = z.object({
   id,
   name: z.string().min(1, 'Le nom du prestataire est obligatoire.'),
@@ -144,10 +136,7 @@ export const VendorSchema = z.object({
   category: z.string().min(1, 'La catégorie est obligatoire.'),
   phone: z.string().optional(),
   email: z.string().email('Adresse email invalide.').optional(),
-  /** Statut du prestataire pour ce mariage — cf. VendorStatusSchema. Défaut ajouté pour rester compatible avec les données créées avant son introduction. */
-  status: VendorStatusSchema.default('a_contacter'),
-  /** Heure d'arrivée au format HH:MM. */
-  arrivalTime: z.string().optional(),
+  /** Notes générales (valables pour tous les mariages). */
   notes: z.string().optional(),
   weddingIds: z.array(id),
 })
@@ -163,6 +152,12 @@ export const VendorWeddingLinkSchema = z.object({
   id,
   vendorId: id,
   weddingId: id,
+  /** Statut du prestataire pour CE mariage uniquement — cf. VendorStatusSchema. */
+  status: VendorStatusSchema.default('a_contacter'),
+  /** Heure d'arrivée au format HH:MM, pour CE mariage uniquement. */
+  arrivalTime: z.string().optional(),
+  /** Notes propres à CE mariage (distinctes de Vendor.notes, qui sont générales). */
+  notes: z.string().optional(),
   estimatedCost: z.number().nonnegative().optional(),
   actualCost: z.number().nonnegative().optional(),
   /**

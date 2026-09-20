@@ -1,3 +1,4 @@
+import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 import { describe, expect, it } from 'vitest'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
@@ -35,7 +36,7 @@ describe('migration v8 -> v9 (clôture et bilan)', () => {
     const result = migrateWorkspace(v8)
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.workspace.schemaVersion).toBe(10)
+    expect(result.workspace.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.workspace.closingSessions).toEqual([])
     expect(result.workspace.weddings[0].closingSessionId).toBeUndefined()
   })

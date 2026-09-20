@@ -14,21 +14,23 @@ import { computeVendorUrgency } from '@/features/vendors/summary'
 import { currency } from '@/lib/currency'
 import { cn } from '@/lib/utils'
 import { isVendorConfirmed } from '@/lib/vendorStatus'
-import type { Vendor, VendorWeddingLink } from '@/types/entities'
+import type { VendorAssignment } from '@/features/vendors/assignments'
+import type { Vendor } from '@/types/entities'
 
 interface VendorCardProps {
-  vendor: Vendor
+  /** Le prestataire vu à travers son affectation à LE mariage affiché : statut, horaire, coûts et notes viennent du lien, jamais de la fiche globale. */
+  assignment: VendorAssignment
   weddingDate: string
-  /** Coût de CE prestataire pour LE mariage affiché — absent si jamais renseigné pour ce mariage. */
-  costForThisWedding?: Pick<VendorWeddingLink, 'estimatedCost' | 'actualCost' | 'needsCostReview'>
-  onEdit: (vendor: Vendor) => void
+  onViewProfile: (vendor: Vendor) => void
+  onEditAssignment: (assignment: VendorAssignment) => void
   onDelete: (vendor: Vendor) => void
-  onMarkConfirmed: (vendor: Vendor) => void
+  onMarkConfirmed: (assignment: VendorAssignment) => void
 }
 
-export function VendorCard({ vendor, weddingDate, costForThisWedding, onEdit, onDelete, onMarkConfirmed }: VendorCardProps) {
-  const confirmed = isVendorConfirmed(vendor.status)
-  const urgency = computeVendorUrgency(vendor, weddingDate)
+export function VendorCard({ assignment, weddingDate, onViewProfile, onEditAssignment, onDelete, onMarkConfirmed }: VendorCardProps) {
+  const { vendor, link } = assignment
+  const confirmed = isVendorConfirmed(link.status)
+  const urgency = computeVendorUrgency(assignment, weddingDate)
 
   return (
     <Card>
@@ -57,9 +59,10 @@ export function VendorCard({ vendor, weddingDate, costForThisWedding, onEdit, on
               <TooltipContent>Actions</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => onEdit(vendor)}>Modifier</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onViewProfile(vendor)}>Voir la fiche catalogue</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onEditAssignment(assignment)}>Modifier l'affectation</DropdownMenuItem>
               {!confirmed && (
-                <DropdownMenuItem onSelect={() => onMarkConfirmed(vendor)}>Marquer comme confirmé</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => onMarkConfirmed(assignment)}>Marquer comme confirmé</DropdownMenuItem>
               )}
               <DropdownMenuItem variant="destructive" onSelect={() => onDelete(vendor)}>
                 Supprimer
@@ -73,7 +76,7 @@ export function VendorCard({ vendor, weddingDate, costForThisWedding, onEdit, on
           <span className="text-xs text-muted-foreground" aria-hidden="true">
             ·
           </span>
-          <VendorStatusBadge status={vendor.status} />
+          <VendorStatusBadge status={link.status} />
           {!confirmed && urgency === 'urgent' && (
             <span className="flex items-center gap-1 text-xs font-medium text-risk">
               <TriangleAlert className="size-3.5" aria-hidden="true" />
@@ -106,19 +109,21 @@ export function VendorCard({ vendor, weddingDate, costForThisWedding, onEdit, on
         )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-3 text-xs">
-          <span className={cn('flex items-center gap-1', vendor.arrivalTime ? 'text-muted-foreground' : 'text-warning font-medium')}>
+          <span className={cn('flex items-center gap-1', link.arrivalTime ? 'text-muted-foreground' : 'text-warning font-medium')}>
             <Clock className="size-3.5" aria-hidden="true" />
-            {vendor.arrivalTime ?? 'Horaire manquant'}
+            {link.arrivalTime ?? 'Horaire manquant'}
           </span>
-          {costForThisWedding?.estimatedCost !== undefined && (
-            <span className="text-muted-foreground">Estimé {currency.format(costForThisWedding.estimatedCost)}</span>
+          {link.estimatedCost !== undefined && (
+            <span className="text-muted-foreground">Estimé {currency.format(link.estimatedCost)}</span>
           )}
-          {costForThisWedding?.actualCost !== undefined && (
-            <span className="text-muted-foreground">Réel {currency.format(costForThisWedding.actualCost)}</span>
+          {link.actualCost !== undefined && (
+            <span className="text-muted-foreground">Réel {currency.format(link.actualCost)}</span>
           )}
         </div>
 
-        {costForThisWedding?.needsCostReview && <CostReviewBadge />}
+        {link.notes && <p className="text-xs text-muted-foreground">{link.notes}</p>}
+
+        {link.needsCostReview && <CostReviewBadge />}
       </CardContent>
     </Card>
   )

@@ -180,6 +180,50 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
    */
   9: (data) => ({ ...data, schemaVersion: 10 }),
 
+  /**
+   * v10 → v11 (Phase 3) : status et arrivalTime quittent Vendor (fiche
+   * catalogue globale) pour VendorWeddingLink (affectation à UN mariage) —
+   * même défaut que celui corrigé pour le coût en v3→v4 : confirmer un
+   * prestataire pour le mariage A le confirmait pour tous ses autres mariages.
+   *
+   * Pour chaque id de vendor.weddingIds : le lien existant reçoit le statut et
+   * l'heure d'arrivée actuels du vendor (coûts et needsCostReview intacts) ;
+   * s'il n'existe pas, il est créé sans coût. Un prestataire lié à 0 mariage
+   * est conservé tel quel : son statut/horaire n'ont aucun mariage où
+   * atterrir et sont abandonnés, jamais le prestataire lui-même.
+   * Vendor.notes reste une note générale (non copiée sur les liens).
+   */
+  10: (data) => {
+    const oldVendors = Array.isArray(data.vendors) ? (data.vendors as Record<string, unknown>[]) : []
+    const links: Record<string, unknown>[] = Array.isArray(data.vendorWeddingLinks)
+      ? (data.vendorWeddingLinks as Record<string, unknown>[]).map((l) => ({ ...l }))
+      : []
+    const indexByPair = new Map<string, number>()
+    links.forEach((l, i) => indexByPair.set(`${String(l.vendorId)}:${String(l.weddingId)}`, i))
+
+    const vendors = oldVendors.map((vendor) => {
+      const weddingIds = Array.isArray(vendor.weddingIds) ? (vendor.weddingIds as string[]) : []
+      const status = typeof vendor.status === 'string' ? vendor.status : 'a_contacter'
+      const arrivalTime = typeof vendor.arrivalTime === 'string' && vendor.arrivalTime !== '' ? vendor.arrivalTime : undefined
+      const assignment = { status, ...(arrivalTime !== undefined ? { arrivalTime } : {}) }
+
+      for (const weddingId of weddingIds) {
+        const key = `${String(vendor.id)}:${weddingId}`
+        const existing = indexByPair.get(key)
+        if (existing !== undefined) {
+          links[existing] = { ...links[existing], ...assignment }
+        } else {
+          indexByPair.set(key, links.length)
+          links.push({ id: generateId(), vendorId: vendor.id, weddingId, ...assignment })
+        }
+      }
+
+      const { status: _status, arrivalTime: _arrivalTime, ...rest } = vendor
+      return rest
+    })
+
+    return { ...data, schemaVersion: 11, vendors, vendorWeddingLinks: links }
+  },
 }
 
 /**

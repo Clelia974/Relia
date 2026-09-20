@@ -1,6 +1,7 @@
 import { differenceInCalendarDays } from 'date-fns'
 import { isOverdue } from '@/features/tasks/summary'
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts } from '@/features/timeline/conflicts'
+import { getWeddingAssignments } from '@/features/vendors/assignments'
 import { isVendorConfirmed } from '@/lib/vendorStatus'
 import type { Wedding, Workspace } from '@/types/entities'
 
@@ -35,15 +36,15 @@ export interface WeddingRiskAssessment {
  */
 export function getWeddingRiskLevel(
   wedding: Wedding,
-  workspace: Pick<Workspace, 'vendors' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
+  workspace: Pick<Workspace, 'vendors' | 'vendorWeddingLinks' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
   today: Date = new Date(),
 ): WeddingRiskAssessment | null {
   const daysUntil = differenceInCalendarDays(new Date(wedding.date), today)
   if (daysUntil < 0) return null
 
-  const vendors = workspace.vendors.filter((v) => v.weddingIds.includes(wedding.id))
+  const vendors = getWeddingAssignments(workspace.vendors, workspace.vendorWeddingLinks, wedding.id)
   const vendorsTotal = vendors.length
-  const vendorsConfirmed = vendors.filter((v) => isVendorConfirmed(v.status)).length
+  const vendorsConfirmed = vendors.filter((a) => isVendorConfirmed(a.link.status)).length
   const vendorsUnconfirmed = vendorsTotal - vendorsConfirmed
 
   const tasks = workspace.tasks.filter((t) => t.weddingId === wedding.id)

@@ -16,6 +16,7 @@ export function RiskWatch() {
     useShallow((s) => ({
       weddings: s.workspace.weddings,
       vendors: s.workspace.vendors,
+      vendorWeddingLinks: s.workspace.vendorWeddingLinks,
       tasks: s.workspace.tasks,
       clientDecisions: s.workspace.clientDecisions,
       timelineEvents: s.workspace.timelineEvents,

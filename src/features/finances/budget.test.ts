@@ -20,7 +20,7 @@ function makeWedding(overrides: Partial<Wedding> = {}): Wedding {
 }
 
 function makeVendor(overrides: Partial<Vendor> = {}): Vendor {
-  return { id: 'v1', name: 'Test', category: 'Autre', status: 'a_contacter', weddingIds: ['w1'], ...overrides }
+  return { id: 'v1', name: 'Test', category: 'Autre', weddingIds: ['w1'], ...overrides }
 }
 
 function makeExpense(overrides: Partial<Expense> = {}): Expense {
@@ -53,7 +53,7 @@ describe('getWeddingBudgetOverview', () => {
   it('sépare toujours coût prestataire estimé et réel — jamais fusionnés dans les totaux stricts', () => {
     const wedding = makeWedding()
     const vendors = [makeVendor()]
-    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', estimatedCost: 2000, actualCost: 2500 }]
+    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, estimatedCost: 2000, actualCost: 2500 }]
 
     const overview = getWeddingBudgetOverview(wedding, vendors, links, [])
 
@@ -106,7 +106,7 @@ describe('getWeddingBudgetOverview', () => {
   it('budget dépassé : isOverBudget vrai et statut "depasse"', () => {
     const wedding = makeWedding({ clientBudget: 1000 })
     const vendors = [makeVendor()]
-    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', actualCost: 900 }]
+    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, actualCost: 900 }]
     const expenses = [makeExpense({ amount: 300 })]
 
     const overview = getWeddingBudgetOverview(wedding, vendors, links, expenses)
@@ -123,7 +123,7 @@ describe('getWeddingBudgetOverview', () => {
     const atRisk = getWeddingBudgetOverview(
       makeWedding({ clientBudget: 1000 }),
       vendors,
-      [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', actualCost: 900 }],
+      [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, actualCost: 900 }],
       [],
     )
     expect(getBudgetStatus(atRisk)).toBe('attention')
@@ -131,7 +131,7 @@ describe('getWeddingBudgetOverview', () => {
     const healthy = getWeddingBudgetOverview(
       makeWedding({ clientBudget: 1000 }),
       vendors,
-      [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', actualCost: 400 }],
+      [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, actualCost: 400 }],
       [],
     )
     expect(getBudgetStatus(healthy)).toBe('ok')

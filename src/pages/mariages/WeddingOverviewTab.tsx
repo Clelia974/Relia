@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { VendorEmptyState } from '@/features/vendors/components/VendorEmptyState'
+import { getWeddingAssignments } from '@/features/vendors/assignments'
 import { countConfirmed, countTotal, findNextVendorToContact, hasUrgentVendor } from '@/features/vendors/summary'
 import { TaskEmptyState } from '@/features/tasks/components/TaskEmptyState'
 import { computeWeddingTaskStats, findNextPriorityTask } from '@/features/tasks/summary'
@@ -32,7 +33,8 @@ export function WeddingOverviewTab() {
   const [showStarter, setShowStarter] = useState(Boolean((location.state as { justCreated?: boolean } | null)?.justCreated))
 
   const allVendors = useWorkspaceStore((s) => s.workspace.vendors)
-  const vendors = allVendors.filter((v) => v.weddingIds.includes(wedding.id))
+  const allVendorLinks = useWorkspaceStore((s) => s.workspace.vendorWeddingLinks)
+  const vendors = getWeddingAssignments(allVendors, allVendorLinks, wedding.id)
   const total = countTotal(vendors)
   const confirmed = countConfirmed(vendors)
   const nextToContact = findNextVendorToContact(vendors, wedding.date)
@@ -180,8 +182,8 @@ export function WeddingOverviewTab() {
 
               {nextToContact && (
                 <p className="text-sm text-muted-foreground">
-                  Prochain à contacter : <span className="text-foreground">{nextToContact.name}</span> (
-                  {nextToContact.category})
+                  Prochain à contacter : <span className="text-foreground">{nextToContact.vendor.name}</span> (
+                  {nextToContact.vendor.category})
                 </p>
               )}
 

@@ -1,9 +1,9 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { countConfirmed, countMissingArrivalTime, countTotal, countUnconfirmed } from '@/features/vendors/summary'
-import type { Vendor } from '@/types/entities'
+import type { VendorAssignment } from '@/features/vendors/assignments'
 
-export function VendorSummary({ vendors }: { vendors: Vendor[] }) {
+export function VendorSummary({ vendors }: { vendors: VendorAssignment[] }) {
   const total = countTotal(vendors)
   const confirmed = countConfirmed(vendors)
   const needed = countUnconfirmed(vendors)

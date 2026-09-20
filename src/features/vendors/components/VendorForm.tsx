@@ -1,36 +1,39 @@
 import { type FormEvent, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { CostReviewBadge } from '@/components/CostReviewBadge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { emptyVendorFormValues, VendorFormSchema, type VendorFormValues } from '@/features/vendors/vendorForm.schema'
+import {
+  emptyVendorFormValues,
+  VendorFormSchema,
+  VendorGlobalFormSchema,
+  type VendorFormValues,
+} from '@/features/vendors/vendorForm.schema'
+import { useReturnFocus } from '@/lib/useReturnFocus'
 import { VENDOR_CATEGORIES } from '@/lib/vendorCategory'
 import { VENDOR_STATUS_LABELS, VENDOR_STATUS_OPTIONS } from '@/lib/vendorStatus'
-import type { Vendor, VendorWeddingLink } from '@/types/entities'
+import type { Vendor } from '@/types/entities'
 
 interface VendorFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** Prestataire dont on modifie la fiche catalogue (champs globaux uniquement) ; absent = création. */
   vendor?: Vendor | null
-  /** Coût de ce prestataire pour LE mariage courant — absent si jamais renseigné pour ce mariage. */
-  costForThisWedding?: Pick<VendorWeddingLink, 'estimatedCost' | 'actualCost' | 'needsCostReview'>
+  /** Création depuis un mariage : ajoute les champs propres à ce mariage (statut, horaire, coûts, notes). Ignoré en modification. */
+  withAssignment?: boolean
   onSubmit: (values: VendorFormValues) => void
 }
 
-function toFormValues(vendor: Vendor, costForThisWedding?: Pick<VendorWeddingLink, 'estimatedCost' | 'actualCost'>): VendorFormValues {
+function toFormValues(vendor: Vendor): VendorFormValues {
   return {
+    ...emptyVendorFormValues(),
     name: vendor.name,
     company: vendor.company ?? '',
     category: vendor.category,
     phone: vendor.phone ?? '',
     email: vendor.email ?? '',
-    estimatedCost: costForThisWedding?.estimatedCost !== undefined ? String(costForThisWedding.estimatedCost) : '',
-    actualCost: costForThisWedding?.actualCost !== undefined ? String(costForThisWedding.actualCost) : '',
-    arrivalTime: vendor.arrivalTime ?? '',
-    status: vendor.status,
     notes: vendor.notes ?? '',
   }
 }
@@ -40,10 +43,12 @@ function toFormValues(vendor: Vendor, costForThisWedding?: Pick<VendorWeddingLin
  * l'état initial dérive directement des props plutôt que d'être resynchronisé
  * par un effect, pour éviter un rendu en cascade.
  */
-export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onSubmit }: VendorFormProps) {
+export function VendorForm({ open, onOpenChange, vendor, withAssignment = false, onSubmit }: VendorFormProps) {
+  const returnFocus = useReturnFocus()
   const isEdit = Boolean(vendor)
+  const showAssignment = withAssignment && !isEdit
   const [values, setValues] = useState<VendorFormValues>(() =>
-    vendor ? toFormValues(vendor, costForThisWedding) : { ...emptyVendorFormValues(), status: 'a_contacter' },
+    vendor ? toFormValues(vendor) : { ...emptyVendorFormValues(), status: 'a_contacter' },
   )
   const [errors, setErrors] = useState<Partial<Record<keyof VendorFormValues, string>>>({})
 
@@ -53,7 +58,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
-    const result = VendorFormSchema.safeParse(values)
+    const result = showAssignment ? VendorFormSchema.safeParse(values) : VendorGlobalFormSchema.safeParse(values)
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof VendorFormValues, string>> = {}
       for (const issue of result.error.issues) {
@@ -64,16 +69,18 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
       return
     }
     setErrors({})
-    onSubmit(result.data)
+    onSubmit({ ...values, ...result.data })
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[90dvh] max-w-lg overflow-y-auto" {...returnFocus}>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Modifier le prestataire' : 'Ajouter un prestataire'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Modifier la fiche prestataire' : 'Ajouter un prestataire'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Mettez à jour les informations de ce prestataire.' : 'Renseignez les informations essentielles.'}
+            {isEdit
+              ? 'Ces informations sont communes à tous les mariages de ce prestataire.'
+              : 'Renseignez les informations essentielles.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,25 +126,6 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Statut du prestataire" htmlFor="v-status" error={errors.status}>
-              <Select value={values.status} onValueChange={(v) => setField('status', v)}>
-                <SelectTrigger
-                  id="v-status"
-                  className="w-full"
-                  aria-invalid={Boolean(errors.status)}
-                  aria-describedby={errors.status ? 'v-status-error' : undefined}
-                >
-                  <SelectValue placeholder="Sélectionnez un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VENDOR_STATUS_OPTIONS.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {VENDOR_STATUS_LABELS[status]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
           </div>
 
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -163,8 +151,39 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
             </Field>
           </div>
 
-          {costForThisWedding?.needsCostReview && <CostReviewBadge />}
+          <Field label="Notes générales" htmlFor="v-notes" optional>
+            <Textarea
+              id="v-notes"
+              rows={3}
+              value={values.notes}
+              onChange={(e) => setField('notes', e.target.value)}
+            />
+          </Field>
 
+          {showAssignment && (
+            <fieldset className="flex flex-col gap-4 rounded-lg border border-border p-3">
+              <legend className="px-1 text-xs font-medium text-muted-foreground">Pour ce mariage</legend>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <Field label="Statut du prestataire" htmlFor="v-status" error={errors.status}>
+                  <Select value={values.status} onValueChange={(v) => setField('status', v)}>
+                    <SelectTrigger
+                      id="v-status"
+                      className="w-full"
+                      aria-invalid={Boolean(errors.status)}
+                      aria-describedby={errors.status ? 'v-status-error' : undefined}
+                    >
+                      <SelectValue placeholder="Sélectionnez un statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VENDOR_STATUS_OPTIONS.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {VENDOR_STATUS_LABELS[status]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Field label="Coût estimé" htmlFor="v-estimated" error={errors.estimatedCost} optional>
               <Input
@@ -200,14 +219,16 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
             </Field>
           </div>
 
-          <Field label="Notes" htmlFor="v-notes" optional>
-            <Textarea
-              id="v-notes"
-              rows={3}
-              value={values.notes}
-              onChange={(e) => setField('notes', e.target.value)}
-            />
-          </Field>
+              <Field label="Notes pour ce mariage" htmlFor="v-assignment-notes" optional>
+                <Textarea
+                  id="v-assignment-notes"
+                  rows={2}
+                  value={values.assignmentNotes}
+                  onChange={(e) => setField('assignmentNotes', e.target.value)}
+                />
+              </Field>
+            </fieldset>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -221,7 +242,7 @@ export function VendorForm({ open, onOpenChange, vendor, costForThisWedding, onS
   )
 }
 
-function Field({
+export function Field({
   label,
   htmlFor,
   error,

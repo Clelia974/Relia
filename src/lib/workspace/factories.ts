@@ -111,8 +111,6 @@ export function createDemoWorkspace(): Workspace {
       company: 'Traiteur Les Saveurs',
       category: 'Traiteur',
       email: 'contact@lessaveurs.fr',
-      status: 'confirme',
-      arrivalTime: '10:00',
       weddingIds: ['w1', 'w3'],
     },
     {
@@ -121,7 +119,6 @@ export function createDemoWorkspace(): Workspace {
       company: 'DJ Bastien Prod',
       category: 'DJ',
       phone: '06 12 34 56 78',
-      status: 'a_contacter',
       weddingIds: ['w1', 'w2'],
     },
     {
@@ -130,7 +127,6 @@ export function createDemoWorkspace(): Workspace {
       company: 'Fleurs de Mars',
       category: 'Fleuriste',
       email: 'hello@fleursdemars.fr',
-      status: 'devis_recu',
       weddingIds: ['w2', 'w4'],
     },
     {
@@ -140,8 +136,6 @@ export function createDemoWorkspace(): Workspace {
       category: 'Photographe',
       email: 'antoine@focusstudio.fr',
       phone: '06 98 76 54 32',
-      status: 'contacte',
-      arrivalTime: '09:30',
       weddingIds: ['w1'],
     },
   ]
@@ -154,13 +148,13 @@ export function createDemoWorkspace(): Workspace {
    * issus d'une migration.
    */
   const vendorWeddingLinks: Workspace['vendorWeddingLinks'] = [
-    { id: 'vwl1', vendorId: 'v1', weddingId: 'w1', estimatedCost: 4200, actualCost: 4200 },
-    { id: 'vwl2', vendorId: 'v1', weddingId: 'w3', estimatedCost: 3800, actualCost: 3800 },
-    { id: 'vwl3', vendorId: 'v2', weddingId: 'w1', estimatedCost: 1100 },
-    { id: 'vwl4', vendorId: 'v2', weddingId: 'w2', estimatedCost: 950 },
-    { id: 'vwl5', vendorId: 'v3', weddingId: 'w2', estimatedCost: 3200 },
-    { id: 'vwl6', vendorId: 'v3', weddingId: 'w4', estimatedCost: 2600 },
-    { id: 'vwl7', vendorId: 'v4', weddingId: 'w1', estimatedCost: 1800 },
+    { id: 'vwl1', vendorId: 'v1', weddingId: 'w1', status: 'confirme', arrivalTime: '10:00', estimatedCost: 4200, actualCost: 4200 },
+    { id: 'vwl2', vendorId: 'v1', weddingId: 'w3', status: 'devis_recu', estimatedCost: 3800, actualCost: 3800 },
+    { id: 'vwl3', vendorId: 'v2', weddingId: 'w1', status: 'a_contacter', estimatedCost: 1100 },
+    { id: 'vwl4', vendorId: 'v2', weddingId: 'w2', status: 'confirme', arrivalTime: '18:00', estimatedCost: 950 },
+    { id: 'vwl5', vendorId: 'v3', weddingId: 'w2', status: 'devis_recu', estimatedCost: 3200 },
+    { id: 'vwl6', vendorId: 'v3', weddingId: 'w4', status: 'confirme', arrivalTime: '14:00', estimatedCost: 2600 },
+    { id: 'vwl7', vendorId: 'v4', weddingId: 'w1', status: 'contacte', arrivalTime: '09:30', estimatedCost: 1800 },
   ]
 
   const tasks: Workspace['tasks'] = [

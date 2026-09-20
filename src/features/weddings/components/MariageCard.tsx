@@ -33,6 +33,7 @@ export function MariageCard({ wedding, onArchive, onUnarchive, onDelete }: Maria
       tasks: s.workspace.tasks,
       vendors: s.workspace.vendors,
       clientDecisions: s.workspace.clientDecisions,
+      vendorWeddingLinks: s.workspace.vendorWeddingLinks,
       timelineEvents: s.workspace.timelineEvents,
       ignoredConflictIds: s.workspace.ignoredConflictIds,
     })),

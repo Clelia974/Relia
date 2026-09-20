@@ -4,6 +4,7 @@ import { getWeddingFinancials } from '@/features/finances/calculations'
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts } from '@/features/timeline/conflicts'
 import { selectActiveWeddingIds, selectActiveWeddings } from '@/features/weddings/activeWeddings'
 import { getWeddingRiskLevel, type WeddingRiskAssessment } from '@/features/weddings/risk'
+import { getWeddingAssignments } from '@/features/vendors/assignments'
 import { isVendorConfirmed } from '@/lib/vendorStatus'
 import type { ClientDecision, Task, Wedding, Workspace } from '@/types/entities'
 
@@ -183,7 +184,7 @@ const RISK_LEVEL_RANK: Record<WeddingRiskAssessment['level'], number> = {
 
 /** Risque de tous les mariages actifs, triés du plus critique au plus calme. */
 export function getWeddingRisks(
-  workspace: Pick<Workspace, 'weddings' | 'vendors' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
+  workspace: Pick<Workspace, 'weddings' | 'vendors' | 'vendorWeddingLinks' | 'tasks' | 'clientDecisions' | 'timelineEvents' | 'ignoredConflictIds'>,
   today: Date = new Date(),
 ): WeddingRiskEntry[] {
   return workspace.weddings
@@ -248,6 +249,7 @@ export function getDashboardAlerts(
     if (daysUntil < 0) continue
 
     const vendors = workspace.vendors.filter((v) => v.weddingIds.includes(wedding.id))
+    const assignments = getWeddingAssignments(workspace.vendors, workspace.vendorWeddingLinks, wedding.id)
     const tasks = workspace.tasks.filter((t) => t.weddingId === wedding.id)
     const events = workspace.timelineEvents.filter((e) => e.weddingId === wedding.id)
     const minBuffer = wedding.minBufferMinutes ?? DEFAULT_MIN_BUFFER_MINUTES
@@ -271,7 +273,7 @@ export function getDashboardAlerts(
     }
 
     if (daysUntil <= VENDOR_PROXIMITY_LIMIT_DAYS) {
-      for (const vendor of vendors.filter((v) => !isVendorConfirmed(v.status))) {
+      for (const { vendor } of assignments.filter((a) => !isVendorConfirmed(a.link.status))) {
         alerts.push({
           id: `prestataire:${vendor.id}`,
           kind: 'prestataire_non_confirme',
@@ -284,7 +286,7 @@ export function getDashboardAlerts(
         })
       }
 
-      for (const vendor of vendors.filter((v) => isVendorConfirmed(v.status) && !v.arrivalTime)) {
+      for (const { vendor } of assignments.filter((a) => isVendorConfirmed(a.link.status) && !a.link.arrivalTime)) {
         alerts.push({
           id: `horaire:${vendor.id}`,
           kind: 'horaire_manquant',

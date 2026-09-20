@@ -44,7 +44,7 @@ describe('WeddingFinancesTab — badge "Coût à vérifier"', () => {
       workspace: {
         ...state.workspace,
         vendorWeddingLinks: [
-          { id: 'l1', vendorId, weddingId, estimatedCost: 3000, needsCostReview: true },
+          { id: 'l1', vendorId, weddingId, status: 'a_contacter', estimatedCost: 3000, needsCostReview: true },
         ],
       },
     }))

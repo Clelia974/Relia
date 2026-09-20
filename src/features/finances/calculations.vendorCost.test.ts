@@ -20,14 +20,14 @@ function makeWedding(overrides: Partial<Wedding> = {}): Wedding {
 }
 
 function makeVendor(overrides: Partial<Vendor> = {}): Vendor {
-  return { id: 'v1', name: 'Test', category: 'Autre', status: 'a_contacter', weddingIds: ['w1'], ...overrides }
+  return { id: 'v1', name: 'Test', category: 'Autre', weddingIds: ['w1'], ...overrides }
 }
 
 describe('getWeddingFinancials — coût par relation', () => {
   it('4. un coût needsCostReview reste inclus dans la marge (jamais masqué ni remplacé par zéro)', () => {
     const wedding = makeWedding()
     const vendors = [makeVendor()]
-    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', estimatedCost: 2000, needsCostReview: true }]
+    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, estimatedCost: 2000, needsCostReview: true }]
 
     const financials = getWeddingFinancials(wedding, vendors, links, [], [])
 
@@ -39,7 +39,7 @@ describe('getWeddingFinancials — coût par relation', () => {
   it("hasCostNeedingReview reste false quand aucun lien n'est marqué", () => {
     const wedding = makeWedding()
     const vendors = [makeVendor()]
-    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', estimatedCost: 2000 }]
+    const links: VendorWeddingLink[] = [{ id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, estimatedCost: 2000 }]
 
     const financials = getWeddingFinancials(wedding, vendors, links, [], [])
     expect(financials.hasCostNeedingReview).toBe(false)
@@ -60,8 +60,8 @@ describe('getWeddingFinancials — coût par relation', () => {
     const w2 = makeWedding({ id: 'w2', soldAmount: 6000 })
     const vendor = makeVendor({ weddingIds: ['w1', 'w2'] })
     const links: VendorWeddingLink[] = [
-      { id: 'l1', vendorId: 'v1', weddingId: 'w1', estimatedCost: 3000 },
-      { id: 'l2', vendorId: 'v1', weddingId: 'w2', estimatedCost: 2000 },
+      { id: 'l1', vendorId: 'v1', weddingId: 'w1', status: 'a_contacter' as const, estimatedCost: 3000 },
+      { id: 'l2', vendorId: 'v1', weddingId: 'w2', status: 'a_contacter' as const, estimatedCost: 2000 },
     ]
 
     const f1 = getWeddingFinancials(w1, [vendor], links.filter((l) => l.weddingId === 'w1'), [], [])
