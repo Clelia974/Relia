@@ -114,6 +114,9 @@ export const WeddingSchema = z.object({
   coupleName: z.string().min(1, 'Le nom du couple est obligatoire.'),
   date: isoDate,
   venue: z.string(),
+  /** Coordonnées du client — reprises par défaut sur les devis et factures (mentions attendues sur ces documents). */
+  clientAddress: z.string().optional(),
+  clientPhone: z.string().optional(),
   soldAmount: z.number().nonnegative('Le montant du contrat ne peut pas être négatif.'),
   clientBudget: z.number().nonnegative('Le budget client ne peut pas être négatif.'),
   status: WeddingStatusSchema,
@@ -338,6 +341,9 @@ export const ProposalSchema = z.object({
   template: ProposalTierSchema,
   title: z.string().min(1, 'Veuillez renseigner le titre.'),
   clientName: z.string(),
+  /** Copie des coordonnées du client au moment de la création du document — modifiable tant qu'il est brouillon, jamais relue depuis le mariage. */
+  clientAddress: z.string().optional(),
+  clientPhone: z.string().optional(),
   validUntil: isoDate.optional(),
   lineItems: z.array(ProposalLineItemSchema),
   /** Toujours recalculé à partir de lineItems — cf. src/features/proposals/calculations.ts. */
@@ -451,6 +457,9 @@ export const InvoiceSchema = z.object({
   invoiceNumber: z.string().min(1),
   date: isoDate,
   clientName: z.string(),
+  /** Copie des coordonnées du client au moment de la création du document — modifiable tant qu'il est brouillon, jamais relue depuis le mariage. */
+  clientAddress: z.string().optional(),
+  clientPhone: z.string().optional(),
   lineItems: z.array(ProposalLineItemSchema),
   subtotal: z.number(),
   vatMode: VatStatusSchema,

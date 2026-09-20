@@ -9,6 +9,8 @@ import type { Wedding } from '@/types/entities'
  */
 export const WeddingEditFormSchema = WeddingFormSchema.extend({
   archived: z.boolean(),
+  clientAddress: z.string().trim(),
+  clientPhone: z.string().trim(),
 })
 
 export type WeddingEditFormValues = z.infer<typeof WeddingEditFormSchema>
@@ -18,6 +20,8 @@ export function weddingToEditFormValues(wedding: Wedding): WeddingEditFormValues
     coupleName: wedding.coupleName,
     date: wedding.date.slice(0, 10),
     venue: wedding.venue,
+    clientAddress: wedding.clientAddress ?? '',
+    clientPhone: wedding.clientPhone ?? '',
     soldAmount: String(wedding.soldAmount),
     clientBudget: String(wedding.clientBudget),
     status: wedding.status,

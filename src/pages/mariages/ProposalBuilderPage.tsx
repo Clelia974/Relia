@@ -69,6 +69,8 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
 
   const [title, setTitle] = useState(proposal?.title ?? '')
   const [clientName, setClientName] = useState(proposal?.clientName ?? '')
+  const [clientAddress, setClientAddress] = useState(proposal?.clientAddress ?? wedding.clientAddress ?? '')
+  const [clientPhone, setClientPhone] = useState(proposal?.clientPhone ?? wedding.clientPhone ?? '')
   const [validUntil, setValidUntil] = useState(proposal?.validUntil?.slice(0, 10) ?? '')
   const [depositPercentage, setDepositPercentage] = useState(proposal?.depositPercentage !== undefined ? String(proposal.depositPercentage) : '')
   const [notes, setNotes] = useState(proposal?.notes ?? '')
@@ -197,6 +199,8 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
     updateProposal(proposal.id, {
       title: title.trim(),
       clientName: clientName.trim(),
+      clientAddress: clientAddress.trim() || undefined,
+      clientPhone: clientPhone.trim() || undefined,
       validUntil: validUntil ? new Date(validUntil).toISOString() : undefined,
       lineItems: finalLines,
       subtotal: finalTotals.subtotal,
@@ -353,6 +357,17 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
                   </Field>
                 </div>
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                  <Field label="Adresse du client" htmlFor="pb-client-address" optional>
+                    <Textarea id="pb-client-address" rows={2} value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="Numéro, rue, code postal, ville" />
+                  </Field>
+                  <Field label="Téléphone du client" htmlFor="pb-client-phone" optional>
+                    <Input id="pb-client-phone" type="tel" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="Ex. 06 12 34 56 78" />
+                  </Field>
+                </div>
+                {(!clientAddress.trim() || !clientPhone.trim()) && (
+                  <p className="text-xs text-warning">Pour un document conforme, renseignez l'adresse et le téléphone du client.</p>
+                )}
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <Field label="Date de validité" htmlFor="pb-valid-until" optional error={errors.validUntil}>
                     <Input
                       id="pb-valid-until"
@@ -428,6 +443,8 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
             proposalNumber={proposal.proposalNumber}
             templateLabel={documentTemplateLabel}
             clientName={clientName || wedding.coupleName}
+            clientAddress={clientAddress.trim() || undefined}
+            clientPhone={clientPhone.trim() || undefined}
             validUntil={validUntil ? new Date(validUntil).toISOString() : undefined}
             lineItems={numericLines}
             totals={totals}

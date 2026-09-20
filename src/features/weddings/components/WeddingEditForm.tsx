@@ -132,6 +132,26 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
               <Input id="w-venue" value={values.venue} onChange={(e) => setField('venue', e.target.value)} />
             </Field>
 
+            <Field label="Adresse du client" htmlFor="w-clientAddress" optional>
+              <Textarea
+                id="w-clientAddress"
+                rows={2}
+                value={values.clientAddress}
+                onChange={(e) => setField('clientAddress', e.target.value)}
+                placeholder="Numéro, rue, code postal, ville"
+              />
+            </Field>
+
+            <Field label="Téléphone du client" htmlFor="w-clientPhone" optional>
+              <Input
+                id="w-clientPhone"
+                type="tel"
+                value={values.clientPhone}
+                onChange={(e) => setField('clientPhone', e.target.value)}
+                placeholder="Ex. 06 12 34 56 78"
+              />
+            </Field>
+
             <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
               <Field label="Montant du contrat" htmlFor="w-soldAmount" error={errors.soldAmount} optional>
                 <Input

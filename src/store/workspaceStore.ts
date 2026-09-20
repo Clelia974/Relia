@@ -117,13 +117,13 @@ type NewScopeChangeInput = Pick<ScopeChange, 'weddingId' | 'description' | 'date
   Partial<Pick<ScopeChange, 'status' | 'notes'>>
 
 type NewProposalInput = Pick<Proposal, 'weddingId' | 'template' | 'title' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total' | 'depositAmount' | 'balanceAmount'> &
-  Partial<Pick<Proposal, 'clientName' | 'validUntil' | 'vatRate' | 'depositPercentage' | 'status' | 'notes'>>
+  Partial<Pick<Proposal, 'clientName' | 'clientAddress' | 'clientPhone' | 'validUntil' | 'vatRate' | 'depositPercentage' | 'status' | 'notes'>>
 
 type NewSoldServiceInput = Pick<SoldService, 'weddingId' | 'proposalId' | 'title' | 'soldPrice'> &
   Partial<Pick<SoldService, 'description' | 'quantity' | 'status' | 'notes'>>
 
 type NewInvoiceInput = Pick<Invoice, 'weddingId' | 'date' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total'> &
-  Partial<Pick<Invoice, 'proposalId' | 'clientName' | 'vatRate' | 'depositAmount' | 'balanceAmount' | 'legalMentions'>>
+  Partial<Pick<Invoice, 'proposalId' | 'clientName' | 'clientAddress' | 'clientPhone' | 'vatRate' | 'depositAmount' | 'balanceAmount' | 'legalMentions'>>
 
 type NewEquipmentItemInput = Pick<EquipmentItem, 'weddingId' | 'name' | 'quantity' | 'acquisitionMode'> &
   Partial<Pick<EquipmentItem, 'category' | 'status' | 'notes'>>
@@ -697,6 +697,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             template: input.template,
             title: input.title,
             clientName: input.clientName ?? '',
+            clientAddress: input.clientAddress,
+            clientPhone: input.clientPhone,
             validUntil: input.validUntil,
             lineItems: input.lineItems,
             subtotal: input.subtotal,
@@ -888,6 +890,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             invoiceNumber: allocated.number,
             date: input.date,
             clientName: input.clientName ?? '',
+            clientAddress: input.clientAddress,
+            clientPhone: input.clientPhone,
             lineItems: input.lineItems,
             subtotal: input.subtotal,
             vatMode: input.vatMode,

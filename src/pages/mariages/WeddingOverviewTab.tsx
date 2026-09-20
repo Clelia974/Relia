@@ -56,6 +56,8 @@ export function WeddingOverviewTab() {
       coupleName: values.coupleName.trim(),
       date: new Date(values.date).toISOString(),
       venue: values.venue.trim(),
+      clientAddress: values.clientAddress.trim() || undefined,
+      clientPhone: values.clientPhone.trim() || undefined,
       soldAmount: values.soldAmount === '' ? 0 : Number(values.soldAmount),
       clientBudget: values.clientBudget === '' ? 0 : Number(values.clientBudget),
       status: values.status,

@@ -21,7 +21,7 @@ const wedding: Wedding = {
   updatedAt: '2025-01-01T00:00:00.000Z',
 }
 
-function renderPreview(templateLabel?: string) {
+function renderPreview(templateLabel?: string, contact: { clientAddress?: string; clientPhone?: string } = {}) {
   const { businessConfig } = createEmptyWorkspace()
   render(
     <ProposalDocumentPreview
@@ -30,6 +30,7 @@ function renderPreview(templateLabel?: string) {
       title="Ma proposition"
       proposalNumber="DEV-2026-0001"
       templateLabel={templateLabel}
+      {...contact}
       clientName="Alice & Bob"
       lineItems={[]}
       totals={computeProposalTotals([], 'franchise_en_base', undefined, undefined)}
@@ -49,5 +50,19 @@ describe('ProposalDocumentPreview — nom de la formule', () => {
     const heading = screen.getByText(/Proposition n° DEV-2026-0001/)
     expect(heading.textContent).not.toContain('—')
     expect(screen.queryByText(/Gold/)).toBeNull()
+  })
+})
+
+describe('ProposalDocumentPreview — coordonnées du client', () => {
+  it("affiche l'adresse et le téléphone du client quand ils sont renseignés", () => {
+    renderPreview('Gold', { clientAddress: '12 rue des Fleurs\n75011 Paris', clientPhone: '06 12 34 56 78' })
+    expect(screen.getByText(/12 rue des Fleurs/)).toBeTruthy()
+    expect(screen.getByText('06 12 34 56 78')).toBeTruthy()
+  })
+
+  it("n'affiche rien de plus quand ils sont absents", () => {
+    renderPreview('Gold')
+    expect(screen.queryByText(/rue des Fleurs/)).toBeNull()
+    expect(screen.queryByText(/06 12/)).toBeNull()
   })
 })

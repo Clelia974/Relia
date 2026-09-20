@@ -64,6 +64,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const invoiceNumber = invoice?.invoiceNumber ?? ''
   const [date, setDate] = useState(invoice?.date.slice(0, 10) ?? '')
   const [clientName, setClientName] = useState(invoice?.clientName ?? '')
+  const [clientAddress, setClientAddress] = useState(invoice?.clientAddress ?? wedding.clientAddress ?? '')
+  const [clientPhone, setClientPhone] = useState(invoice?.clientPhone ?? wedding.clientPhone ?? '')
   const [legalMentions, setLegalMentions] = useState(invoice?.legalMentions ?? '')
   const [lines, setLines] = useState<ProposalLineItemFormValues[]>(
     () =>
@@ -144,6 +146,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
     updateInvoicePreview(invoice.id, {
       date: new Date(date).toISOString(),
       clientName: clientName.trim(),
+      clientAddress: clientAddress.trim() || undefined,
+      clientPhone: clientPhone.trim() || undefined,
       legalMentions: legalMentions.trim() || undefined,
       lineItems: finalLines,
       subtotal: finalTotals.subtotal,
@@ -288,6 +292,17 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
                   <Input id="inv-client" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder={wedding.coupleName} />
                 </Field>
               </div>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <Field label="Adresse du client" htmlFor="inv-client-address" optional>
+                  <Textarea id="inv-client-address" rows={2} value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="Numéro, rue, code postal, ville" />
+                </Field>
+                <Field label="Téléphone du client" htmlFor="inv-client-phone" optional>
+                  <Input id="inv-client-phone" type="tel" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="Ex. 06 12 34 56 78" />
+                </Field>
+              </div>
+              {(!clientAddress.trim() || !clientPhone.trim()) && (
+                <p className="text-xs text-warning">Pour un document conforme, renseignez l'adresse et le téléphone du client.</p>
+              )}
               <Field label="Mentions" htmlFor="inv-mentions" optional>
                 <Textarea id="inv-mentions" rows={2} value={legalMentions} onChange={(e) => setLegalMentions(e.target.value)} />
               </Field>
@@ -322,6 +337,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
             invoiceNumber={invoiceNumber}
             date={date ? new Date(date).toISOString() : invoice.date}
             clientName={clientName || wedding.coupleName}
+            clientAddress={clientAddress.trim() || undefined}
+            clientPhone={clientPhone.trim() || undefined}
             lineItems={numericLines}
             subtotal={totals.subtotal}
             taxAmount={totals.taxAmount}

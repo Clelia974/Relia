@@ -10,6 +10,8 @@ interface InvoiceDocumentPreviewProps {
   invoiceNumber: string
   date: string
   clientName: string
+  clientAddress?: string
+  clientPhone?: string
   lineItems: ProposalLineItem[]
   subtotal: number
   taxAmount: number
@@ -27,6 +29,8 @@ export function InvoiceDocumentPreview({
   invoiceNumber,
   date,
   clientName,
+  clientAddress,
+  clientPhone,
   lineItems,
   subtotal,
   taxAmount,
@@ -73,6 +77,8 @@ export function InvoiceDocumentPreview({
         <div>
           <p className="text-xs text-muted-foreground">Client</p>
           <p className="text-sm font-medium text-foreground">{clientName || wedding.coupleName}</p>
+          {clientAddress && <p className="whitespace-pre-line text-sm text-muted-foreground">{clientAddress}</p>}
+          {clientPhone && <p className="text-sm text-muted-foreground">{clientPhone}</p>}
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Mariage</p>

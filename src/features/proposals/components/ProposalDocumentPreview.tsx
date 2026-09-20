@@ -12,6 +12,8 @@ interface ProposalDocumentPreviewProps {
   proposalNumber: string
   templateLabel?: string
   clientName: string
+  clientAddress?: string
+  clientPhone?: string
   validUntil?: string
   lineItems: ProposalLineItem[]
   totals: ProposalTotals
@@ -28,6 +30,8 @@ export function ProposalDocumentPreview({
   proposalNumber,
   templateLabel,
   clientName,
+  clientAddress,
+  clientPhone,
   validUntil,
   lineItems,
   totals,
@@ -75,6 +79,8 @@ export function ProposalDocumentPreview({
         <div>
           <p className="text-xs text-muted-foreground">Couple</p>
           <p className="text-sm font-medium text-foreground">{clientName || wedding.coupleName}</p>
+          {clientAddress && <p className="whitespace-pre-line text-sm text-muted-foreground">{clientAddress}</p>}
+          {clientPhone && <p className="text-sm text-muted-foreground">{clientPhone}</p>}
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Mariage</p>
