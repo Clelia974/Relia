@@ -7,9 +7,9 @@ import type { TaskStatus } from '@/types/entities'
 const STATUS_TONE: Record<TaskStatus, BadgeTone> = {
   a_preparer: 'muted',
   a_faire: 'muted',
-  en_cours: 'warning',
+  en_cours: 'muted',
   en_attente: 'warning',
-  terminee: 'success',
+  terminee: 'muted',
 }
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {

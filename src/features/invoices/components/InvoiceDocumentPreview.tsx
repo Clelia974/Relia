@@ -66,7 +66,7 @@ export function InvoiceDocumentPreview({
           </div>
         </div>
         <div className="text-right">
-          <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread'}`} style={accentStyle}>
+          <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread-text'}`} style={accentStyle}>
             Facture n° {invoiceNumber}
           </p>
           <p className="text-sm text-muted-foreground">{format(new Date(date), 'd MMMM yyyy', { locale: fr })}</p>

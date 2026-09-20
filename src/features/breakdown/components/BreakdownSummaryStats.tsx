@@ -11,7 +11,7 @@ export function BreakdownSummaryStats({ summary }: BreakdownSummaryStatsProps) {
     <div className="flex flex-col gap-3">
       {isComplete && (
         <div className="rounded-lg border border-thread/40 bg-thread/10 px-4 py-3 text-center">
-          <p className="font-heading text-base font-semibold text-thread">Démontage complet</p>
+          <p className="font-heading text-base font-semibold text-thread-text">Démontage complet</p>
           <p className="text-xs text-muted-foreground">Tous les éléments ont été récupérés et affectés à une destination.</p>
         </div>
       )}

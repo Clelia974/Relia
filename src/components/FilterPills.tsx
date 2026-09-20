@@ -23,10 +23,10 @@ export function FilterPills<T extends string>({ options, value, onChange, ariaLa
           onClick={() => onChange(option.key)}
           aria-pressed={value === option.key}
           className={cn(
-            'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+            'rounded-full border px-3.5 py-1.5 text-xs font-medium transition-[color,background-color,border-color,box-shadow] duration-200',
             value === option.key
-              ? 'border-transparent bg-primary text-primary-foreground'
-              : 'border-border text-muted-foreground hover:text-foreground',
+              ? 'border-transparent bg-primary text-primary-foreground shadow-sm'
+              : 'border-border bg-card text-muted-foreground hover:border-primary/25 hover:bg-accent hover:text-accent-foreground',
           )}
         >
           {option.label}

@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils'
 
 const PALETTE = [
-  { bg: '#EDE9FE', text: '#6D28D9' },
-  { bg: '#CCFBF1', text: '#0F766E' },
-  { bg: '#FEF3C7', text: '#92400E' },
-  { bg: '#E0F2FE', text: '#075985' },
-  { bg: '#FCE7F3', text: '#BE185D' },
-  { bg: '#ECFCCB', text: '#4D7C0F' },
+  'bg-primary/10 text-primary dark:bg-primary/25 dark:text-accent-foreground',
+  'bg-accent text-accent-foreground',
+  'bg-success-bg text-success',
+  'bg-warning-bg text-warning',
+  'bg-secondary text-foreground/80',
+  'bg-risk-bg text-risk',
 ]
 
 function getInitials(name: string): string {
@@ -32,11 +32,9 @@ interface InitialsBadgeProps {
 
 /** Chip d'initiales coloré (façon "Guestlist") pour repérer un couple ou un prestataire en un coup d'œil. */
 export function InitialsBadge({ name, className }: InitialsBadgeProps) {
-  const { bg, text } = pickColor(name)
   return (
     <span
-      className={cn('flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold', className)}
-      style={{ backgroundColor: bg, color: text }}
+      className={cn('flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold tracking-wide', pickColor(name), className)}
       aria-hidden="true"
     >
       {getInitials(name)}

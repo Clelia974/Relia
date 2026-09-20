@@ -39,7 +39,7 @@ export function WeddingLayout() {
         </p>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="font-heading text-2xl font-semibold text-foreground">{wedding.coupleName}</h1>
-          <span className="text-sm font-medium tabular-nums text-thread">
+          <span className="text-sm font-medium tabular-nums text-thread-text">
             {formatDaysUntil(differenceInCalendarDays(new Date(wedding.date), new Date()))}
           </span>
         </div>

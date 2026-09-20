@@ -13,7 +13,7 @@ export function LandingPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
         <div className="flex max-w-xl flex-col items-center gap-6 text-center">
-          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-thread">
+          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-thread-text">
             <span className="h-1.5 w-1.5 rounded-full bg-thread" aria-hidden="true" />
             Le fil conducteur de vos mariages.
           </span>

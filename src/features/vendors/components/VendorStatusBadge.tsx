@@ -8,10 +8,10 @@ const STATUS_TONE: Record<VendorStatus, BadgeTone> = {
   a_contacter: 'muted',
   contacte: 'muted',
   devis_recu: 'warning',
-  confirme: 'success',
-  acompte_paye: 'success',
+  confirme: 'muted',
+  acompte_paye: 'muted',
   solde_a_payer: 'warning',
-  termine: 'success',
+  termine: 'muted',
 }
 
 export function VendorStatusBadge({ status }: { status: VendorStatus }) {

@@ -52,11 +52,11 @@ export function WeddingDayTimeline({ wedding, events, tasks, vendorNameById, con
         return (
           <section key={dateKey} className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <h3 className={cn('font-heading text-base font-semibold capitalize', isWeddingDay ? 'text-thread' : 'text-foreground')}>
+              <h3 className={cn('font-heading text-base font-semibold capitalize', isWeddingDay ? 'text-thread-text' : 'text-foreground')}>
                 {format(new Date(dateKey), 'EEEE d MMMM yyyy', { locale: fr })}
               </h3>
               {isWeddingDay && (
-                <span className="rounded-full bg-thread/15 px-2 py-0.5 text-xs font-medium text-thread">Jour J</span>
+                <span className="rounded-full bg-thread/15 px-2 py-0.5 text-xs font-medium text-thread-text">Jour J</span>
               )}
             </div>
 

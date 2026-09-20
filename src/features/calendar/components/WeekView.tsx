@@ -43,7 +43,7 @@ export function WeekView({ items }: { items: CalendarItem[] }) {
           const dayItems = byDate.get(key) ?? []
           return (
             <div key={key} className="flex flex-col gap-2">
-              <p className={cn('text-xs font-medium capitalize', isToday(day) ? 'text-thread' : 'text-muted-foreground')}>
+              <p className={cn('text-xs font-medium capitalize', isToday(day) ? 'text-thread-text' : 'text-muted-foreground')}>
                 {format(day, 'EEE d', { locale: fr })}
               </p>
               <div className="flex flex-col gap-1.5">

@@ -112,7 +112,7 @@ export function TaskCard({
           <TaskPriorityBadge priority={task.priority} />
           {task.postponedCount > 0 && !done && (
             <Badge
-              className="border-transparent bg-warning-bg text-warning"
+              className={cn('border-transparent', task.postponedCount > 1 ? 'bg-warning-bg text-warning' : 'bg-muted text-muted-foreground')}
               title={lastPostponeSummary(task)}
             >
               <History className="size-3" aria-hidden="true" />

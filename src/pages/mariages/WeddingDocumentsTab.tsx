@@ -150,7 +150,7 @@ export function WeddingDocumentsTab() {
                 <Link key={p.id} to={`/mariages/${wedding.id}/documents/propositions/${p.id}`}>
                   <Card className="h-full transition-colors hover:border-thread/50">
                     <CardContent className="flex flex-col gap-2">
-                      <p className="text-xs uppercase tracking-wide text-thread">
+                      <p className="text-xs uppercase tracking-wide text-thread-text">
                         {p.proposalNumber} · {proposalTemplates.find((t) => t.tier === p.template)?.label ?? p.template}
                       </p>
                       <p className="font-medium text-foreground">{p.title}</p>
@@ -181,7 +181,7 @@ export function WeddingDocumentsTab() {
                 <Link key={inv.id} to={`/mariages/${wedding.id}/documents/factures/${inv.id}`}>
                   <Card className="h-full transition-colors hover:border-thread/50">
                     <CardContent className="flex flex-col gap-2">
-                      <p className="text-xs uppercase tracking-wide text-thread">Facture n° {inv.invoiceNumber}</p>
+                      <p className="text-xs uppercase tracking-wide text-thread-text">Facture n° {inv.invoiceNumber}</p>
                       <p className="font-medium text-foreground">{inv.clientName || wedding.coupleName}</p>
                       <p className="font-heading text-lg font-semibold tabular-nums text-foreground">{currency.format(inv.total)}</p>
                       <p className="text-xs text-muted-foreground">{formatShortDate(inv.date)}</p>

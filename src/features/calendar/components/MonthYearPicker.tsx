@@ -81,7 +81,7 @@ export function MonthYearPicker({ value, onSelect, children }: MonthYearPickerPr
                   className={cn(
                     'rounded-lg px-2 py-2 text-sm capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     selected ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-accent',
-                    isTodayMonth && !selected && 'font-semibold text-thread',
+                    isTodayMonth && !selected && 'font-semibold text-thread-text',
                   )}
                 >
                   {format(new Date(2000, m, 1), 'MMM', { locale: fr })}
@@ -106,7 +106,7 @@ export function MonthYearPicker({ value, onSelect, children }: MonthYearPickerPr
                   className={cn(
                     'rounded-lg px-2 py-2 text-sm tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     selected ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-accent',
-                    y === todayYear && !selected && 'font-semibold text-thread',
+                    y === todayYear && !selected && 'font-semibold text-thread-text',
                   )}
                 >
                   {y}

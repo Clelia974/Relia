@@ -77,13 +77,13 @@ export function DayOfItemCard({ item, vendor, onToggleTask }: DayOfItemCardProps
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-2 text-xs">
             <span className="font-medium text-foreground">{vendor.name}</span>
             {vendor.phone && (
-              <a href={`tel:${vendor.phone}`} className="flex items-center gap-1 text-thread hover:underline">
+              <a href={`tel:${vendor.phone}`} className="flex items-center gap-1 text-thread-text hover:underline">
                 <Phone className="size-3.5" aria-hidden="true" />
                 Appeler
               </a>
             )}
             {vendor.email && (
-              <a href={`mailto:${vendor.email}`} className="flex items-center gap-1 text-thread hover:underline">
+              <a href={`mailto:${vendor.email}`} className="flex items-center gap-1 text-thread-text hover:underline">
                 <Mail className="size-3.5" aria-hidden="true" />
                 Email
               </a>

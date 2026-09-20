@@ -64,7 +64,7 @@ export function ProposalDocumentPreview({
           </div>
         </div>
         <div className="text-right">
-          <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread'}`} style={accentStyle}>
+          <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread-text'}`} style={accentStyle}>
             Proposition n° {proposalNumber}
             {templateLabel ? ` — ${templateLabel}` : ''}
           </p>

@@ -42,6 +42,8 @@
     --color-background: var(--background);
     /* Relia — accent de marque ("fil conducteur"), distinct des couleurs sémantiques */
     --color-thread: var(--thread);
+    /* Or foncé pour le TEXTE (contraste ≥ 4,5) — --thread reste réservé aux points, filets et barres décoratifs */
+    --color-thread-text: var(--thread-text);
     /* Relia — couleurs sémantiques de statut, jamais utilisées comme accent décoratif */
     --color-success: var(--success);
     --color-success-foreground: var(--success-foreground);
@@ -62,96 +64,108 @@
 }
 
 :root {
-    /* Relia — palette "Cave & Champagne" : bordeaux (#6B1F23) + or champagne (#F0DBB3)
-       sur un fond ivoire, gardés sobres et espacés pour rester calmes et professionnels */
-    --background: #FAF6F1;
+    /* Relia — palette "Calme & Luxe" : fond bleu pastel (#DEE6EF), cartes blanc neutre (#FAFAF8),
+       texte anthracite, bordeaux (#6B1F23) comme UNIQUE couleur d'action, vert sauge pour les
+       statuts positifs. L'or n'est plus qu'un fil décoratif (--thread). Les survols et états
+       sélectionnés sont des teintes bleues (--accent), jamais dorées. */
+    --background: #DEE6EF;
     --foreground: #2C2C2C;
-    --card: #FFFFF0;
+    --card: #FAFAF8;
     --card-foreground: #2C2C2C;
-    --popover: #FFFFF0;
+    --popover: #FAFAF8;
     --popover-foreground: #2C2C2C;
     --primary: #6B1F23;
     --primary-foreground: #FBF3EA;
-    --secondary: #F3ECE4;
+    --secondary: #D5DFEA;
     --secondary-foreground: #2C2C2C;
-    --muted: #F4EEE7;
-    --muted-foreground: #6E6259;
-    --accent: #F0DBB3;
-    --accent-foreground: var(--primary);
+    --muted: #D2DCE7;
+    --muted-foreground: #4F5B6A;
+    --accent: #D0DDEC;
+    --accent-foreground: #6B1F23;
     --destructive: #B54A2C;
     --destructive-foreground: #FBF3EA;
-    --border: #E6DCD0;
-    --input: #9F896F;
+    --border: #C8D3E0;
+    --input: #8496AB;
     --ring: var(--primary);
     --thread: #C9A15A;
+    --thread-text: #75561A;
     --success: #4F6B3D;
     --success-foreground: #F7FAF3;
-    --success-bg: #E8EEE1;
+    --success-bg: #DFE8D6;
     --warning: #7A551A;
     --warning-foreground: #FBF7EF;
-    --warning-bg: #F3ECDD;
+    --warning-bg: #EFE6D2;
     --risk: #A23F2C;
     --risk-foreground: #FBF3EA;
-    --risk-bg: #F5E4DC;
+    --risk-bg: #F1DED4;
     --chart-1: #6B1F23;
     --chart-2: #C9A15A;
     --chart-3: #5F7A4C;
-    --chart-4: #96691F;
+    --chart-4: #4F7CAC;
     --chart-5: #A23F2C;
-    --radius: 0.5rem;
-    --sidebar: #FFFFF0;
+    --radius: 0.625rem;
+    --sidebar: #F1F3F6;
     --sidebar-foreground: #2C2C2C;
     --sidebar-primary: #6B1F23;
     --sidebar-primary-foreground: #FBF3EA;
-    --sidebar-accent: #F3ECE4;
-    --sidebar-accent-foreground: #2C2C2C;
-    --sidebar-border: #E6DCD0;
+    --sidebar-accent: #D0DDEC;
+    --sidebar-accent-foreground: #6B1F23;
+    --sidebar-border: #D3DCE6;
     --sidebar-ring: var(--primary);
+    /* Ombres douces et froides (teinte bleu-gris) : la profondeur vient de l'ombre, pas de bordures épaisses. */
+    --shadow-card: 0 1px 2px rgb(31 45 61 / 0.05), 0 6px 20px -8px rgb(31 45 61 / 0.10);
+    --shadow-raised: 0 2px 4px rgb(31 45 61 / 0.06), 0 12px 28px -10px rgb(31 45 61 / 0.18);
+    --ease-out-soft: cubic-bezier(0.22, 0.75, 0.25, 1);
 }
 
 .dark {
-    --background: #1C1513;
-    --foreground: #F1E9DE;
-    --card: #241B19;
-    --card-foreground: #F1E9DE;
-    --popover: #241B19;
-    --popover-foreground: #F1E9DE;
-    --primary: #9A3540;
-    --primary-foreground: #FBF3EA;
-    --secondary: #2E2320;
-    --secondary-foreground: #F1E9DE;
-    --muted: #2E2320;
-    --muted-foreground: #B3A89C;
-    --accent: #F0DBB3;
-    --accent-foreground: var(--primary);
-    --destructive: #E0916B;
+    /* Mode sombre "bleu nuit" : l'inverse du thème clair — fond marine profond, cartes un cran
+       plus claires, bordeaux éclairci pour rester un bouton lisible, texte bleu-blanc. */
+    --background: #111A26;
+    --foreground: #D9E2EC;
+    --card: #182435;
+    --card-foreground: #D9E2EC;
+    --popover: #1D2B3F;
+    --popover-foreground: #D9E2EC;
+    --primary: #A63F4E;
+    --primary-foreground: #FFF6F1;
+    --secondary: #22324A;
+    --secondary-foreground: #D9E2EC;
+    --muted: #1E2C40;
+    --muted-foreground: #98A7BA;
+    --accent: #263A55;
+    --accent-foreground: #F0C6CC;
+    --destructive: #E59A88;
     --destructive-foreground: #2A1710;
-    --border: #3B2E29;
-    --input: #926554;
-    --ring: var(--accent);
+    --border: #2A3B52;
+    --input: #5B7290;
+    --ring: #8FB0DA;
     --thread: #D8B876;
+    --thread-text: #D8B876;
     --success: #A9C398;
     --success-foreground: #16231A;
-    --success-bg: #212D1E;
+    --success-bg: #1B2B25;
     --warning: #D9AE5E;
     --warning-foreground: #2A2010;
-    --warning-bg: #2A2314;
-    --risk: #D98A78;
+    --warning-bg: #2A2618;
+    --risk: #E59A88;
     --risk-foreground: #2A1710;
-    --risk-bg: #2E1D17;
-    --chart-1: #9A3540;
+    --risk-bg: #33201F;
+    --chart-1: #C4606E;
     --chart-2: #D8B876;
     --chart-3: #A9C398;
-    --chart-4: #D9AE5E;
-    --chart-5: #D98A78;
-    --sidebar: #241B19;
-    --sidebar-foreground: #F1E9DE;
-    --sidebar-primary: #9A3540;
-    --sidebar-primary-foreground: #FBF3EA;
-    --sidebar-accent: #2E2320;
-    --sidebar-accent-foreground: #F1E9DE;
-    --sidebar-border: #3B2E29;
-    --sidebar-ring: var(--accent);
+    --chart-4: #8FB0DA;
+    --chart-5: #E59A88;
+    --sidebar: #0D1520;
+    --sidebar-foreground: #D9E2EC;
+    --sidebar-primary: #A63F4E;
+    --sidebar-primary-foreground: #FFF6F1;
+    --sidebar-accent: #263A55;
+    --sidebar-accent-foreground: #F0C6CC;
+    --sidebar-border: #1B2A3D;
+    --sidebar-ring: #8FB0DA;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.30), 0 8px 24px -10px rgb(0 0 0 / 0.45);
+    --shadow-raised: 0 2px 6px rgb(0 0 0 / 0.35), 0 16px 32px -12px rgb(0 0 0 / 0.55);
 }
 
 @layer base {
@@ -162,6 +176,12 @@
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    transition: background-color 250ms var(--ease-out-soft), color 250ms var(--ease-out-soft);
+    }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 22%, transparent);
     }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
@@ -186,6 +206,29 @@
 .font-heading.text-lg { letter-spacing: -0.01em; }
 .font-heading.text-base { letter-spacing: -0.005em; }
 .font-heading.text-sm { letter-spacing: 0em; }
+
+/* Relia — titres de page plus grands, plus aérés ; sous-titre au repos (règles hors @layer : elles priment sur les utilitaires Tailwind) */
+main h1.font-heading {
+  font-size: 1.875rem;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+main h1.font-heading + p {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  max-width: 60ch;
+}
+main h2.font-heading.text-lg {
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+}
+p { text-wrap: pretty; }
+
+/* Relia — respiration : les grands blocs d'une page s'espacent un cran de plus */
+main .gap-6 {
+  gap: 1.75rem;
+}
 
 /* Relia — animations : discrètes, < 300ms, désactivées si l'utilisatrice préfère moins de mouvement */
 @keyframes fade-in-page {
