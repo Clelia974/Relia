@@ -44,6 +44,8 @@
     --color-thread: var(--thread);
     /* Or foncé pour le TEXTE (contraste ≥ 4,5) — --thread reste réservé aux points, filets et barres décoratifs */
     --color-thread-text: var(--thread-text);
+    /* Vert sauge de la marque (#9CAF88) : décoratif seulement (fonds, filets) — jamais pour du texte, contraste insuffisant */
+    --color-sage: var(--sage);
     /* Relia — couleurs sémantiques de statut, jamais utilisées comme accent décoratif */
     --color-success: var(--success);
     --color-success-foreground: var(--success-foreground);
@@ -89,6 +91,7 @@
     --ring: var(--primary);
     --thread: #C9A15A;
     --thread-text: #75561A;
+    --sage: #9CAF88;
     --success: #4F6B3D;
     --success-foreground: #F7FAF3;
     --success-bg: #DFE8D6;
@@ -142,6 +145,7 @@
     --ring: #8FB0DA;
     --thread: #D8B876;
     --thread-text: #D8B876;
+    --sage: #7F9470;
     --success: #A9C398;
     --success-foreground: #16231A;
     --success-bg: #1B2B25;
@@ -208,25 +212,25 @@
 .font-heading.text-sm { letter-spacing: 0em; }
 
 /* Relia — titres de page plus grands, plus aérés ; sous-titre au repos (règles hors @layer : elles priment sur les utilitaires Tailwind) */
-main h1.font-heading {
+#main-content h1.font-heading {
   font-size: 1.875rem;
   line-height: 1.15;
   font-weight: 600;
   letter-spacing: -0.03em;
 }
-main h1.font-heading + p {
+#main-content h1.font-heading + p {
   margin-top: 0.5rem;
   font-size: 0.9375rem;
   max-width: 60ch;
 }
-main h2.font-heading.text-lg {
+#main-content h2.font-heading.text-lg {
   font-size: 1.25rem;
   letter-spacing: -0.015em;
 }
 p { text-wrap: pretty; }
 
 /* Relia — respiration : les grands blocs d'une page s'espacent un cran de plus */
-main .gap-6 {
+#main-content .gap-6 {
   gap: 1.75rem;
 }
 
@@ -251,6 +255,21 @@ main .gap-6 {
     opacity: 1;
     transform: translateY(0);
     }
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-notice-in {
+  animation: notice-in 240ms cubic-bezier(0.22, 0.75, 0.25, 1) both;
 }
 
 .animate-page-in {

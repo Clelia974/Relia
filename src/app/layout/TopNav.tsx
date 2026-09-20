@@ -33,8 +33,8 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Relia — Aujourd'hui">
+          <img src="/brand/relia-monogram.svg" alt="" className="size-7" />
           <span className="font-heading text-lg font-semibold text-foreground">Relia</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-thread" aria-hidden="true" />
         </NavLink>
 
         <div className="flex items-center gap-1">

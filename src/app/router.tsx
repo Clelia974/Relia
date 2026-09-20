@@ -8,6 +8,10 @@ import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
 import { RootGate } from '@/pages/RootGate'
+import { CookiesPage } from '@/pages/legal/CookiesPage'
+import { PrivacyPage } from '@/pages/legal/PrivacyPage'
+import { RefundPage } from '@/pages/legal/RefundPage'
+import { TermsPage } from '@/pages/legal/TermsPage'
 
 // Chargées à la demande : pages lourdes (Gantt, calculs de proposition/facture,
 // calendrier) peu visitées au premier chargement — cf. Phase 10.
@@ -77,6 +81,10 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<RootGate />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/confidentialite" element={<PrivacyPage />} />
+      <Route path="/conditions" element={<TermsPage />} />
+      <Route path="/remboursement" element={<RefundPage />} />
+      <Route path="/cookies" element={<CookiesPage />} />
 
       <Route element={<AppLayout />}>
         <Route path="aujourdhui" element={<AujourdHuiPage />} />
