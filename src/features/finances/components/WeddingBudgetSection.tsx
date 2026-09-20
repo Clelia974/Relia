@@ -1,4 +1,4 @@
-import { CircleHelp, Info, OctagonAlert } from 'lucide-react'
+import { CircleHelp, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { BudgetProgressBar } from '@/features/finances/components/BudgetProgressBar'
@@ -7,6 +7,7 @@ import { BudgetStatusBadge } from '@/features/finances/components/BudgetStatusBa
 import { HorizontalBars } from '@/features/finances/components/HorizontalBars'
 import { getBudgetStatus, type WeddingBudgetOverview } from '@/features/finances/budget'
 import { currency } from '@/lib/currency'
+import { cn } from '@/lib/utils'
 import { EXPENSE_CATEGORY_LABELS } from '@/lib/expenseCategory'
 import type { BadgeTone } from '@/lib/badgeTone'
 
@@ -75,35 +76,40 @@ export function WeddingBudgetSection({ overview, editBudgetHref }: WeddingBudget
           )}
         </div>
       ) : (
-        <>
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            <Tile label="Budget client" value={currency.format(overview.clientBudget)} />
-            <Tile
-              label="Utilisé"
-              value={currency.format(overview.estimatedTotalSpend)}
-              tooltip="Coût prestataire réel s'il est connu, sinon estimé, plus toutes les autres dépenses (quel que soit leur statut) — une estimation."
-            />
-            <Tile label="Reste" value={currency.format(overview.remainingEstimate ?? 0)} />
-            <Tile label="Progression" value={`${Math.round(overview.budgetUsagePct ?? 0)} %`} />
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-1">
+            <p className="flex items-center gap-1 text-sm text-muted-foreground">
+              {overview.isOverBudget ? 'Au-dessus du budget' : 'Reste à dépenser'}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" aria-label="À propos du calcul" className="text-muted-foreground hover:text-foreground">
+                    <Info className="size-3.5" aria-hidden="true" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Estimation : coût prestataire réel s'il est connu, sinon estimé, plus toutes les autres dépenses (quel que soit leur statut).
+                </TooltipContent>
+              </Tooltip>
+            </p>
+            <p className={cn('font-heading text-4xl font-semibold tabular-nums', overview.isOverBudget ? 'text-risk' : 'text-foreground')}>
+              {currency.format(Math.abs(overview.remainingEstimate ?? 0))}
+            </p>
           </div>
-
           <BudgetProgressBar
             pct={overview.budgetUsagePct ?? 0}
             toneClassName={PROGRESS_BAR_FILL[tone]}
             accessibleLabel={`${Math.round(overview.budgetUsagePct ?? 0)} % du budget utilisé — ${currency.format(overview.estimatedTotalSpend)} sur ${currency.format(overview.clientBudget)}`}
             caption={`${currency.format(overview.estimatedTotalSpend)} utilisés sur ${currency.format(overview.clientBudget)}`}
           />
-
-          {overview.isOverBudget && overview.remainingEstimate !== null && (
-            <p className="flex items-center gap-2 text-sm font-medium text-risk">
-              <OctagonAlert className="size-4 shrink-0" aria-hidden="true" />
-              {currency.format(Math.abs(overview.remainingEstimate))} au-dessus du budget (estimation).
-            </p>
-          )}
-        </>
+        </div>
       )}
 
-      <div className="flex flex-col gap-2">
+      <details className="group rounded-lg border border-border">
+        <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-medium text-foreground marker:content-none">
+          Voir le détail
+        </summary>
+        <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
+        <div className="flex flex-col gap-2">
         <h3 className="text-sm font-medium text-foreground">Répartition des dépenses</h3>
         <HorizontalBars
           items={categoryItems}
@@ -111,13 +117,9 @@ export function WeddingBudgetSection({ overview, editBudgetHref }: WeddingBudget
           ariaLabel="Répartition des autres dépenses par catégorie, triée du montant le plus élevé au plus faible"
           emptyLabel="Aucune autre dépense pour ce mariage."
         />
-      </div>
+        </div>
 
-      <details className="group rounded-lg border border-border">
-        <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-medium text-foreground marker:content-none">
-          Détails
-        </summary>
-        <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
+
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Tile label="Coûts prestataires estimés" value={overview.hasAnyVendor ? currency.format(overview.vendorEstimatedTotal) : '—'} />
             <Tile label="Coûts prestataires réels" value={overview.hasAnyVendor ? currency.format(overview.vendorActualTotal) : '—'} />

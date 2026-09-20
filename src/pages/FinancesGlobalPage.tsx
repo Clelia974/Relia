@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { CircleCheck, TriangleAlert } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
 import { getBudgetStatus, getWeddingBudgetOverview } from '@/features/finances/budget'
 import { getWeddingFinancials } from '@/features/finances/calculations'
-import { BudgetStatusBadge } from '@/features/finances/components/BudgetStatusBadge'
-import { MarginStatusBadge } from '@/features/finances/components/MarginStatusBadge'
+import { BudgetProgressBar } from '@/features/finances/components/BudgetProgressBar'
+import { WeddingComparison } from '@/features/finances/components/WeddingComparison'
 import { currency } from '@/lib/currency'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
@@ -78,20 +78,34 @@ export function FinancesGlobalPage() {
                 Compare le budget prévu par les couples avec les dépenses et coûts suivis dans RELIA.
               </p>
             </div>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              <SummaryCard
-                label="Budget total configuré"
-                value={budgetConfigured.length > 0 ? currency.format(budgetTotals.clientBudget) : '—'}
-              />
-              <SummaryCard
-                label="Dépenses estimées (budgets configurés)"
-                value={budgetConfigured.length > 0 ? currency.format(budgetTotals.estimatedSpend) : '—'}
-              />
-              <SummaryCard
-                label="Mariages à surveiller ou dépassés"
-                value={budgetConfigured.length > 0 ? String(budgetTotals.atRiskCount) : '—'}
-              />
-            </div>
+            {budgetConfigured.length > 0 ? (
+              <Card>
+                <CardContent className="flex flex-col gap-3">
+                  <BudgetProgressBar
+                    pct={(budgetTotals.estimatedSpend / Math.max(1, budgetTotals.clientBudget)) * 100}
+                    toneClassName={budgetTotals.atRiskCount > 0 ? 'bg-warning' : 'bg-success'}
+                    accessibleLabel={`${currency.format(budgetTotals.estimatedSpend)} dépensés sur ${currency.format(budgetTotals.clientBudget)}, tous mariages avec budget confondus`}
+                    caption={`${currency.format(budgetTotals.estimatedSpend)} dépensés sur ${currency.format(budgetTotals.clientBudget)}`}
+                  />
+                  {budgetTotals.atRiskCount > 0 ? (
+                    <p className="flex items-center gap-1.5 text-sm font-medium text-warning">
+                      <TriangleAlert className="size-4 shrink-0" aria-hidden="true" />
+                      {budgetTotals.atRiskCount} mariage{budgetTotals.atRiskCount > 1 ? 's' : ''} à surveiller ou dépassé
+                      {budgetTotals.atRiskCount > 1 ? 's' : ''}
+                    </p>
+                  ) : (
+                    <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <CircleCheck className="size-4 shrink-0 text-success" aria-hidden="true" />
+                      Tous les budgets sont dans les clous.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <p className="rounded-lg border border-dashed border-border px-4 py-4 text-sm text-muted-foreground">
+                Aucun budget client renseigné pour l'instant.
+              </p>
+            )}
             {budgetMissingCount > 0 && (
               <p className="text-xs text-muted-foreground">
                 {budgetMissingCount} mariage{budgetMissingCount > 1 ? 's' : ''} sans budget client renseigné, non comptabilisé
@@ -109,12 +123,20 @@ export function FinancesGlobalPage() {
                 Mesure la rentabilité de ta prestation à partir du montant vendu et des coûts associés.
               </p>
             </div>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              <SummaryCard label="Chiffre d'affaires approuvé" value={currency.format(totals.revenue)} />
-              <SummaryCard label="Coûts totaux" value={currency.format(totals.costs)} />
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <SummaryCard label="Profit prévisionnel" value={currency.format(totals.profit)} />
               <SummaryCard label="Marge moyenne" value={calculable.length > 0 ? `${Math.round(totals.averageMarginPct)} %` : '—'} />
             </div>
+
+            <details className="rounded-lg border border-border">
+              <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-medium text-foreground marker:content-none">
+                Voir le détail
+              </summary>
+              <div className="grid gap-4 border-t border-border px-4 py-4 grid-cols-1 sm:grid-cols-2">
+                <SummaryCard label="Chiffre d'affaires approuvé" value={currency.format(totals.revenue)} />
+                <SummaryCard label="Coûts totaux" value={currency.format(totals.costs)} />
+              </div>
+            </details>
 
             {incompleteCount > 0 && (
               <p className="text-xs text-muted-foreground">
@@ -124,68 +146,7 @@ export function FinancesGlobalPage() {
             )}
           </section>
 
-          <div className="flex flex-col gap-2.5">
-            {rows.map(({ wedding, financials, budget }) => (
-              <Link
-                key={wedding.id}
-                to={`/mariages/${wedding.id}/finances`}
-                className="flex flex-col gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm transition-colors hover:border-thread/50"
-              >
-                <div>
-                  <p className="font-medium text-foreground">{wedding.coupleName}</p>
-                  <p className="text-xs text-muted-foreground">{wedding.venue}</p>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-medium text-muted-foreground">Budget du mariage</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <span className="text-muted-foreground">
-                        Budget :{' '}
-                        <span className="tabular-nums text-foreground">
-                          {budget.hasClientBudget ? currency.format(budget.clientBudget) : 'Non renseigné'}
-                        </span>
-                      </span>
-                      {budget.hasClientBudget && (
-                        <span className="text-muted-foreground">
-                          Estimé dépensé :{' '}
-                          <span className="tabular-nums text-foreground">{currency.format(budget.estimatedTotalSpend)}</span>
-                        </span>
-                      )}
-                      <BudgetStatusBadge status={getBudgetStatus(budget)} />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-medium text-muted-foreground">Rentabilité</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <span className="text-muted-foreground">
-                        Revenu : <span className="tabular-nums text-foreground">{currency.format(financials.approvedRevenue)}</span>
-                      </span>
-                      <span className="text-muted-foreground">
-                        Coûts :{' '}
-                        <span className="tabular-nums text-foreground">
-                          {financials.hasCostData ? currency.format(financials.totalCosts) : '—'}
-                        </span>
-                      </span>
-                      <span className="text-muted-foreground">
-                        Profit :{' '}
-                        <span className="tabular-nums text-foreground">
-                          {financials.hasCostData ? currency.format(financials.profit) : '—'}
-                        </span>
-                      </span>
-                      {financials.marginStatus ? (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium tabular-nums text-foreground">{Math.round(financials.marginPct)} %</span>
-                          <MarginStatusBadge status={financials.marginStatus} />
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Données incomplètes</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <WeddingComparison rows={rows} />
         </>
       )}
     </div>

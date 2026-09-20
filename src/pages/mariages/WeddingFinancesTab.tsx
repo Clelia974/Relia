@@ -18,7 +18,6 @@ import { CostReviewBadge } from '@/components/CostReviewBadge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-  calculateProposedScopeChanges,
   getWeddingFinancials,
   simulateScopeChangeApproval,
 } from '@/features/finances/calculations'
@@ -202,7 +201,7 @@ export function WeddingFinancesTab() {
         </p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card>
           <CardContent className="flex flex-col gap-1.5">
             <Label htmlFor="sold-amount" className="text-xs text-muted-foreground">
@@ -220,11 +219,6 @@ export function WeddingFinancesTab() {
 
         {!showEmptyState && (
           <>
-            <SummaryCard label="Changements approuvés" value={`+${currency.format(financials.scopeChangeApprovedTotal)}`} />
-            <SummaryCard
-              label="Coûts totaux"
-              value={financials.hasCostData ? currency.format(financials.totalCosts) : '—'}
-            />
             <SummaryCard
               label="Profit prévisionnel"
               value={financials.hasCostData ? currency.format(financials.profit) : '—'}
@@ -250,6 +244,18 @@ export function WeddingFinancesTab() {
         )}
       </div>
 
+      {!showEmptyState && (
+        <details className="rounded-lg border border-border">
+          <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-medium text-foreground marker:content-none">
+            Voir le calcul
+          </summary>
+          <div className="grid gap-4 border-t border-border px-4 py-4 grid-cols-1 sm:grid-cols-2">
+            <SummaryCard label="Coûts totaux" value={financials.hasCostData ? currency.format(financials.totalCosts) : '—'} />
+            <SummaryCard label="Changements approuvés" value={`+${currency.format(financials.scopeChangeApprovedTotal)}`} />
+          </div>
+        </details>
+      )}
+
       {!showEmptyState && financials.hasCostNeedingReview && (
         <p className="rounded-lg border border-warning/30 bg-warning-bg px-4 py-2.5 text-sm text-warning">
           La marge ci-dessus inclut au moins un coût prestataire à vérifier (dupliqué automatiquement lors d'une mise
@@ -270,7 +276,7 @@ export function WeddingFinancesTab() {
             <p className="text-sm text-foreground">
               Total : <span className="font-medium tabular-nums">{currency.format(financials.vendorCosts)}</span>
               {financials.scopeChangeApprovedCost > 0 && (
-                <span className="text-muted-foreground"> (dont {currency.format(financials.scopeChangeApprovedCost)} de changements de périmètre approuvés)</span>
+                <span className="text-xs text-muted-foreground"> · inclut {currency.format(financials.scopeChangeApprovedCost)} de changements approuvés</span>
               )}
             </p>
           )}
@@ -279,40 +285,42 @@ export function WeddingFinancesTab() {
           <p className="text-sm text-muted-foreground">Aucun prestataire associé à ce mariage.</p>
         ) : (
           <>
-            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {vendors.map((vendor) => {
-                const link = linkByVendorId.get(vendor.id)
-                const hasEstimated = link?.estimatedCost !== undefined
-                const hasActual = link?.actualCost !== undefined
-                const gap = hasEstimated && hasActual ? link.actualCost! - link.estimatedCost! : null
-                return (
-                  <Card key={vendor.id}>
-                    <CardContent className="flex flex-col gap-2">
-                      <p className="font-medium text-foreground">{vendor.name}</p>
-                      <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-                        <div>
-                          <dt className="text-xs text-muted-foreground">Coût estimé</dt>
-                          <dd className="tabular-nums text-foreground">{hasEstimated ? currency.format(link!.estimatedCost!) : '—'}</dd>
+            {vendors.length > missingCostVendors.length && (
+              <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+                {vendors
+                  .filter((v) => !missingCostVendors.includes(v))
+                  .map((vendor) => {
+                    const link = linkByVendorId.get(vendor.id)
+                    const estimated = link?.estimatedCost
+                    const actual = link?.actualCost
+                    const gap = estimated !== undefined && actual !== undefined ? actual - estimated : null
+                    const detail =
+                      actual === undefined
+                        ? 'estimé'
+                        : gap !== null && gap !== 0
+                          ? `estimé ${currency.format(estimated!)} · écart ${gap > 0 ? '+' : ''}${currency.format(gap)}`
+                          : 'réel'
+                    return (
+                      <li key={vendor.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-foreground">{vendor.name}</p>
+                          {link?.needsCostReview && <CostReviewBadge />}
                         </div>
-                        <div>
-                          <dt className="text-xs text-muted-foreground">Coût réel</dt>
-                          <dd className="tabular-nums text-foreground">{hasActual ? currency.format(link!.actualCost!) : '—'}</dd>
+                        <div className="shrink-0 text-right">
+                          <p className="font-medium tabular-nums text-foreground">{currency.format(actual ?? estimated ?? 0)}</p>
+                          <p className="text-xs text-muted-foreground">{detail}</p>
                         </div>
-                        <div>
-                          <dt className="text-xs text-muted-foreground">Écart</dt>
-                          <dd className="tabular-nums text-foreground">{gap !== null ? currency.format(gap) : '—'}</dd>
-                        </div>
-                      </div>
-                      {!hasEstimated && !hasActual && <p className="text-xs text-warning">Coût non renseigné pour ce mariage.</p>}
-                      {link?.needsCostReview && <CostReviewBadge />}
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground">
+                      </li>
+                    )
+                  })}
+              </ul>
+            )}
+            <p className={missingCostVendors.length > 0 ? 'text-xs text-warning' : 'text-xs text-muted-foreground'}>
               {missingCostVendors.length > 0
-                ? `${missingCostVendors.length} coût${missingCostVendors.length !== 1 ? 's' : ''} non renseigné${missingCostVendors.length !== 1 ? 's' : ''}.`
+                ? `Sans coût renseigné : ${missingCostVendors
+                    .slice(0, 3)
+                    .map((v) => v.name)
+                    .join(', ')}${missingCostVendors.length > 3 ? ` et ${missingCostVendors.length - 3} autre${missingCostVendors.length - 3 > 1 ? 's' : ''}` : ''}.`
                 : 'Tous les coûts prestataires sont renseignés.'}{' '}
               <Link to={`/mariages/${wedding.id}/prestataires`} className="underline-offset-4 hover:underline">
                 Gérer les prestataires →
@@ -349,14 +357,6 @@ export function WeddingFinancesTab() {
             Ajouter un changement
           </Button>
         </div>
-
-        {scopeChanges.length > 0 && (
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>Scope creep proposé : +{currency.format(calculateProposedScopeChanges(scopeChanges))}</span>
-            <span>Scope creep approuvé : +{currency.format(financials.scopeChangeApprovedTotal)}</span>
-            <span>Scope creep non facturé : {currency.format(financials.scopeChangeUnbilledTotal)}</span>
-          </div>
-        )}
 
         {scopeChanges.length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucun changement de périmètre pour ce mariage.</p>

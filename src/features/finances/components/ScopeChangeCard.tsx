@@ -77,11 +77,7 @@ export function ScopeChangeCard({ scopeChange, impact, onApprove, onReject, onEd
           {SCOPE_CHANGE_STATUS_LABELS[scopeChange.status]}
         </Badge>
 
-        <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-          <div>
-            <dt className="text-xs text-muted-foreground">Coût fournisseur</dt>
-            <dd className="tabular-nums text-foreground">{currency.format(scopeChange.vendorCost)}</dd>
-          </div>
+        <dl className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <dt className="text-xs text-muted-foreground">Prix facturé</dt>
             <dd className="tabular-nums text-foreground">{scopeChange.clientPrice === 0 ? 'Non facturé' : currency.format(scopeChange.clientPrice)}</dd>
