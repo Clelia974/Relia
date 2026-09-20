@@ -49,6 +49,35 @@ export function findNextPriorityTask(tasks: Task[], today: Date = new Date()): T
   return sortActiveTasksForDashboard(tasks, today)[0] ?? null
 }
 
+/** Priorité urgente et pas encore terminée — même définition que WeddingTaskStats.urgent, réutilisée pour éviter deux critères "urgent" divergents. */
+export function isUrgentActive(task: Task): boolean {
+  return task.priority === 'urgente' && task.status !== 'terminee'
+}
+
+/** "En attente d'un paiement" — jamais un champ dédié : dérivé de waitingOn + status, cf. TaskWaitingOnSchema. */
+export function isWaitingOnPayment(task: Task): boolean {
+  return task.status === 'en_attente' && task.waitingOn === 'paiement'
+}
+
+export interface TaskSummaryCounts {
+  total: number
+  aFaire: number
+  enRetard: number
+  urgentes: number
+  attentePaiement: number
+}
+
+/** Alimente les cartes de synthèse de l'onglet Tâches (Phase 1) — un seul calcul, réutilisé par le composant de cartes et testable isolément. */
+export function computeTaskSummaryCounts(tasks: Task[], today: Date = new Date()): TaskSummaryCounts {
+  return {
+    total: tasks.length,
+    aFaire: tasks.filter((t) => t.status === 'a_faire').length,
+    enRetard: tasks.filter((t) => isOverdue(t, today)).length,
+    urgentes: tasks.filter(isUrgentActive).length,
+    attentePaiement: tasks.filter(isWaitingOnPayment).length,
+  }
+}
+
 export interface WeddingTaskStats {
   total: number
   open: number

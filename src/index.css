@@ -254,12 +254,23 @@
     }
 }
 
+/** Contenu réservé à l'impression — invisible à l'écran, affiché uniquement dans @media print ci-dessous (ex. le déroulé Jour J imprimable, distinct de la vue interactive Liste/Gantt). */
+.print-only {
+  display: none;
+}
+
 @media print {
   .no-print {
     display: none !important;
     }
+  .print-only {
+    display: block;
+    }
   .print-area {
     margin: 0;
+    }
+  .print-area tr {
+    break-inside: avoid;
     }
   body {
     background: #FFFFFF;

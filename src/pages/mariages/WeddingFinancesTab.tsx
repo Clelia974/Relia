@@ -22,6 +22,8 @@ import {
   getWeddingFinancials,
   simulateScopeChangeApproval,
 } from '@/features/finances/calculations'
+import { getWeddingBudgetOverview } from '@/features/finances/budget'
+import { WeddingBudgetSection } from '@/features/finances/components/WeddingBudgetSection'
 import { ExpenseCard } from '@/features/finances/components/ExpenseCard'
 import { ExpenseForm } from '@/features/finances/components/ExpenseForm'
 import { MarginStatusBadge } from '@/features/finances/components/MarginStatusBadge'
@@ -80,6 +82,7 @@ export function WeddingFinancesTab() {
   const expenses = allExpenses.filter((e) => e.weddingId === wedding.id)
   const scopeChanges = allScopeChanges.filter((sc) => sc.weddingId === wedding.id)
   const financials = getWeddingFinancials(wedding, vendors, vendorLinks, expenses, scopeChanges)
+  const budgetOverview = getWeddingBudgetOverview(wedding, vendors, vendorLinks, expenses)
 
   const [soldAmountDraft, setSoldAmountDraft] = useState(String(wedding.soldAmount))
 
@@ -187,7 +190,16 @@ export function WeddingFinancesTab() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold text-foreground">Finances</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Suivez la rentabilité de ce mariage.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Suivez le budget de ce mariage et la rentabilité de votre prestation.</p>
+      </div>
+
+      <WeddingBudgetSection overview={budgetOverview} editBudgetHref={`/mariages/${wedding.id}`} />
+
+      <div className="flex flex-col gap-1 border-t border-border pt-6">
+        <h2 className="font-heading text-lg font-semibold text-foreground">Rentabilité de l'entreprise</h2>
+        <p className="text-sm text-muted-foreground">
+          Mesure la rentabilité de ta prestation à partir du montant vendu et des coûts associés.
+        </p>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">

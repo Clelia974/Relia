@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { resolveTimeRange } from '@/features/timeline/timeRange'
 import { optionalPositiveAmount } from '@/lib/zodHelpers'
+import type { TimelineEvent } from '@/types/entities'
 
 const optionalMinutes = optionalPositiveAmount('Veuillez saisir une marge positive.')
 
@@ -41,6 +43,33 @@ export const TimelineEventFormSchema = z
   })
 
 export type TimelineEventFormValues = z.infer<typeof TimelineEventFormSchema>
+
+/**
+ * Convertit les valeurs du formulaire en patch d'entité — inverse
+ * d'emptyTimelineEventFormValues. Partagé entre l'onglet Planning et la Vue
+ * Jour J (Phase Planning/Jour J) : un seul endroit qui sait construire ce
+ * patch, jamais deux implémentations qui pourraient diverger.
+ */
+export function toTimelineEventPatch(values: TimelineEventFormValues) {
+  return {
+    title: values.title.trim(),
+    description: values.description.trim() || undefined,
+    date: new Date(values.date).toISOString(),
+    startTime: values.startTime,
+    endTime: values.endTime,
+    durationMinutes: resolveTimeRange(values.startTime, values.endTime)?.durationMinutes,
+    location: values.location.trim() || undefined,
+    vendorId: values.vendorId || undefined,
+    responsiblePerson: values.responsiblePerson.trim() || undefined,
+    isPhotoMoment: values.isPhotoMoment,
+    bufferBeforeMinutes: values.bufferBeforeMinutes === '' ? undefined : Number(values.bufferBeforeMinutes),
+    bufferAfterMinutes: values.bufferAfterMinutes === '' ? undefined : Number(values.bufferAfterMinutes),
+    type: values.type as TimelineEvent['type'],
+    status: values.status as TimelineEvent['status'],
+    notes: values.notes.trim() || undefined,
+    phase: values.phase ? (values.phase as TimelineEvent['phase']) : undefined,
+  }
+}
 
 export function emptyTimelineEventFormValues(defaultDate?: string): TimelineEventFormValues {
   return {

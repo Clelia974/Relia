@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -17,6 +17,16 @@ function renderWithWedding(wedding: Wedding) {
     },
   ])
   return render(<RouterProvider router={router} />)
+}
+
+/**
+ * Le bloc print-only répète volontairement les mêmes titres/prestataires
+ * pour l'impression (masqué à l'écran par CSS, mais jsdom n'applique aucune
+ * feuille de style) — toujours scoper les requêtes texte à la vue
+ * interactive pour éviter une correspondance ambiguë entre les deux copies.
+ */
+function screenView() {
+  return within(screen.getByTestId('dayof-screen'))
 }
 
 function seedWedding(date = '2026-06-06T00:00:00.000Z') {
@@ -40,7 +50,7 @@ describe('WeddingDayOfTab', () => {
     const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
     renderWithWedding(wedding)
 
-    expect(screen.getByText(/Aucune tâche ni aucun moment prévu/)).toBeInTheDocument()
+    expect(screenView().getByText(/Aucune tâche ni aucun moment prévu/)).toBeInTheDocument()
   })
 
   it('2. fusionne tâches et moments en une liste chronologique unique', () => {
@@ -58,8 +68,8 @@ describe('WeddingDayOfTab', () => {
     const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
     renderWithWedding(wedding)
 
-    expect(screen.getByText('Tâche du matin')).toBeInTheDocument()
-    expect(screen.getByText('Coupe du gâteau')).toBeInTheDocument()
+    expect(screenView().getByText('Tâche du matin')).toBeInTheDocument()
+    expect(screenView().getByText('Coupe du gâteau')).toBeInTheDocument()
   })
 
   it('3. coche une tâche depuis la vue jour J', () => {
@@ -91,8 +101,8 @@ describe('WeddingDayOfTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Réception' }))
     fireEvent.click(screen.getByRole('button', { name: 'Démontage' }))
 
-    expect(screen.queryByText('Tâche non classée')).not.toBeInTheDocument()
-    expect(screen.getByText('Tâche installation')).toBeInTheDocument()
+    expect(screenView().queryByText('Tâche non classée')).not.toBeInTheDocument()
+    expect(screenView().getByText('Tâche installation')).toBeInTheDocument()
   })
 
   it("5. affiche un avertissement quand un moment jour J ne correspond plus à la date du mariage", () => {
@@ -107,7 +117,7 @@ describe('WeddingDayOfTab', () => {
     const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
     renderWithWedding(wedding)
 
-    expect(screen.getByText(/ne correspond.*plus à la date actuelle du mariage/)).toBeInTheDocument()
+    expect(screenView().getByText(/ne correspond.*plus à la date actuelle du mariage/)).toBeInTheDocument()
   })
 
   it('6. affiche les coordonnées du prestataire associé pour un accès rapide', () => {
@@ -126,7 +136,7 @@ describe('WeddingDayOfTab', () => {
     const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
     renderWithWedding(wedding)
 
-    expect(screen.getByText('DJ Mix')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Appeler/ })).toHaveAttribute('href', 'tel:0600000000')
+    expect(screenView().getByText('DJ Mix')).toBeInTheDocument()
+    expect(screenView().getByRole('link', { name: /Appeler/ })).toHaveAttribute('href', 'tel:0600000000')
   })
 })

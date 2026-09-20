@@ -45,7 +45,7 @@ export function CalendrierGlobalPage() {
         onTogglesChange={setToggles}
       />
 
-      <Tabs defaultValue="agenda">
+      <Tabs defaultValue="mois">
         <TabsList>
           <TabsTrigger value="mois">Mois</TabsTrigger>
           <TabsTrigger value="semaine">Semaine</TabsTrigger>

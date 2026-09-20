@@ -5,6 +5,8 @@ import { EmptyState } from '@/components/EmptyState'
 import { TaskPriorityBadge } from '@/features/tasks/components/TaskPriorityBadge'
 import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
 import { isOverdue } from '@/features/tasks/summary'
+import { TimelineEventCard } from '@/features/timeline/components/TimelineEventCard'
+import type { TimelineConflict } from '@/features/timeline/conflicts'
 import { MILESTONE_LABELS, milestoneBucket, PREPARATION_MILESTONES } from '@/features/timeline/milestones'
 import { cn } from '@/lib/utils'
 import type { Task, TimelineEvent, Wedding } from '@/types/entities'
@@ -14,6 +16,9 @@ interface TimelinePreparationProps {
   tasks: Task[]
   dayEvents: TimelineEvent[]
   vendorNameById: Map<string, string>
+  conflicts?: TimelineConflict[]
+  onEditEvent: (event: TimelineEvent) => void
+  onDeleteEvent: (event: TimelineEvent) => void
 }
 
 interface FriseRow {
@@ -28,8 +33,17 @@ function friseSymbol(task: Task) {
   return { icon: Circle, label: 'À faire', className: 'text-muted-foreground' }
 }
 
-export function TimelinePreparation({ wedding, tasks, dayEvents, vendorNameById }: TimelinePreparationProps) {
+export function TimelinePreparation({
+  wedding,
+  tasks,
+  dayEvents,
+  vendorNameById,
+  conflicts = [],
+  onEditEvent,
+  onDeleteEvent,
+}: TimelinePreparationProps) {
   const weddingDate = new Date(wedding.date)
+  const conflictedEventIds = new Set(conflicts.flatMap((c) => c.eventIds))
 
   const rows: FriseRow[] = tasks
     .filter((t) => t.dueDate)
@@ -46,6 +60,7 @@ export function TimelinePreparation({ wedding, tasks, dayEvents, vendorNameById 
   }
 
   const hasAnyTask = rows.length > 0
+  const sortedDayEvents = [...dayEvents].filter((e) => e.startTime).sort((a, b) => (a.startTime ?? '').localeCompare(b.startTime ?? ''))
 
   return (
     <div className="flex flex-col gap-6">
@@ -114,20 +129,26 @@ export function TimelinePreparation({ wedding, tasks, dayEvents, vendorNameById 
                   </li>
                 )
               })}
-              {dayEvents.length === 0 ? (
-                <li className="text-sm text-muted-foreground">Aucun moment du jour J planifié pour l'instant.</li>
-              ) : (
-                dayEvents
-                  .filter((e) => e.startTime)
-                  .sort((a, b) => (a.startTime ?? '').localeCompare(b.startTime ?? ''))
-                  .map((event) => (
-                    <li key={event.id} className="flex items-center gap-2 text-sm text-foreground">
-                      <span className="font-mono text-xs text-thread">{event.startTime}</span>
-                      {event.title}
-                    </li>
-                  ))
-              )}
             </ul>
+
+            <div className="mt-3 flex flex-col gap-2">
+              {sortedDayEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Aucun moment du jour J planifié pour l'instant.</p>
+              ) : (
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+                  {sortedDayEvents.map((event) => (
+                    <TimelineEventCard
+                      key={event.id}
+                      event={event}
+                      vendorName={event.vendorId ? vendorNameById.get(event.vendorId) : undefined}
+                      hasConflict={conflictedEventIds.has(event.id)}
+                      onEdit={onEditEvent}
+                      onDelete={onDeleteEvent}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </section>
         </div>
       )}

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import { WeddingFinancesTab } from '@/pages/mariages/WeddingFinancesTab'
@@ -8,6 +9,7 @@ import type { Wedding } from '@/types/entities'
 
 afterEach(cleanup)
 
+/** TooltipProvider est monté globalement dans App.tsx — reproduit ici, sinon tout Tooltip (ex. WeddingBudgetSection) fait planter le rendu. */
 function renderWithWedding(wedding: Wedding) {
   const router = createMemoryRouter([
     {
@@ -16,7 +18,11 @@ function renderWithWedding(wedding: Wedding) {
       children: [{ index: true, element: <WeddingFinancesTab /> }],
     },
   ])
-  return render(<RouterProvider router={router} />)
+  return render(
+    <TooltipProvider>
+      <RouterProvider router={router} />
+    </TooltipProvider>,
+  )
 }
 
 describe('WeddingFinancesTab — badge "Coût à vérifier"', () => {

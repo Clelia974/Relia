@@ -19,11 +19,12 @@ import { EmptyState } from '@/components/EmptyState'
 import { PostponeTaskDialog } from '@/features/tasks/components/PostponeTaskDialog'
 import { TaskEmptyState } from '@/features/tasks/components/TaskEmptyState'
 import { TaskFilters } from '@/features/tasks/components/TaskFilters'
+import { TaskSummaryCards } from '@/features/tasks/components/TaskSummaryCards'
 import type { TaskPrimaryFilter } from '@/features/tasks/taskFilters'
 import { TaskForm } from '@/features/tasks/components/TaskForm'
 import { TaskKanban } from '@/features/tasks/components/TaskKanban'
 import { TaskList } from '@/features/tasks/components/TaskList'
-import { isDueToday, isOverdue } from '@/features/tasks/summary'
+import { isDueToday, isOverdue, isUrgentActive, isWaitingOnPayment } from '@/features/tasks/summary'
 import type { TaskFormValues } from '@/features/tasks/taskForm.schema'
 import { selectActiveWeddingIds, selectActiveWeddings } from '@/features/weddings/activeWeddings'
 import { TASK_STATUS_LABELS } from '@/lib/taskStatus'
@@ -71,6 +72,12 @@ function matchesPrimaryFilter(task: Task, filter: TaskPrimaryFilter, today: Date
       return task.status === 'en_attente'
     case 'terminees':
       return task.status === 'terminee'
+    case 'a_faire':
+      return task.status === 'a_faire'
+    case 'urgentes':
+      return isUrgentActive(task)
+    case 'paiement_attente':
+      return isWaitingOnPayment(task)
     default:
       return true
   }
@@ -112,6 +119,14 @@ export function TaskBoard({ scopeWeddingId }: TaskBoardProps) {
   const [pendingDelete, setPendingDelete] = useState<Task | null>(null)
 
   const today = new Date()
+  /** Base des cartes de synthèse : respecte le mariage sélectionné (dropdown), jamais primary/priority/recherche — c'est justement ce qu'elles permettent de changer. */
+  const cardBaseTasks = tasksInScope.filter(
+    (t) => scopeWeddingId || weddingFilter === 'tous' || t.weddingId === weddingFilter,
+  )
+  const handleSelectSummaryFilter = (filter: TaskPrimaryFilter) => {
+    setPrimaryFilter(filter)
+    setPriorityFilter('toutes')
+  }
   const filtered = tasksInScope
     .filter((t) => matchesPrimaryFilter(t, primaryFilter, today))
     .filter((t) => (scopeWeddingId ? true : weddingFilter === 'tous' || t.weddingId === weddingFilter))
@@ -215,6 +230,8 @@ export function TaskBoard({ scopeWeddingId }: TaskBoardProps) {
 
   return (
     <div className="flex flex-col gap-5">
+      <TaskSummaryCards tasks={cardBaseTasks} activeFilter={primaryFilter} onSelectFilter={handleSelectSummaryFilter} today={today} />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Tabs value={view} onValueChange={(v) => setView(v as 'kanban' | 'liste')}>
           <TabsList>

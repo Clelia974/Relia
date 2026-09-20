@@ -131,8 +131,9 @@ export function TimelineGanttView({ wedding, events, tasks, vendorNameById, conf
                             type="button"
                             onClick={() => onEditEvent(event)}
                             title={`${event.title} (${formatTimeRange(event.startTime!, event.endTime!)})`}
+                            aria-label={`Modifier « ${event.title} », ${formatTimeRange(event.startTime!, event.endTime!)}${vendorName ? `, ${vendorName}` : ''}${hasConflict ? ', conflit détecté' : ''}`}
                             className={cn(
-                              'absolute top-1 flex h-5 items-center overflow-hidden rounded px-1.5 text-[11px] font-medium text-primary-foreground hover:opacity-90',
+                              'absolute top-1 flex h-5 items-center overflow-hidden rounded px-1.5 text-[11px] font-medium text-primary-foreground hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
                               STATUS_BAR_TONE[event.status],
                               hasConflict && 'ring-2 ring-risk ring-offset-1 ring-offset-card',
                             )}

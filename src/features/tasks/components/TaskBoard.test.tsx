@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { TaskBoard } from '@/features/tasks/components/TaskBoard'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
@@ -98,5 +98,75 @@ describe('TaskBoard — périmètre scopé (scopeWeddingId défini)', () => {
     // Depuis la fiche d'un mariage (même archivé), ses propres tâches restent visibles.
     expect(screen.getByText('Tâche du mariage archivé')).toBeInTheDocument()
     expect(screen.queryByText('Tâche autre mariage')).not.toBeInTheDocument()
+  })
+})
+
+describe('TaskBoard — cartes de synthèse (Phase 1)', () => {
+  it("aucune tâche : état vide affiché, pas de rangée de cartes", () => {
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
+
+    expect(screen.queryByRole('group', { name: /Synthèse des tâches/ })).not.toBeInTheDocument()
+  })
+
+  it('compte correctement total / à faire / en retard / urgentes / en attente de paiement', () => {
+    useWorkspaceStore.getState().addTask({ title: 'À faire simple', status: 'a_faire', dueDate: '2030-01-01T00:00:00.000Z' })
+    useWorkspaceStore.getState().addTask({ title: 'En retard', status: 'a_faire', dueDate: '2020-01-01T00:00:00.000Z' })
+    useWorkspaceStore.getState().addTask({ title: 'Urgente active', status: 'en_cours', priority: 'urgente' })
+    useWorkspaceStore.getState().addTask({
+      title: 'Attend un paiement',
+      status: 'en_attente',
+      waitingOn: 'paiement',
+    })
+    useWorkspaceStore.getState().addTask({ title: 'Terminée', status: 'terminee' })
+
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
+
+    const group = screen.getByRole('group', { name: /Synthèse des tâches/ })
+    expect(within(group).getByRole('button', { name: /^Total : 5/ })).toBeInTheDocument()
+    expect(within(group).getByRole('button', { name: /^À faire : 2/ })).toBeInTheDocument()
+    expect(within(group).getByRole('button', { name: /^En retard : 1/ })).toBeInTheDocument()
+    expect(within(group).getByRole('button', { name: /^Tâches urgentes : 1/ })).toBeInTheDocument()
+    expect(within(group).getByRole('button', { name: /^En attente d'un paiement : 1/ })).toBeInTheDocument()
+  })
+
+  it('cliquer "En retard" filtre la liste et affiche le filtre comme actif', () => {
+    useWorkspaceStore.getState().addTask({ title: 'Tâche à jour', status: 'a_faire', dueDate: '2030-01-01T00:00:00.000Z' })
+    useWorkspaceStore.getState().addTask({ title: 'Tâche en retard', status: 'a_faire', dueDate: '2020-01-01T00:00:00.000Z' })
+
+    render(
+      <TooltipProvider>
+        <TaskBoard />
+      </TooltipProvider>,
+    )
+
+    const group = screen.getByRole('group', { name: /Synthèse des tâches/ })
+    const overdueCard = within(group).getByRole('button', { name: /^En retard : 1/ })
+    fireEvent.click(overdueCard)
+
+    expect(overdueCard).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Tâche en retard')).toBeInTheDocument()
+    expect(screen.queryByText('Tâche à jour')).not.toBeInTheDocument()
+  })
+
+  it('les cartes de synthèse restent disponibles en périmètre scopé (mariage précis)', () => {
+    const weddingId = seedWedding('Mariage Scopé')
+    useWorkspaceStore.getState().addTask({ title: 'Tâche du mariage', weddingId, status: 'a_faire', priority: 'urgente' })
+
+    render(
+      <TooltipProvider>
+        <TaskBoard scopeWeddingId={weddingId} />
+      </TooltipProvider>,
+    )
+
+    const group = screen.getByRole('group', { name: /Synthèse des tâches/ })
+    expect(within(group).getByRole('button', { name: /^Tâches urgentes : 1/ })).toBeInTheDocument()
   })
 })

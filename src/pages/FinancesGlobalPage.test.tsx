@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { FinancesGlobalPage } from '@/pages/FinancesGlobalPage'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
@@ -11,9 +11,18 @@ const currency = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: '
 /** Neutralise les variantes d'espace insécable produites par Intl selon l'environnement ICU. */
 const normalizeSpaces = (s: string) => s.replace(/[\s  ]+/g, ' ').trim()
 
+/**
+ * Les sections "Budget du mariage" et "Rentabilité de l'entreprise" sont
+ * volontairement séparées et peuvent afficher le même montant formaté (ex.
+ * clientBudget === soldAmount dans les fixtures ci-dessous) — toujours
+ * scoper la recherche à la section "Rentabilité" que ces tests vérifient.
+ */
 function expectAmount(amount: number) {
+  const region = screen.getByRole('region', { name: "Rentabilité de l'entreprise" })
   const expected = normalizeSpaces(currency.format(amount))
-  expect(screen.getByText((_, el) => el?.tagName === 'P' && normalizeSpaces(el.textContent ?? '') === expected)).toBeInTheDocument()
+  expect(
+    within(region).getByText((_, el) => el?.tagName === 'P' && normalizeSpaces(el.textContent ?? '') === expected),
+  ).toBeInTheDocument()
 }
 
 beforeEach(() => {

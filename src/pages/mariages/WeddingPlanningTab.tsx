@@ -18,38 +18,19 @@ import { Label } from '@/components/ui/label'
 import { TimelineConflictAlert } from '@/features/timeline/components/TimelineConflictAlert'
 import { TimelineConflictDialog } from '@/features/timeline/components/TimelineConflictDialog'
 import { TimelineEventForm } from '@/features/timeline/components/TimelineEventForm'
-import { TimelineGanttView } from '@/features/timeline/components/TimelineGanttView'
 import { TimelinePreparation } from '@/features/timeline/components/TimelinePreparation'
-import { TimelineViewSwitcher, type TimelineView } from '@/features/timeline/components/TimelineViewSwitcher'
-import { WeddingDayTimeline } from '@/features/timeline/components/WeddingDayTimeline'
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts, type TimelineConflict } from '@/features/timeline/conflicts'
-import { resolveTimeRange } from '@/features/timeline/timeRange'
-import type { TimelineEventFormValues } from '@/features/timeline/timelineEventForm.schema'
+import { toTimelineEventPatch, type TimelineEventFormValues } from '@/features/timeline/timelineEventForm.schema'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { TimelineEvent } from '@/types/entities'
 
-function toEventPatch(values: TimelineEventFormValues) {
-  return {
-    title: values.title.trim(),
-    description: values.description.trim() || undefined,
-    date: new Date(values.date).toISOString(),
-    startTime: values.startTime,
-    endTime: values.endTime,
-    durationMinutes: resolveTimeRange(values.startTime, values.endTime)?.durationMinutes,
-    location: values.location.trim() || undefined,
-    vendorId: values.vendorId || undefined,
-    responsiblePerson: values.responsiblePerson.trim() || undefined,
-    isPhotoMoment: values.isPhotoMoment,
-    bufferBeforeMinutes: values.bufferBeforeMinutes === '' ? undefined : Number(values.bufferBeforeMinutes),
-    bufferAfterMinutes: values.bufferAfterMinutes === '' ? undefined : Number(values.bufferAfterMinutes),
-    type: values.type as TimelineEvent['type'],
-    status: values.status as TimelineEvent['status'],
-    notes: values.notes.trim() || undefined,
-    phase: values.phase ? (values.phase as TimelineEvent['phase']) : undefined,
-  }
-}
-
+/**
+ * Vue unique — frise chronologique uniquement (cf. audit Planning/Jour J).
+ * Les vues "Calendrier" (WeddingDayTimeline) et "Gantt" (TimelineGanttView,
+ * relocalisé Vue Jour J) restent dans le dépôt mais ne sont plus montées
+ * ici ; TimelineViewSwitcher n'a donc plus d'appelant dans cet onglet.
+ */
 export function WeddingPlanningTab() {
   const { wedding } = useOutletContext<WeddingOutletContext>()
   const allEvents = useWorkspaceStore((s) => s.workspace.timelineEvents)
@@ -67,7 +48,6 @@ export function WeddingPlanningTab() {
   const vendors = allVendors.filter((v) => v.weddingIds.includes(wedding.id))
   const vendorNameById = useMemo(() => new Map(allVendors.map((v) => [v.id, v.name])), [allVendors])
 
-  const [view, setView] = useState<TimelineView>('frise')
   const [formOpen, setFormOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null)
   const [pendingDelete, setPendingDelete] = useState<TimelineEvent | null>(null)
@@ -91,7 +71,7 @@ export function WeddingPlanningTab() {
   }
 
   const handleSubmit = (values: TimelineEventFormValues) => {
-    const patch = toEventPatch(values)
+    const patch = toTimelineEventPatch(values)
     if (editingEvent) {
       updateTimelineEvent(editingEvent.id, patch)
       toast.success('Moment mis à jour.')
@@ -153,42 +133,22 @@ export function WeddingPlanningTab() {
       <TimelineConflictAlert conflicts={conflicts} onSeeOptions={setActiveConflict} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <TimelineViewSwitcher value={view} onChange={setView} />
+        <h2 className="font-heading text-base font-semibold text-foreground">Frise chronologique</h2>
         <Button onClick={openCreate}>
           <Plus className="size-4" aria-hidden="true" />
           Ajouter un moment
         </Button>
       </div>
 
-      {view === 'frise' && (
-        <TimelinePreparation
-          wedding={wedding}
-          tasks={tasks}
-          dayEvents={events.filter((e) => e.date.slice(0, 10) === wedding.date.slice(0, 10))}
-          vendorNameById={vendorNameById}
-        />
-      )}
-      {view === 'calendrier' && (
-        <WeddingDayTimeline
-          wedding={wedding}
-          events={events}
-          tasks={tasks}
-          vendorNameById={vendorNameById}
-          conflicts={conflicts}
-          onEditEvent={openEdit}
-          onDeleteEvent={setPendingDelete}
-        />
-      )}
-      {view === 'gantt' && (
-        <TimelineGanttView
-          wedding={wedding}
-          events={events}
-          tasks={tasks}
-          vendorNameById={vendorNameById}
-          conflicts={conflicts}
-          onEditEvent={openEdit}
-        />
-      )}
+      <TimelinePreparation
+        wedding={wedding}
+        tasks={tasks}
+        dayEvents={events.filter((e) => e.date.slice(0, 10) === wedding.date.slice(0, 10))}
+        vendorNameById={vendorNameById}
+        conflicts={conflicts}
+        onEditEvent={openEdit}
+        onDeleteEvent={setPendingDelete}
+      />
 
       <TimelineEventForm
         key={formOpen ? (editingEvent?.id ?? 'new') : 'closed'}
