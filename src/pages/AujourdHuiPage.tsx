@@ -32,7 +32,7 @@ function StatCard({ targetId, value, label }: { targetId: string; value: number;
     <a
       href={`#${targetId}`}
       onClick={handleClick}
-      className="flex flex-col gap-0.5 rounded-lg border border-border bg-card p-4 transition-colors hover:border-thread/50 hover:bg-accent active:scale-[0.98]"
+      className="flex flex-col gap-0.5 px-5 py-4 transition-colors duration-200 first:rounded-l-xl last:rounded-r-xl hover:bg-accent active:bg-accent/70"
     >
       <span className="font-heading text-2xl font-semibold tabular-nums text-foreground">{value}</span>
       <span className="text-xs text-muted-foreground">{label}</span>
@@ -41,7 +41,7 @@ function StatCard({ targetId, value, label }: { targetId: string; value: number;
 }
 
 function Column({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4">{children}</div>
+  return <div className="flex flex-col gap-6">{children}</div>
 }
 
 export function AujourdHuiPage() {
@@ -92,23 +92,23 @@ export function AujourdHuiPage() {
         </p>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-xl bg-card shadow-(--shadow-card) ring-1 ring-foreground/[0.06] lg:grid-cols-4 lg:divide-y-0" role="group" aria-label="Résumé du jour">
         <StatCard targetId="actions-du-jour" value={summary.todayActionsCount} label={`action${summary.todayActionsCount !== 1 ? 's' : ''} aujourd'hui`} />
         <StatCard targetId="actions-du-jour" value={summary.pendingResponsesCount} label={`réponse${summary.pendingResponsesCount !== 1 ? 's' : ''} en attente`} />
         <StatCard targetId="alertes" value={summary.planningAlertsCount} label={`alerte${summary.planningAlertsCount !== 1 ? 's' : ''} planning`} />
         <StatCard targetId="mariages-a-surveiller" value={summary.watchedWeddingsCount} label={`mariage${summary.watchedWeddingsCount !== 1 ? 's' : ''} à surveiller`} />
       </div>
 
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
-        <Column>
-          <TaskDigest />
-        </Column>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <Column>
+            <TaskDigest />
+            <BlockerList />
+          </Column>
+        </div>
         <Column>
           <RiskWatch />
           <UpcomingEvents />
-        </Column>
-        <Column>
-          <BlockerList />
           <ProfitOverview />
         </Column>
       </div>

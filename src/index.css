@@ -230,6 +230,17 @@ main .gap-6 {
   gap: 1.75rem;
 }
 
+/* Relia — tableau de bord : les tâches du jour sont des lignes séparées par un filet, pas des cartes dans une carte */
+#actions-du-jour [data-slot="card"] {
+  box-shadow: none !important;
+  background: transparent;
+  border-radius: 0;
+  --card-spacing: 0.875rem;
+}
+#actions-du-jour [data-slot="card"] + [data-slot="card"] {
+  border-top: 1px solid var(--border);
+}
+
 /* Relia — animations : discrètes, < 300ms, désactivées si l'utilisatrice préfère moins de mouvement */
 @keyframes fade-in-page {
   from {
