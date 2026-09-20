@@ -1,12 +1,12 @@
 import type { ScopeChangeStatus } from '@/types/entities'
 
 export const SCOPE_CHANGE_STATUS_LABELS: Record<ScopeChangeStatus, string> = {
-  proposee: 'Proposé',
+  proposee: 'Proposée',
   a_envoyer: 'À envoyer',
   en_attente_approbation: "En attente d'approbation",
-  approuvee: 'Approuvé',
-  rejetee: 'Rejeté',
-  realisee: 'Réalisé',
+  approuvee: 'Approuvée',
+  rejetee: 'Rejetée',
+  realisee: 'Réalisée',
 }
 
 export const SCOPE_CHANGE_STATUS_OPTIONS: ScopeChangeStatus[] = [

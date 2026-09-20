@@ -94,7 +94,7 @@ export function ScopeChangeCard({ scopeChange, impact, onApprove, onReject, onEd
         {isPending && impact && (
           <p className="rounded-md bg-muted px-2.5 py-2 text-xs text-muted-foreground">
             <span className="font-medium text-foreground">Impact potentiel : </span>
-            ce changement pourrait faire passer la marge de {Math.round(impact.marginBefore)}% à {Math.round(impact.marginAfter)}%.
+            cette demande pourrait faire passer la marge de {Math.round(impact.marginBefore)}% à {Math.round(impact.marginAfter)}%.
           </p>
         )}
 

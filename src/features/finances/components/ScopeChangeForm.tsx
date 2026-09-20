@@ -67,14 +67,14 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Modifier le changement' : 'Ajouter un changement'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Modifier la demande' : 'Ajouter une demande'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Mettez à jour ce changement de périmètre.' : 'Renseignez les informations essentielles.'}
+            {isEdit ? 'Mettez à jour cette demande supplémentaire.' : 'Renseignez les informations essentielles.'}
           </DialogDescription>
         </DialogHeader>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
-          <Field label="Description du changement" htmlFor="sc-description" error={errors.description}>
+          <Field label="Description de la demande" htmlFor="sc-description" error={errors.description}>
             <Input
               id="sc-description"
               placeholder="Ex. Ajout d'une deuxième salle pour le vin d'honneur"
@@ -111,7 +111,7 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Profit potentiel de ce changement : <span className="tabular-nums text-foreground">{(clientPriceNum - vendorCostNum).toLocaleString('fr-FR')} €</span>
+            Profit potentiel de cette demande : <span className="tabular-nums text-foreground">{(clientPriceNum - vendorCostNum).toLocaleString('fr-FR')} €</span>
           </p>
 
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -154,7 +154,7 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Annuler
             </Button>
-            <Button type="submit">{isEdit ? 'Enregistrer' : 'Ajouter le changement'}</Button>
+            <Button type="submit">{isEdit ? 'Enregistrer' : 'Ajouter la demande'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -143,10 +143,10 @@ export function WeddingFinancesTab() {
     const patch = toScopeChangePatch(wedding.id, values)
     if (editingScopeChange) {
       updateScopeChange(editingScopeChange.id, patch)
-      toast.success('Changement mis à jour.')
+      toast.success('Demande mise à jour.')
     } else {
       addScopeChange(patch)
-      toast.success('Changement ajouté.')
+      toast.success('Demande ajoutée.')
     }
     setScopeFormOpen(false)
   }
@@ -154,7 +154,7 @@ export function WeddingFinancesTab() {
     if (!pendingDeleteScopeChange) return
     deleteScopeChange(pendingDeleteScopeChange.id)
     setPendingDeleteScopeChange(null)
-    toast.success('Changement supprimé.')
+    toast.success('Demande supprimée.')
   }
 
   const handleApprove = (scopeChange: ScopeChange) => {
@@ -168,7 +168,7 @@ export function WeddingFinancesTab() {
       scopeChanges.map((sc) => (sc.id === scopeChange.id ? { ...sc, status: 'approuvee' as const } : sc)),
     )
     toast.success(
-      `Changement approuvé. Marge : ${Math.round(marginBefore)}% → ${Math.round(after.marginPct)}% (${after.marginPct >= marginBefore ? '+' : ''}${Math.round(after.marginPct - marginBefore)} points).`,
+      `Demande approuvée. Marge : ${Math.round(marginBefore)}% → ${Math.round(after.marginPct)}% (${after.marginPct >= marginBefore ? '+' : ''}${Math.round(after.marginPct - marginBefore)} points).`,
     )
     if (financials.hasSoldAmount && financials.hasCostData && after.marginPct < 25) {
       toast.warning('La marge de ce mariage est maintenant inférieure à 25%. Vérifiez les coûts ou le prix proposé.')
@@ -176,7 +176,7 @@ export function WeddingFinancesTab() {
   }
   const handleReject = (scopeChange: ScopeChange) => {
     rejectScopeChange(scopeChange.id)
-    toast.success('Changement rejeté.')
+    toast.success('Demande rejetée.')
   }
 
   const missingCostVendors = vendors.filter((v) => {
@@ -251,7 +251,7 @@ export function WeddingFinancesTab() {
           </summary>
           <div className="grid gap-4 border-t border-border px-4 py-4 grid-cols-1 sm:grid-cols-2">
             <SummaryCard label="Coûts totaux" value={financials.hasCostData ? currency.format(financials.totalCosts) : '—'} />
-            <SummaryCard label="Changements approuvés" value={`+${currency.format(financials.scopeChangeApprovedTotal)}`} />
+            <SummaryCard label="Demandes approuvées" value={`+${currency.format(financials.scopeChangeApprovedTotal)}`} />
           </div>
         </details>
       )}
@@ -276,7 +276,7 @@ export function WeddingFinancesTab() {
             <p className="text-sm text-foreground">
               Total : <span className="font-medium tabular-nums">{currency.format(financials.vendorCosts)}</span>
               {financials.scopeChangeApprovedCost > 0 && (
-                <span className="text-xs text-muted-foreground"> · inclut {currency.format(financials.scopeChangeApprovedCost)} de changements approuvés</span>
+                <span className="text-xs text-muted-foreground"> · inclut {currency.format(financials.scopeChangeApprovedCost)} de demandes approuvées</span>
               )}
             </p>
           )}
@@ -351,15 +351,15 @@ export function WeddingFinancesTab() {
 
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-heading text-lg font-semibold text-foreground">Changements de périmètre</h2>
+          <h2 className="font-heading text-lg font-semibold text-foreground">Demandes supplémentaires</h2>
           <Button size="sm" onClick={openCreateScopeChange}>
             <Plus className="size-4" aria-hidden="true" />
-            Ajouter un changement
+            Ajouter une demande
           </Button>
         </div>
 
         {scopeChanges.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucun changement de périmètre pour ce mariage.</p>
+          <p className="text-sm text-muted-foreground">Aucune demande supplémentaire pour ce mariage.</p>
         ) : (
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {scopeChanges.map((sc) => (
@@ -412,7 +412,7 @@ export function WeddingFinancesTab() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Supprimer « {pendingDeleteScopeChange?.description} » ?</AlertDialogTitle>
-            <AlertDialogDescription>Ce changement sera définitivement supprimé. Cette action est irréversible.</AlertDialogDescription>
+            <AlertDialogDescription>Cette demande sera définitivement supprimée. Cette action est irréversible.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>

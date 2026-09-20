@@ -44,7 +44,7 @@ export function ProfitOverview() {
               <dd className="tabular-nums text-foreground">{currency.format(data.approvedRevenue)}</dd>
             </div>
             <div>
-              <dt className="text-xs text-muted-foreground">Scope creep non facturé</dt>
+              <dt className="text-xs text-muted-foreground">Demandes non facturées</dt>
               <dd className="tabular-nums text-foreground">{currency.format(data.unbilledScopeCreep)}</dd>
             </div>
             {data.missingVendorCostCount > 0 && (
