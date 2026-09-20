@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
+import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
 
 /**
@@ -35,7 +36,7 @@ describe('migration v10 -> v11 (affectations prestataire par mariage)', () => {
     const result = migrateWorkspace(v10([{ id: 'v1', name: 'Seul', category: 'DJ', status: 'confirme', arrivalTime: '10:00', weddingIds: [] }]))
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.workspace.schemaVersion).toBe(11)
+    expect(result.workspace.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.workspace.vendors).toHaveLength(1)
     expect(result.workspace.vendors[0].name).toBe('Seul')
     expect('status' in result.workspace.vendors[0]).toBe(false)

@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 11 as const
+export const CURRENT_SCHEMA_VERSION = 12 as const
 
 const isoDate = z
   .string()
@@ -332,6 +332,8 @@ export const ProposalStatusSchema = z.enum([
 export const ProposalSchema = z.object({
   id,
   weddingId: id,
+  /** Numéro attribué automatiquement à la création (DEV-AAAA-NNNN) — jamais modifiable, jamais réutilisé. */
+  proposalNumber: z.string().min(1),
   /** Formule d'origine — les templates par défaut restent séparés des propositions réellement créées (cf. src/features/proposals/templates.ts). */
   template: ProposalTierSchema,
   title: z.string().min(1, 'Veuillez renseigner le titre.'),
@@ -576,6 +578,8 @@ export const WorkspaceSchema = z
     invoices: z.array(InvoiceSchema),
     equipmentItems: z.array(EquipmentItemSchema).default([]),
     closingSessions: z.array(ClosingSessionSchema).default([]),
+    /** Dernier numéro attribué par type et par année (clé "devis:2026") — ne fait qu'augmenter, même si un document est supprimé. */
+    documentCounters: z.record(z.string(), z.number().int().nonnegative()).default({}),
     uiPreferences: UiPreferencesSchema,
     /** Identifiants déterministes (cf. detectTimelineConflicts) des alertes de planning écartées par l'utilisatrice. */
     ignoredConflictIds: z.array(z.string()).default([]),

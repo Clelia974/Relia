@@ -59,7 +59,7 @@ export function PropositionsGlobalPage() {
             >
               <div className="min-w-40 flex-1">
                 <p className="font-medium text-foreground">{proposal.title}</p>
-                <p className="text-xs uppercase tracking-wide text-thread">{templateLabelByTier.get(proposal.template) ?? proposal.template}</p>
+                <p className="text-xs uppercase tracking-wide text-thread">{proposal.proposalNumber} · {templateLabelByTier.get(proposal.template) ?? proposal.template}</p>
               </div>
               <span className="text-muted-foreground">{wedding ? wedding.coupleName : 'Mariage supprimé'}</span>
               <ProposalStatusBadge status={proposal.status} />

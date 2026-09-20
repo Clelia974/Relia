@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { format } from 'date-fns'
 import { Plus } from 'lucide-react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import {
@@ -76,12 +75,10 @@ export function WeddingDocumentsTab() {
 
   const handleCreateInvoice = () => {
     const source = invoiceSource !== 'vide' ? proposals.find((p) => p.id === invoiceSource) : undefined
-    const invoiceNumber = `FACT-${format(new Date(), 'yyyyMMdd')}-${invoices.length + 1}`
     const id = source
       ? createInvoicePreview({
           weddingId: wedding.id,
           proposalId: source.id,
-          invoiceNumber,
           date: new Date().toISOString(),
           clientName: source.clientName || wedding.coupleName,
           lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
@@ -96,7 +93,6 @@ export function WeddingDocumentsTab() {
         })
       : createInvoicePreview({
           weddingId: wedding.id,
-          invoiceNumber,
           date: new Date().toISOString(),
           clientName: wedding.coupleName,
           lineItems: [],
@@ -141,7 +137,7 @@ export function WeddingDocumentsTab() {
                   <Card className="h-full transition-colors hover:border-thread/50">
                     <CardContent className="flex flex-col gap-2">
                       <p className="text-xs uppercase tracking-wide text-thread">
-                        {proposalTemplates.find((t) => t.tier === p.template)?.label ?? p.template}
+                        {p.proposalNumber} · {proposalTemplates.find((t) => t.tier === p.template)?.label ?? p.template}
                       </p>
                       <p className="font-medium text-foreground">{p.title}</p>
                       <ProposalStatusBadge status={p.status} />

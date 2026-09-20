@@ -43,7 +43,6 @@ describe('workspaceStore — verrou d\'immutabilité Proposal/Invoice (Phase 2b)
   function seedInvoice(status: 'brouillon' | 'finalisee') {
     const id = useWorkspaceStore.getState().createInvoicePreview({
       weddingId,
-      invoiceNumber: 'FACT-1',
       date: '2026-06-06T00:00:00.000Z',
       lineItems: [],
       subtotal: 0,

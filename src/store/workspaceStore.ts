@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, type PersistStorage } from 'zustand/middleware'
 import { computeClosingSummary } from '@/features/closing/closingSummary'
 import { generateId } from '@/lib/id'
+import { allocateDocumentNumber } from '@/lib/documentNumber'
 import { isInvoiceStatusLocked } from '@/lib/invoiceStatus'
 import { nowIso } from '@/lib/now'
 import { isProposalEditable, isProposalStatusLocked } from '@/lib/proposalStatus'
@@ -121,7 +122,7 @@ type NewProposalInput = Pick<Proposal, 'weddingId' | 'template' | 'title' | 'lin
 type NewSoldServiceInput = Pick<SoldService, 'weddingId' | 'proposalId' | 'title' | 'soldPrice'> &
   Partial<Pick<SoldService, 'description' | 'quantity' | 'status' | 'notes'>>
 
-type NewInvoiceInput = Pick<Invoice, 'weddingId' | 'invoiceNumber' | 'date' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total'> &
+type NewInvoiceInput = Pick<Invoice, 'weddingId' | 'date' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total'> &
   Partial<Pick<Invoice, 'proposalId' | 'clientName' | 'vatRate' | 'depositAmount' | 'balanceAmount' | 'legalMentions'>>
 
 type NewEquipmentItemInput = Pick<EquipmentItem, 'weddingId' | 'name' | 'quantity' | 'acquisitionMode'> &
@@ -687,38 +688,45 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       createProposal: (input) => {
         const id = generateId()
         const timestamp = nowIso()
-        const proposal: Proposal = {
-          id,
-          weddingId: input.weddingId,
-          template: input.template,
-          title: input.title,
-          clientName: input.clientName ?? '',
-          validUntil: input.validUntil,
-          lineItems: input.lineItems,
-          subtotal: input.subtotal,
-          vatMode: input.vatMode,
-          vatRate: input.vatRate,
-          taxAmount: input.taxAmount,
-          total: input.total,
-          depositPercentage: input.depositPercentage,
-          depositAmount: input.depositAmount,
-          balanceAmount: input.balanceAmount,
-          status: input.status ?? 'brouillon',
-          notes: input.notes,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        }
-        set((state) => ({ workspace: { ...state.workspace, proposals: [...state.workspace.proposals, proposal] } }))
+        set((state) => {
+          const allocated = allocateDocumentNumber(state.workspace.documentCounters, 'devis', timestamp)
+          const proposal: Proposal = {
+            id,
+            weddingId: input.weddingId,
+            proposalNumber: allocated.number,
+            template: input.template,
+            title: input.title,
+            clientName: input.clientName ?? '',
+            validUntil: input.validUntil,
+            lineItems: input.lineItems,
+            subtotal: input.subtotal,
+            vatMode: input.vatMode,
+            vatRate: input.vatRate,
+            taxAmount: input.taxAmount,
+            total: input.total,
+            depositPercentage: input.depositPercentage,
+            depositAmount: input.depositAmount,
+            balanceAmount: input.balanceAmount,
+            status: input.status ?? 'brouillon',
+            notes: input.notes,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }
+          return {
+            workspace: { ...state.workspace, proposals: [...state.workspace.proposals, proposal], documentCounters: allocated.counters },
+          }
+        })
         return id
       },
 
       /** Refuse silencieusement toute modification de contenu si le statut actuel n'est pas modifiable (cf. isProposalEditable, Phase 2b) — le contenu d'une proposition verrouillée ne doit jamais être écrasé, ni depuis l'UI (qui ne l'appelle déjà plus) ni depuis un appel direct. */
       updateProposal: (id, patch) => {
+        const { proposalNumber: _ignored, ...safePatch } = patch
         set((state) => ({
           workspace: {
             ...state.workspace,
             proposals: state.workspace.proposals.map((p) =>
-              p.id === id && isProposalEditable(p.status) ? { ...p, ...patch, updatedAt: nowIso() } : p,
+              p.id === id && isProposalEditable(p.status) ? { ...p, ...safePatch, updatedAt: nowIso() } : p,
             ),
           },
         }))
@@ -743,17 +751,23 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (!source) return null
         const newId = generateId()
         const timestamp = nowIso()
-        const duplicate: Proposal = {
-          ...source,
-          id: newId,
-          title: `${source.title} (copie)`,
-          lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
-          status: 'brouillon',
-          approvedAt: undefined,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        }
-        set((state) => ({ workspace: { ...state.workspace, proposals: [...state.workspace.proposals, duplicate] } }))
+        set((state) => {
+          const allocated = allocateDocumentNumber(state.workspace.documentCounters, 'devis', timestamp)
+          const duplicate: Proposal = {
+            ...source,
+            id: newId,
+            proposalNumber: allocated.number,
+            title: `${source.title} (copie)`,
+            lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
+            status: 'brouillon',
+            approvedAt: undefined,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }
+          return {
+            workspace: { ...state.workspace, proposals: [...state.workspace.proposals, duplicate], documentCounters: allocated.counters },
+          }
+        })
         return newId
       },
 
@@ -865,38 +879,44 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       createInvoicePreview: (input) => {
         const id = generateId()
         const timestamp = nowIso()
-        const invoice: Invoice = {
-          id,
-          weddingId: input.weddingId,
-          proposalId: input.proposalId,
-          invoiceNumber: input.invoiceNumber,
-          date: input.date,
-          clientName: input.clientName ?? '',
-          lineItems: input.lineItems,
-          subtotal: input.subtotal,
-          vatMode: input.vatMode,
-          vatRate: input.vatRate,
-          taxAmount: input.taxAmount,
-          total: input.total,
-          depositAmount: input.depositAmount,
-          balanceAmount: input.balanceAmount,
-          legalMentions: input.legalMentions,
-          isIndicativePreview: true,
-          status: 'brouillon',
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        }
-        set((state) => ({ workspace: { ...state.workspace, invoices: [...state.workspace.invoices, invoice] } }))
+        set((state) => {
+          const allocated = allocateDocumentNumber(state.workspace.documentCounters, 'facture', timestamp)
+          const invoice: Invoice = {
+            id,
+            weddingId: input.weddingId,
+            proposalId: input.proposalId,
+            invoiceNumber: allocated.number,
+            date: input.date,
+            clientName: input.clientName ?? '',
+            lineItems: input.lineItems,
+            subtotal: input.subtotal,
+            vatMode: input.vatMode,
+            vatRate: input.vatRate,
+            taxAmount: input.taxAmount,
+            total: input.total,
+            depositAmount: input.depositAmount,
+            balanceAmount: input.balanceAmount,
+            legalMentions: input.legalMentions,
+            isIndicativePreview: true,
+            status: 'brouillon',
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }
+          return {
+            workspace: { ...state.workspace, invoices: [...state.workspace.invoices, invoice], documentCounters: allocated.counters },
+          }
+        })
         return id
       },
 
       /** Refuse silencieusement toute modification de contenu si la facture est finalisée (cf. isInvoiceEditable, Phase 2b) — jamais écrasée une fois verrouillée. */
       updateInvoicePreview: (id, patch) => {
+        const { invoiceNumber: _ignored, ...safePatch } = patch
         set((state) => ({
           workspace: {
             ...state.workspace,
             invoices: state.workspace.invoices.map((inv) =>
-              inv.id === id && !isInvoiceStatusLocked(inv.status) ? { ...inv, ...patch, updatedAt: nowIso() } : inv,
+              inv.id === id && !isInvoiceStatusLocked(inv.status) ? { ...inv, ...safePatch, updatedAt: nowIso() } : inv,
             ),
           },
         }))
@@ -922,16 +942,22 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (!source) return null
         const newId = generateId()
         const timestamp = nowIso()
-        const duplicate: Invoice = {
-          ...source,
-          id: newId,
-          lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
-          status: 'brouillon',
-          finalizedAt: undefined,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        }
-        set((state) => ({ workspace: { ...state.workspace, invoices: [...state.workspace.invoices, duplicate] } }))
+        set((state) => {
+          const allocated = allocateDocumentNumber(state.workspace.documentCounters, 'facture', timestamp)
+          const duplicate: Invoice = {
+            ...source,
+            id: newId,
+            invoiceNumber: allocated.number,
+            lineItems: source.lineItems.map((line) => ({ ...line, id: generateId() })),
+            status: 'brouillon',
+            finalizedAt: undefined,
+            createdAt: timestamp,
+            updatedAt: timestamp,
+          }
+          return {
+            workspace: { ...state.workspace, invoices: [...state.workspace.invoices, duplicate], documentCounters: allocated.counters },
+          }
+        })
         return newId
       },
 

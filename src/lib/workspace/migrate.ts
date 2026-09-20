@@ -224,6 +224,40 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
 
     return { ...data, schemaVersion: 11, vendors, vendorWeddingLinks: links }
   },
+  /**
+   * v11 → v12 : numérotation automatique des devis et des factures.
+   *
+   * Les devis n'avaient aucun numéro : chacun reçoit DEV-AAAA-NNNN, dans l'ordre de création (année de
+   * création), sans changer l'ordre du tableau. Les factures gardent LEUR numéro tel quel (jamais
+   * renumérotées) ; seul le compteur est initialisé pour que les prochains numéros continuent après
+   * celles qui existent déjà cette année-là.
+   */
+  11: (data) => {
+    const proposals = Array.isArray(data.proposals) ? (data.proposals as Record<string, unknown>[]) : []
+    const invoices = Array.isArray(data.invoices) ? (data.invoices as Record<string, unknown>[]) : []
+    const counters: Record<string, number> = {}
+    const yearOf = (value: unknown) => (typeof value === 'string' && /^\d{4}/.test(value) ? value.slice(0, 4) : String(new Date().getFullYear()))
+
+    const numberById = new Map<unknown, string>()
+    const inCreationOrder = [...proposals].sort((a, b) => String(a.createdAt ?? '').localeCompare(String(b.createdAt ?? '')))
+    for (const proposal of inCreationOrder) {
+      const year = yearOf(proposal.createdAt)
+      const key = `devis:${year}`
+      counters[key] = (counters[key] ?? 0) + 1
+      numberById.set(proposal.id, `DEV-${year}-${String(counters[key]).padStart(4, '0')}`)
+    }
+    for (const invoice of invoices) {
+      const key = `facture:${yearOf(invoice.date ?? invoice.createdAt)}`
+      counters[key] = (counters[key] ?? 0) + 1
+    }
+
+    return {
+      ...data,
+      schemaVersion: 12,
+      proposals: proposals.map((p) => ({ ...p, proposalNumber: typeof p.proposalNumber === 'string' && p.proposalNumber ? p.proposalNumber : numberById.get(p.id) })),
+      documentCounters: { ...(typeof data.documentCounters === 'object' && data.documentCounters !== null ? (data.documentCounters as Record<string, number>) : {}), ...counters },
+    }
+  },
 }
 
 /**

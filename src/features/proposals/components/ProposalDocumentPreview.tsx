@@ -9,6 +9,7 @@ interface ProposalDocumentPreviewProps {
   businessConfig: BusinessConfig
   wedding: Wedding
   title: string
+  proposalNumber: string
   templateLabel: string
   clientName: string
   validUntil?: string
@@ -24,6 +25,7 @@ export function ProposalDocumentPreview({
   businessConfig,
   wedding,
   title,
+  proposalNumber,
   templateLabel,
   clientName,
   validUntil,
@@ -59,7 +61,7 @@ export function ProposalDocumentPreview({
         </div>
         <div className="text-right">
           <p className={`text-xs uppercase tracking-wide ${businessConfig.brandColor ? '' : 'text-thread'}`} style={accentStyle}>
-            Proposition — {templateLabel}
+            Proposition n° {proposalNumber} — {templateLabel}
           </p>
           <p className="font-heading text-xl font-semibold text-foreground">{title}</p>
           {validUntil && (

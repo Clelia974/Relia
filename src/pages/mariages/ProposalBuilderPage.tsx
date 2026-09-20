@@ -257,6 +257,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
           <Link to={`/mariages/${wedding.id}/documents`} className="text-sm text-muted-foreground hover:underline">
             ← Documents
           </Link>
+          <p className="mt-1 text-xs font-medium uppercase tracking-wide tabular-nums text-thread">N° {proposal.proposalNumber}</p>
           <h1 className="font-heading text-2xl font-semibold text-foreground">{title || 'Proposition'}</h1>
           <div className="mt-1 flex items-center gap-2">
             <ProposalStatusBadge status={proposal.status} />
@@ -421,6 +422,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
             businessConfig={businessConfig}
             wedding={wedding}
             title={title}
+            proposalNumber={proposal.proposalNumber}
             templateLabel={templateLabel}
             clientName={clientName || wedding.coupleName}
             validUntil={validUntil ? new Date(validUntil).toISOString() : undefined}

@@ -60,7 +60,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const duplicateInvoicePreview = useWorkspaceStore((s) => s.duplicateInvoicePreview)
   const deleteInvoicePreview = useWorkspaceStore((s) => s.deleteInvoicePreview)
 
-  const [invoiceNumber, setInvoiceNumber] = useState(invoice?.invoiceNumber ?? '')
+  /** Attribué automatiquement à la création : jamais modifiable. */
+  const invoiceNumber = invoice?.invoiceNumber ?? ''
   const [date, setDate] = useState(invoice?.date.slice(0, 10) ?? '')
   const [clientName, setClientName] = useState(invoice?.clientName ?? '')
   const [legalMentions, setLegalMentions] = useState(invoice?.legalMentions ?? '')
@@ -79,7 +80,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
         }),
       ) ?? [],
   )
-  const [errors, setErrors] = useState<Partial<Record<'invoiceNumber' | 'date', string>>>({})
+  const [errors, setErrors] = useState<Partial<Record<'date', string>>>({})
   const [rowErrors, setRowErrors] = useState<Record<string, Partial<Record<keyof ProposalLineItemFormValues, string>>>>({})
   const [view, setView] = useState<'editeur' | 'apercu'>(invoice && !isInvoiceEditable(invoice.status) ? 'apercu' : 'editeur')
   const [pendingDelete, setPendingDelete] = useState(false)
@@ -109,12 +110,12 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const addLine = () => setLines((prev) => [...prev, emptyLineItemFormValues()])
 
   const handleSave = () => {
-    const result = InvoicePreviewFormSchema.safeParse({ invoiceNumber, date, clientName, legalMentions })
+    const result = InvoicePreviewFormSchema.safeParse({ date, clientName, legalMentions })
     const fieldErrors: typeof errors = {}
     if (!result.success) {
       for (const issue of result.error.issues) {
         const key = issue.path[0] as keyof typeof errors
-        if (key === 'invoiceNumber' || key === 'date') fieldErrors[key] = issue.message
+        if (key === 'date') fieldErrors[key] = issue.message
       }
     }
 
@@ -141,7 +142,6 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
     const finalLines = toNumericLines(lines)
     const finalTotals = computeProposalTotals(finalLines, invoice.vatMode, invoice.vatRate, undefined)
     updateInvoicePreview(invoice.id, {
-      invoiceNumber: invoiceNumber.trim(),
       date: new Date(date).toISOString(),
       clientName: clientName.trim(),
       legalMentions: legalMentions.trim() || undefined,
@@ -268,14 +268,11 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           <Card>
             <CardContent className="flex flex-col gap-4">
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                <Field label="Numéro de facture" htmlFor="inv-number" error={errors.invoiceNumber}>
-                  <Input
-                    id="inv-number"
-                    value={invoiceNumber}
-                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                    aria-invalid={Boolean(errors.invoiceNumber)}
-                    aria-describedby={errors.invoiceNumber ? 'inv-number-error' : undefined}
-                  />
+                <Field label="Numéro de facture" htmlFor="inv-number">
+                  <Input id="inv-number" value={invoiceNumber} readOnly aria-describedby="inv-number-hint" className="bg-muted/40 tabular-nums" />
+                  <p id="inv-number-hint" className="text-xs text-muted-foreground">
+                    Attribué automatiquement, non modifiable.
+                  </p>
                 </Field>
                 <Field label="Date" htmlFor="inv-date" error={errors.date}>
                   <Input

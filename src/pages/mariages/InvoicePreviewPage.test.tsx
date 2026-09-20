@@ -25,7 +25,6 @@ function seedWeddingAndInvoice(status: InvoiceStatus) {
   const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
   const invoiceId = useWorkspaceStore.getState().createInvoicePreview({
     weddingId,
-    invoiceNumber: 'FACT-1',
     date: '2026-06-06T00:00:00.000Z',
     clientName: 'Camille & Antoine',
     lineItems: [
