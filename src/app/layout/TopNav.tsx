@@ -1,4 +1,4 @@
-import { Menu } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import {
@@ -28,7 +28,7 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(isActive && 'bg-accent text-accent-foreground')
 
 /** En-tête léger — logo + menu, affiché uniquement en dessous de `lg` (la navigation principale vit dans la Sidebar). */
-export function TopNav() {
+export function TopNav({ onSearch }: { onSearch: () => void }) {
   return (
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
@@ -38,6 +38,14 @@ export function TopNav() {
         </NavLink>
 
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onSearch}
+            aria-label="Rechercher"
+            className="relative flex size-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <Search className="size-5" aria-hidden="true" />
+          </button>
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

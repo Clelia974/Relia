@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Plus, Search } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -44,7 +44,10 @@ export function PrestatairesGlobalPage() {
   const [filter, setFilter] = useState<FilterKey>('tous')
   const [category, setCategory] = useState<string>(ALL_CATEGORIES)
   const [query, setQuery] = useState('')
-  const [profileVendorId, setProfileVendorId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [openedProfileId, setOpenedProfileId] = useState<string | null>(null)
+  /** La fiche peut s'ouvrir depuis la recherche globale (?fiche=…) ou depuis un bouton de la page. */
+  const profileVendorId = searchParams.get('fiche') ?? openedProfileId
   const [creating, setCreating] = useState(false)
   const [addingTo, setAddingTo] = useState<Vendor | null>(null)
 
@@ -170,7 +173,7 @@ export function PrestatairesGlobalPage() {
                     : `${assignments.length} mariage${assignments.length > 1 ? 's' : ''}`}
                 </span>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setProfileVendorId(vendor.id)}>
+                  <Button size="sm" variant="outline" onClick={() => setOpenedProfileId(vendor.id)}>
                     Voir la fiche
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setAddingTo(vendor)}>
@@ -191,7 +194,7 @@ export function PrestatairesGlobalPage() {
               className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-border bg-card px-4 py-3 text-sm"
             >
               <div className="min-w-40 flex-1">
-                <button type="button" onClick={() => setProfileVendorId(vendor.id)} className="font-medium text-foreground hover:underline">
+                <button type="button" onClick={() => setOpenedProfileId(vendor.id)} className="font-medium text-foreground hover:underline">
                   {vendor.name}
                 </button>
                 {vendor.company && <p className="text-xs text-muted-foreground">{vendor.company}</p>}
@@ -210,7 +213,13 @@ export function PrestatairesGlobalPage() {
         </ul>
       )}
 
-      <VendorProfileDialog vendorId={profileVendorId} onClose={() => setProfileVendorId(null)} />
+      <VendorProfileDialog
+        vendorId={profileVendorId}
+        onClose={() => {
+          setOpenedProfileId(null)
+          if (searchParams.has('fiche')) setSearchParams({}, { replace: true })
+        }}
+      />
 
       {creating && <VendorForm open onOpenChange={setCreating} onSubmit={handleCreate} />}
 

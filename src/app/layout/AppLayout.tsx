@@ -1,16 +1,29 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { HydrationNotice } from '@/app/layout/HydrationNotice'
 import { PersistenceIssueBanner } from '@/app/layout/PersistenceIssueBanner'
 import { Sidebar } from '@/app/layout/Sidebar'
 import { TopNav } from '@/app/layout/TopNav'
 import { useResolvedTheme } from '@/app/useResolvedTheme'
+import { CommandPalette } from '@/features/search/CommandPalette'
 import { Spinner } from '@/components/ui/spinner'
 import { Toaster } from '@/components/ui/sonner'
 
 export function AppLayout() {
   const location = useLocation()
   const resolvedTheme = useResolvedTheme()
+  const [searchOpen, setSearchOpen] = useState(false)
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setSearchOpen((open) => !open)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   return (
     <div className="min-h-dvh bg-background text-foreground lg:flex">
@@ -20,12 +33,13 @@ export function AppLayout() {
       >
         Aller au contenu
       </a>
-      <Sidebar />
+      <Sidebar onSearch={() => setSearchOpen(true)} />
+      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
       <div className="flex min-w-0 flex-1 flex-col">
         <HydrationNotice />
         <Toaster position="bottom-right" theme={resolvedTheme} />
         <PersistenceIssueBanner />
-        <TopNav />
+        <TopNav onSearch={() => setSearchOpen(true)} />
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
           <Suspense
             fallback={
