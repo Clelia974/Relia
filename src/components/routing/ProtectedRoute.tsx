@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { LoadingScreen } from '@/components/routing/LoadingScreen'
+import { useAutoRestoreOnLogin } from '@/features/sync/useAutoRestoreOnLogin'
 import { useAuth } from '@/hooks/useAuth'
 import { useWorkspaceCheck } from '@/hooks/useWorkspaceCheck'
 
@@ -13,15 +14,22 @@ interface ProtectedRouteProps {
 /**
  * Garde de routing générique : non authentifié → renvoie à la landing ;
  * authentifié sans espace onboardé (si `requireWorkspace`) → renvoie à
- * l'onboarding ; sinon rend `children`. Pas encore branchée sur le routeur
- * de l'app (cf. router.tsx) — prête à l'être quand Supabase Auth (Phase 1)
- * remplacera le mock de useAuth.
+ * l'onboarding ; sinon rend `children`.
+ *
+ * Tente d'abord une restauration cloud (`useAutoRestoreOnLogin`) — c'est
+ * ici, pas dans LoginPage, que ça se déclenche : ça couvre aussi bien le
+ * clic sur "Se connecter" qu'un rechargement de page déjà authentifiée, et
+ * ça s'applique quelle que soit la route protégée d'entrée. No-op immédiat
+ * si un espace local existe déjà (jamais d'écrasement), donc jamais
+ * exécuté pendant un mariage en cours (Vue Jour J implique un espace
+ * onboardé).
  */
 export function ProtectedRoute({ children, requireWorkspace = true }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { hasWorkspace, isLoading: workspaceLoading } = useWorkspaceCheck()
+  const { isRestoring } = useAutoRestoreOnLogin()
 
-  if (authLoading || workspaceLoading) return <LoadingScreen />
+  if (authLoading || workspaceLoading || isRestoring) return <LoadingScreen />
   if (!isAuthenticated) return <Navigate to="/" replace />
   if (requireWorkspace && !hasWorkspace) return <Navigate to="/onboarding" replace />
 

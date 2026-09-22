@@ -12,9 +12,14 @@ afterEach(cleanup)
 const useAuthMock = vi.hoisted(() => vi.fn())
 vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
 
-function mockAuth(isAuthenticated: boolean) {
+/** ProtectedRoute tente une restauration cloud (useAutoRestoreOnLogin) — mockée ici pour ne jamais taper le vrai réseau ; "found: false" partout, ce n'est pas ce que ce fichier teste (cf. useAutoRestoreOnLogin.test.ts). */
+const fetchWorkspaceBackupMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/sync/workspaceBackup', () => ({ fetchWorkspaceBackup: fetchWorkspaceBackupMock }))
+
+/** userId distinct par défaut par test : useAutoRestoreOnLogin ne tente qu'une fois par utilisateur (singleton module), un id partagé entre tests ferait dépendre leur résultat de l'ordre d'exécution. */
+function mockAuth(isAuthenticated: boolean, userId = 'u1') {
   useAuthMock.mockReturnValue({
-    user: isAuthenticated ? { id: 'u1', email: 'sophie@example.com' } : null,
+    user: isAuthenticated ? { id: userId, email: 'sophie@example.com' } : null,
     isLoading: false,
     isAuthenticated,
     logout: vi.fn(),
@@ -24,6 +29,7 @@ function mockAuth(isAuthenticated: boolean) {
 beforeEach(() => {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
   mockAuth(false)
+  fetchWorkspaceBackupMock.mockReset().mockResolvedValue({ found: false, workspace: null })
 })
 
 function renderAt(path: string) {
@@ -51,11 +57,11 @@ describe('AppRouter — routing protégé', () => {
     expect(screen.queryByRole('button', { name: "Aller à mon application" })).not.toBeInTheDocument()
   })
 
-  it('« / » affiche l’en-tête authentifié quand connecté·e', () => {
+  it('« / » affiche l’en-tête authentifié quand connecté·e', async () => {
     mockAuth(true)
     renderAt('/')
 
-    expect(screen.getByRole('button', { name: "Aller à mon application" })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: "Aller à mon application" })).toBeInTheDocument()
   })
 
   it('/aujourdhui sans compte renvoie vers la landing (pas de redirection en boucle, pas de fuite de contenu protégé)', () => {
@@ -65,20 +71,20 @@ describe('AppRouter — routing protégé', () => {
     expect(appLayoutNav()).not.toBeInTheDocument()
   })
 
-  it('/aujourdhui avec compte mais sans espace onboardé renvoie vers /onboarding', () => {
+  it('/aujourdhui avec compte mais sans espace onboardé renvoie vers /onboarding', async () => {
     mockAuth(true)
     renderAt('/aujourdhui')
 
-    expect(screen.getByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
     expect(appLayoutNav()).not.toBeInTheDocument()
   })
 
-  it('/aujourdhui avec compte et espace onboardé affiche l’app (sidebar)', () => {
+  it('/aujourdhui avec compte et espace onboardé affiche l’app (sidebar)', async () => {
     mockAuth(true)
     useWorkspaceStore.getState().completeOnboarding()
     renderAt('/aujourdhui')
 
-    expect(appLayoutNav()).toBeInTheDocument()
+    expect(await screen.findByRole('navigation', { name: 'Navigation principale' })).toBeInTheDocument()
   })
 
   it('/onboarding sans compte renvoie vers la landing', () => {
@@ -87,11 +93,23 @@ describe('AppRouter — routing protégé', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Tout orchestré. Enfin la paix.' })).toBeInTheDocument()
   })
 
-  it('/onboarding avec compte (sans espace) reste accessible', () => {
+  it('/onboarding avec compte (sans espace) reste accessible', async () => {
     mockAuth(true)
     renderAt('/onboarding')
 
-    expect(screen.getByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
+  })
+
+  it('/aujourdhui avec compte, sans espace, mais une sauvegarde existe dans le cloud : restaure automatiquement et affiche l’app', async () => {
+    mockAuth(true, 'u-avec-sauvegarde-cloud')
+    fetchWorkspaceBackupMock.mockResolvedValue({
+      found: true,
+      workspace: { ...createEmptyWorkspace(), userProfile: { ...createEmptyWorkspace().userProfile, onboarded: true } },
+    })
+    renderAt('/aujourdhui')
+
+    expect(await screen.findByRole('navigation', { name: 'Navigation principale' })).toBeInTheDocument()
+    expect(useWorkspaceStore.getState().workspace.userProfile.onboarded).toBe(true)
   })
 
   it('les pages légales restent publiques, sans compte', () => {

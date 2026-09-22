@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
-import { Download, RotateCcw, Upload, X } from 'lucide-react'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+import { CloudUpload, Download, RotateCcw, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -19,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ProposalTemplateForm } from '@/features/proposals/components/ProposalTemplateForm'
+import { useSyncToCloud } from '@/features/sync/useSyncToCloud'
 import { readFileAsDataUrl } from '@/lib/readFileAsDataUrl'
 import { VAT_STATUS_LABELS, VAT_STATUS_OPTIONS, vatApplies } from '@/lib/vatStatus'
 import { exportWorkspaceToFile, parseWorkspaceFile } from '@/lib/workspace/importExport'
@@ -29,6 +32,8 @@ const DEFAULT_BRAND_COLOR = '#9C6B3F'
 const MAX_LOGO_FILE_SIZE = 1024 * 1024
 
 export function ParametresPage() {
+  const { syncNow, isSyncing, error: syncError, lastSyncedAt } = useSyncToCloud()
+
   const workspace = useWorkspaceStore((s) => s.workspace)
   const replaceWorkspace = useWorkspaceStore((s) => s.replaceWorkspace)
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)
@@ -393,9 +398,32 @@ export function ParametresPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Sauvegarde en ligne</CardTitle>
+          <CardDescription>
+            Vos mariages, tâches, prestataires et finances restent dans ce navigateur — la sauvegarde en ligne est une
+            copie de secours, à votre demande, pour les retrouver sur un autre appareil. Jamais utilisée pendant la
+            Vue Jour J, qui reste 100&nbsp;% locale.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <Button loading={isSyncing} onClick={syncNow} className="w-fit">
+            {!isSyncing && <CloudUpload className="size-4" aria-hidden="true" />}
+            Sauvegarder maintenant
+          </Button>
+          {syncError && <p className="text-sm text-risk">{syncError}</p>}
+          {lastSyncedAt && !syncError && (
+            <p className="text-xs text-muted-foreground">
+              Dernière sauvegarde : {format(new Date(lastSyncedAt), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Vos données</CardTitle>
           <CardDescription>
-            Tout reste dans ce navigateur — aucun serveur. Exportez régulièrement une sauvegarde pour ne rien perdre.
+            Export/import JSON manuel, en plus de la sauvegarde en ligne ci-dessus.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
