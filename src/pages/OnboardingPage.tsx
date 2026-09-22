@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { useUserProfile } from '@/features/auth/useUserProfile'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
@@ -43,6 +44,8 @@ const STEPS: { key: StepKey; question: string; options: string[] }[] = [
 
 export function OnboardingPage() {
   const navigate = useNavigate()
+  // Vérifie que le profil public.users a bien été créé par le trigger à l'inscription (cf. useUserProfile) — ne bloque jamais l'onboarding, juste un signal en cas d'anomalie.
+  useUserProfile()
   const updateOnboardingAnswers = useWorkspaceStore((s) => s.updateOnboardingAnswers)
   const completeOnboarding = useWorkspaceStore((s) => s.completeOnboarding)
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)

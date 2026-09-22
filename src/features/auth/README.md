@@ -24,22 +24,20 @@
 [`src/components/routing/README.md`](../../components/routing/README.md)) —
 rien n'est branché, la landing et le routing actuel n'ont pas changé.
 
-## En attente ⏸️ — Sprint 4
-
-Bloqué sur l'exécution manuelle du SQL par l'utilisateur.
-
-**Ce qui manque** : `OnboardingPage` doit créer/vérifier la ligne
-`public.users` (via le trigger `on_auth_user_created`, cf.
-`supabase/sql/001_create_users_table.sql`) associée à l'utilisateur
-Supabase connecté.
-
-**Pour débloquer** :
-1. Exécuter `supabase/sql/001_create_users_table.sql` dans
-   Supabase → SQL Editor (projet `onpvqzewpyedbfnltqif`).
-2. Vérifier : `select * from public.users limit 1;` (table existe),
-   `select * from pg_trigger where tgname = 'on_auth_user_created';`
-   (trigger existe).
-3. Le dire ici — le Sprint 4 sera codé dans la foulée.
+- **Sprint 4** — SQL exécuté (`supabase/sql/001_create_users_table.sql`) :
+  `public.users` existe, RLS + trigger `on_auth_user_created` en place.
+  Côté app : `userProfile.ts` (lecture typée, snake_case → camelCase) +
+  `useUserProfile.ts`, branché dans `OnboardingPage` pour vérifier — sans
+  jamais bloquer — que le profil a bien été créé automatiquement par le
+  trigger. **Pas d'insertion côté client** : volontaire, il n'existe pas de
+  policy INSERT pour `authenticated` (la ligne est créée uniquement par le
+  trigger, en `security definer`, indépendant de RLS) — une tentative
+  d'écriture ici échouerait. `profile === null` après chargement signale
+  une anomalie (trigger qui n'a pas tourné) et va en `console.error`, sans
+  jamais bloquer l'onboarding.
+- Rien dans l'UI n'affiche encore `trialEndDate`/`subscriptionStatus` — le
+  hook existe, prêt pour un futur bandeau d'essai, mais aucune maquette ne
+  le demande pour l'instant.
 
 ## Après Sprint 4 — câblage (non commencé)
 
