@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { GRATUIT_FEATURES, PRO_FEATURES } from '@/features/landing/landingContent'
 import { PaymentPage } from '@/pages/PaymentPage'
 
 afterEach(cleanup)
@@ -43,13 +44,24 @@ describe('PaymentPage', () => {
     expect(screen.getByRole('button', { name: 'Passer au Pro' })).toBeInTheDocument()
   })
 
-  it('abonnement actif : pas de carte "Passer au Pro"', () => {
+  it('abonnement actif : pas de carte "Passer au Pro" ni de tableau comparatif', () => {
     useSubscriptionCheckMock.mockReturnValue({ status: 'active', hasAccess: true, daysLeftInTrial: null, isLoading: false })
 
     renderPage()
 
     expect(screen.getByText('Pro actif')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Passer au Pro' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Comparer les offres')).not.toBeInTheDocument()
+  })
+
+  it('non-Pro : affiche le tableau comparatif Gratuit / Pro (même contenu que la landing)', () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+
+    renderPage()
+
+    expect(screen.getByText('Comparer les offres')).toBeInTheDocument()
+    for (const feature of GRATUIT_FEATURES) expect(screen.getByText(feature)).toBeInTheDocument()
+    for (const feature of PRO_FEATURES) expect(screen.getByText(feature)).toBeInTheDocument()
   })
 
   it('clic sur "Passer au Pro" appelle createCheckoutSession avec le prix mensuel par défaut', () => {

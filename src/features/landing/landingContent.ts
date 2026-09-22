@@ -4,14 +4,29 @@
  * pas de chiffres d'audience ni de témoignages inventés).
  */
 
-/** Passer à true quand l'abonnement (connexion + paiement) est réellement ouvert : la mention « bientôt » disparaît. */
-export const BILLING_LIVE = false
+/** Le paiement (Stripe Checkout) est réellement ouvert depuis l'Étape 3 : la mention « bientôt » disparaît de la landing. */
+export const BILLING_LIVE = true
 
 export const TRIAL_DAYS = 14
 export const PRICE_MONTHLY = 29
 export const PRICE_ANNUAL = 290
 /** 12 × 29 € = 348 € ; 290 € par an = 58 € d'économie, soit 2 mois offerts. */
 export const ANNUAL_FREE_MONTHS = Math.round((PRICE_MONTHLY * 12 - PRICE_ANNUAL) / PRICE_MONTHLY)
+
+/**
+ * Listes reprises telles quelles par la landing (Tarifs) et la page
+ * Abonnement (/paiement) — une seule source pour rester cohérent entre
+ * les deux. "Sauvegarde en ligne" n'a plus le "(bientôt)" : elle existe
+ * et tourne depuis l'Étape 2, même si elle n'est pas encore réellement
+ * réservée au Pro dans le code (Gratuit y a accès aussi aujourd'hui).
+ */
+export const GRATUIT_FEATURES = ['3 mariages', 'Tâches, planning, prestataires et matériel', 'Export de tes données en JSON']
+export const PRO_FEATURES = [
+  'Mariages illimités',
+  'Devis, factures, finances et bilan post-mariage',
+  'Support prioritaire',
+  'Sauvegarde en ligne',
+]
 
 export const CONTACT_EMAIL = 'hello@relia.com'
 

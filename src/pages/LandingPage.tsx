@@ -18,14 +18,17 @@ import {
   BILLING_LIVE,
   CONTACT_EMAIL,
   FAQ,
+  GRATUIT_FEATURES,
   PAIN_POINTS,
   PRICE_ANNUAL,
   PRICE_MONTHLY,
+  PRO_FEATURES,
   SOLUTION_POINTS,
   TESTIMONIALS,
   TRIAL_DAYS,
 } from '@/features/landing/landingContent'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
+import { PlanFeature } from '@/features/landing/components/PlanFeature'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { useAuth } from '@/hooks/useAuth'
@@ -349,7 +352,7 @@ export function LandingPage() {
                 <p className="mt-4 font-heading text-5xl font-semibold tracking-tight text-foreground">0 €</p>
                 <p className="mt-1 text-sm text-muted-foreground">Sans limite de durée</p>
                 <ul className="mt-8 flex flex-col gap-3 text-sm">
-                  {['3 mariages', 'Tâches, planning, prestataires et matériel', 'Export de tes données en JSON'].map((f) => (
+                  {GRATUIT_FEATURES.map((f) => (
                     <PlanFeature key={f}>{f}</PlanFeature>
                   ))}
                 </ul>
@@ -371,12 +374,7 @@ export function LandingPage() {
                   {billing === 'month' ? 'Sans engagement, annulable à tout moment' : `Soit ${ANNUAL_FREE_MONTHS} mois offerts par rapport au mensuel`}
                 </p>
                 <ul className="mt-8 flex flex-col gap-3 text-sm">
-                  {[
-                    'Mariages illimités',
-                    'Devis, factures, finances et bilan post-mariage',
-                    'Support prioritaire',
-                    'Sauvegarde en ligne (bientôt)',
-                  ].map((f) => (
+                  {PRO_FEATURES.map((f) => (
                     <PlanFeature key={f}>{f}</PlanFeature>
                   ))}
                 </ul>
@@ -450,17 +448,6 @@ export function LandingPage() {
       </footer>
       <CookieNotice />
     </div>
-  )
-}
-
-function PlanFeature({ children }: { children: React.ReactNode }) {
-  return (
-    <li className="flex items-start gap-3">
-      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage/30 text-success">
-        <Check className="size-3.5" aria-hidden="true" />
-      </span>
-      <span>{children}</span>
-    </li>
   )
 }
 

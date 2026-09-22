@@ -119,9 +119,9 @@ describe('LandingPage', () => {
     expect(ANNUAL_FREE_MONTHS).toBe(2)
   })
 
-  it('la mention « bientôt » de l’abonnement est affichée tant que le paiement n’est pas ouvert', () => {
+  it('la mention « bientôt » de l’abonnement a disparu maintenant que le paiement est réellement ouvert (Étape 3)', () => {
     setup()
-    expect(screen.getByText(/L’abonnement ouvre avec la connexion en ligne/)).toBeTruthy()
+    expect(screen.queryByText(/L’abonnement ouvre avec la connexion en ligne/)).toBeNull()
   })
 
   it('la FAQ répond aux huit questions', () => {

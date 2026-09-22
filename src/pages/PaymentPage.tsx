@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ANNUAL_FREE_MONTHS, PRICE_ANNUAL, PRICE_MONTHLY, TRIAL_DAYS } from '@/features/landing/landingContent'
+import { PlanFeature } from '@/features/landing/components/PlanFeature'
+import { ANNUAL_FREE_MONTHS, GRATUIT_FEATURES, PRICE_ANNUAL, PRICE_MONTHLY, PRO_FEATURES, TRIAL_DAYS } from '@/features/landing/landingContent'
 import { SubscriptionStatusBadge } from '@/features/payment/components/SubscriptionStatusBadge'
 import { useStripeCheckout } from '@/features/payment/useStripeCheckout'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
@@ -79,6 +80,32 @@ export function PaymentPage() {
           </CardContent>
         )}
       </Card>
+
+      {status !== 'active' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Comparer les offres</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <p className="font-heading text-lg font-semibold text-foreground">Gratuit</p>
+              <ul className="mt-4 flex flex-col gap-2.5 text-sm">
+                {GRATUIT_FEATURES.map((f) => (
+                  <PlanFeature key={f}>{f}</PlanFeature>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="font-heading text-lg font-semibold text-foreground">Pro</p>
+              <ul className="mt-4 flex flex-col gap-2.5 text-sm">
+                {PRO_FEATURES.map((f) => (
+                  <PlanFeature key={f}>{f}</PlanFeature>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {status !== 'active' && (
         <Card>
