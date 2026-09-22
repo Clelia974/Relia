@@ -89,6 +89,12 @@ describe('LandingPage', () => {
     for (const item of FAQ) expect(screen.getByText(item.q)).toBeTruthy()
   })
 
+  it('n’affiche aucun en-tête authentifié (AuthenticatedHeader reste réservé à la Phase 1, non branché)', () => {
+    setup()
+    expect(screen.queryByRole('button', { name: 'Aller à mon application' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Menu du compte' })).not.toBeInTheDocument()
+  })
+
   it('toutes les images ont un texte alternatif et des dimensions', () => {
     setup()
     for (const img of screen.getAllByRole('img')) {
