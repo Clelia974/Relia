@@ -1,9 +1,25 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 
 afterEach(cleanup)
+
+/** useAuth parle à Supabase (réseau) — mocké ici pour isoler le composant. */
+const useAuthMock = vi.hoisted(() => vi.fn())
+vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
+
+const logoutMock = vi.fn()
+
+beforeEach(() => {
+  logoutMock.mockReset()
+  useAuthMock.mockReturnValue({
+    user: { id: 'u1', email: 'local@relia.app' },
+    isLoading: false,
+    isAuthenticated: true,
+    logout: logoutMock,
+  })
+})
 
 function renderHeader() {
   const router = createMemoryRouter([
@@ -29,5 +45,22 @@ describe('AuthenticatedHeader', () => {
     fireEvent.pointerDown(screen.getByRole('button', { name: 'Menu du compte' }))
 
     expect(screen.getByText('local@relia.app')).toBeInTheDocument()
+  })
+
+  it('appelle logout depuis le menu', () => {
+    renderHeader()
+
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Menu du compte' }))
+    fireEvent.click(screen.getByText('Déconnexion'))
+
+    expect(logoutMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('ne rend rien quand personne n\'est authentifié', () => {
+    useAuthMock.mockReturnValue({ user: null, isLoading: false, isAuthenticated: false, logout: logoutMock })
+
+    const { container } = renderHeader()
+
+    expect(container).toBeEmptyDOMElement()
   })
 })

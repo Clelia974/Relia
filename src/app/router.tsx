@@ -8,6 +8,10 @@ import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
 import { RootGate } from '@/pages/RootGate'
+import { LoginPage } from '@/pages/auth/LoginPage'
+import { PasswordResetPage } from '@/pages/auth/PasswordResetPage'
+import { PasswordUpdatePage } from '@/pages/auth/PasswordUpdatePage'
+import { SignupPage } from '@/pages/auth/SignupPage'
 import { CookiesPage } from '@/pages/legal/CookiesPage'
 import { PrivacyPage } from '@/pages/legal/PrivacyPage'
 import { RefundPage } from '@/pages/legal/RefundPage'
@@ -81,6 +85,10 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<RootGate />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/connexion" element={<LoginPage />} />
+      <Route path="/inscription" element={<SignupPage />} />
+      <Route path="/mot-de-passe-oublie" element={<PasswordResetPage />} />
+      <Route path="/nouveau-mot-de-passe" element={<PasswordUpdatePage />} />
       <Route path="/confidentialite" element={<PrivacyPage />} />
       <Route path="/conditions" element={<TermsPage />} />
       <Route path="/remboursement" element={<RefundPage />} />
