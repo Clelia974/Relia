@@ -7,13 +7,13 @@ section Tarifs) promet déjà un palier **Gratuit permanent** (3 mariages,
 sans limite de durée) à côté du **Pro** (29€/mois ou 290€/an, essai 14
 jours). Décision explicite prise avec l'utilisatrice :
 
-- **Zéro blocage** après l'essai — jamais d'accès coupé, nulle part.
-- Après le trial (+ 48h de grâce), affichage informatif seulement :
-  badge "Version Gratuite" + invitation à passer au Pro.
-- La limite réelle de 3 mariages (palier Gratuit) **n'est pas
-  implémentée** — rien dans le code ne la fait respecter aujourd'hui.
-  Chantier séparé, à faire consciemment plus tard (compter les mariages,
-  bloquer la création du 4e...).
+- **Zéro blocage d'accès** après l'essai — jamais coupée de l'app,
+  nulle part. Après le trial (+ 48h de grâce), badge "Version Gratuite" +
+  invitation à passer au Pro.
+- **Sauf la création de mariages** : limite dure à 3 pour la Version
+  Gratuite (`expired`/`cancelled`) — cf. section dédiée plus bas. Seule
+  restriction réelle du palier Gratuit, tout le reste de l'app reste
+  utilisable sans limite.
 
 ## Fichiers
 
@@ -46,28 +46,33 @@ quoi que ce soit de `src/features/payment` — structurellement impossible
 d'y déclencher un appel Stripe par accident, même si le blocage était
 activé un jour.
 
-## Étapes manuelles restantes (côté toi, pas moi)
+## Étapes manuelles — faites ✅
 
-- [ ] **SQL** : exécuter `supabase/sql/003_add_stripe_customer_id.sql`
-      dans Supabase SQL Editor (`001` et `002` déjà faits).
-- [ ] **`SUPABASE_SERVICE_ROLE_KEY`** : à récupérer dans Supabase →
-      Settings → API → clé `service_role` (secrète, distincte de la clé
-      publique déjà utilisée) — nécessaire pour que le webhook puisse
-      écrire dans `public.users`. Pas encore dans `.env.local`.
-- [ ] **Variables d'environnement Vercel** (Production, et Preview si
-      besoin) : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
-      `SUPABASE_SERVICE_ROLE_KEY` — **jamais préfixées `VITE_`**, sinon
-      elles finiraient dans le bundle client. Puis `VITE_STRIPE_*` comme
-      pour Supabase.
-- [ ] **Webhook Stripe** : Stripe Dashboard → Developers → Webhooks →
-      Add endpoint → `https://relia-app.vercel.app/api/stripe/webhook`,
-      événements `checkout.session.completed` et
-      `customer.subscription.deleted`. (Le `STRIPE_WEBHOOK_SECRET` déjà
-      fourni suggère que c'est peut-être déjà fait — à vérifier que
-      l'URL de destination est correcte.)
-- [ ] Redéployer une fois les variables Vercel en place (comme pour
-      Supabase — un `git push` seul ne suffit pas si les variables
-      n'existaient pas au moment du build).
+SQL (001, 002, 003) exécuté, `SUPABASE_SERVICE_ROLE_KEY` récupérée et
+posée (locale + Vercel), variables Vercel en place, redéployé et vérifié
+en prod (bundle à jour, `/api/stripe/checkout-session` répond 405 sur
+GET). À confirmer de ton côté : que le webhook Stripe pointe bien vers
+`https://relia-app.vercel.app/api/stripe/webhook` avec les événements
+`checkout.session.completed` et `customer.subscription.deleted`.
+
+## Limite Gratuit — 3 mariages (Étape 4)
+
+| Fichier | Rôle |
+|---|---|
+| `weddingLimit.ts` | Logique pure : illimité pour `trial`/`grace`/`active` (et statut pas encore résolu — jamais bloquer par défaut), limité à 3 pour `expired`/`cancelled`. |
+| `useWeddingLimit.ts` | Hook, combine `useSubscriptionCheck` + `workspace.weddings.length`. |
+| `components/WeddingLimitDialog.tsx` | `AlertDialog` (même convention que les autres confirmations de l'app) — jamais de blocage sans échappatoire, "Annuler" toujours présent. |
+
+Deux points d'application, l'un suffit en usage normal, l'autre est un
+filet de sécurité :
+- `MariagesListPage.tsx` : le bouton "Créer un mariage" ouvre le
+  dialogue au lieu de naviguer si la limite est atteinte.
+- `NewWeddingPage.tsx` : si on arrive directement sur `/mariages/nouveau`
+  par URL alors que la limite est atteinte, affiche un état bloqué (avec
+  liens de sortie) au lieu du formulaire.
+
+Vérifiée uniquement à la création — jamais consultée pour un mariage déjà
+créé, donc aucun impact possible sur la Vue Jour J.
 
 ## Limite de test locale
 

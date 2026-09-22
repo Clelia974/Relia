@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Plus, Search } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -17,6 +17,8 @@ import { Input } from '@/components/ui/input'
 import { EmptyState } from '@/components/EmptyState'
 import { FilterPills } from '@/components/FilterPills'
 import { MariageCard } from '@/features/weddings/components/MariageCard'
+import { WeddingLimitDialog } from '@/features/payment/components/WeddingLimitDialog'
+import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { Wedding } from '@/types/entities'
 
@@ -48,14 +50,22 @@ function matchesFilter(wedding: Wedding, filter: FilterKey): boolean {
 }
 
 export function MariagesListPage() {
+  const navigate = useNavigate()
   const weddings = useWorkspaceStore((s) => s.workspace.weddings)
   const archiveWedding = useWorkspaceStore((s) => s.archiveWedding)
   const updateWedding = useWorkspaceStore((s) => s.updateWedding)
   const deleteWedding = useWorkspaceStore((s) => s.deleteWedding)
+  const { canCreate, limitReached, weddingCount, limit } = useWeddingLimit()
 
   const [filter, setFilter] = useState<FilterKey>('tous')
   const [query, setQuery] = useState('')
   const [pendingDelete, setPendingDelete] = useState<Wedding | null>(null)
+  const [limitDialogOpen, setLimitDialogOpen] = useState(false)
+
+  const handleCreateClick = () => {
+    if (canCreate) navigate('/mariages/nouveau')
+    else setLimitDialogOpen(true)
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -103,12 +113,17 @@ export function MariagesListPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-semibold text-foreground">Mariages</h1>
-        <Button asChild>
-          <Link to="/mariages/nouveau">
-            <Plus className="size-4" aria-hidden="true" />
-            Créer un mariage
-          </Link>
+        <div>
+          <h1 className="font-heading text-2xl font-semibold text-foreground">Mariages</h1>
+          {limitReached && (
+            <p className="mt-1 text-sm text-warning">
+              {weddingCount} / {limit} mariages — limite de la version Gratuite atteinte.
+            </p>
+          )}
+        </div>
+        <Button onClick={handleCreateClick}>
+          <Plus className="size-4" aria-hidden="true" />
+          Créer un mariage
         </Button>
       </div>
 
@@ -158,6 +173,8 @@ export function MariagesListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <WeddingLimitDialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen} />
     </div>
   )
 }

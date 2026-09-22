@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,12 +8,14 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { emptyWeddingFormValues, WeddingFormSchema, type WeddingFormValues } from '@/features/weddings/weddingForm.schema'
+import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
 import { WEDDING_STATUS_LABELS, WEDDING_STATUS_OPTIONS } from '@/lib/weddingStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
 export function NewWeddingPage() {
   const navigate = useNavigate()
   const createWedding = useWorkspaceStore((s) => s.createWedding)
+  const { canCreate, weddingCount, limit } = useWeddingLimit()
 
   const [values, setValues] = useState<WeddingFormValues>(emptyWeddingFormValues())
   const [errors, setErrors] = useState<Partial<Record<keyof WeddingFormValues, string>>>({})
@@ -49,6 +51,27 @@ export function NewWeddingPage() {
 
     toast.success('Votre mariage a été créé.')
     navigate(`/mariages/${id}`, { state: { justCreated: true } })
+  }
+
+  // Filet de sécurité pour un accès direct par URL — le point d'entrée normal (bouton "Créer un mariage" sur MariagesListPage) intercepte déjà le clic avant d'arriver ici.
+  if (!canCreate) {
+    return (
+      <div className="mx-auto flex max-w-xl flex-col gap-4 rounded-lg border border-dashed border-border px-6 py-16 text-center">
+        <h1 className="font-heading text-xl font-semibold text-foreground">Limite de la version Gratuite atteinte</h1>
+        <p className="text-sm text-muted-foreground">
+          La version Gratuite est limitée à {limit} mariages (vous en avez {weddingCount}). Passez au Pro pour créer
+          des mariages en illimité.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button variant="outline" asChild>
+            <Link to="/mariages">Retour aux mariages</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/paiement">Passer au Pro</Link>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (

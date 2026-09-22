@@ -7,6 +7,7 @@ import { ANNUAL_FREE_MONTHS, PRICE_ANNUAL, PRICE_MONTHLY, TRIAL_DAYS } from '@/f
 import { SubscriptionStatusBadge } from '@/features/payment/components/SubscriptionStatusBadge'
 import { useStripeCheckout } from '@/features/payment/useStripeCheckout'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
+import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
 import { cn } from '@/lib/utils'
 
 const euro = (n: number) => `${n} €`
@@ -22,6 +23,7 @@ const STATUS_MESSAGE: Record<string, string> = {
 export function PaymentPage() {
   const { status, daysLeftInTrial, isLoading } = useSubscriptionCheck()
   const { createCheckoutSession, isLoading: isCheckoutLoading, error: checkoutError } = useStripeCheckout()
+  const { weddingCount, limit: weddingLimit, limitReached: weddingLimitReached } = useWeddingLimit()
   const [billing, setBilling] = useState<'month' | 'year'>('month')
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -62,11 +64,18 @@ export function PaymentPage() {
           </div>
           {!isLoading && status && <CardDescription>{STATUS_MESSAGE[status]}</CardDescription>}
         </CardHeader>
-        {status === 'trial' && daysLeftInTrial !== null && daysLeftInTrial !== undefined && (
-          <CardContent>
-            <p className="text-sm text-foreground">
-              <strong>{daysLeftInTrial}</strong> jour{daysLeftInTrial > 1 ? 's' : ''} restant{daysLeftInTrial > 1 ? 's' : ''} sur votre essai de {TRIAL_DAYS} jours.
-            </p>
+        {(status === 'trial' || weddingLimitReached) && (
+          <CardContent className="flex flex-col gap-2">
+            {status === 'trial' && daysLeftInTrial !== null && daysLeftInTrial !== undefined && (
+              <p className="text-sm text-foreground">
+                <strong>{daysLeftInTrial}</strong> jour{daysLeftInTrial > 1 ? 's' : ''} restant{daysLeftInTrial > 1 ? 's' : ''} sur votre essai de {TRIAL_DAYS} jours.
+              </p>
+            )}
+            {weddingLimitReached && (
+              <p className="text-sm text-warning">
+                {weddingCount} / {weddingLimit} mariages — limite de la version Gratuite atteinte.
+              </p>
+            )}
           </CardContent>
         )}
       </Card>
