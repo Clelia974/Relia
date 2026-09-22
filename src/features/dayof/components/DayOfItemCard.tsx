@@ -2,10 +2,10 @@ import { Mail, MapPin, Phone, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { DayOfItem } from '@/features/dayof/dayOfTimeline'
+import { TaskStatusBadge } from '@/features/tasks/components/TaskStatusBadge'
+import { TimelineEventStatusBadge } from '@/features/timeline/components/TimelineEventStatusBadge'
 import { formatTimeRange } from '@/features/timeline/timeRange'
 import { DAY_PHASE_LABELS } from '@/lib/dayPhase'
-import { TASK_STATUS_LABELS } from '@/lib/taskStatus'
-import { TIMELINE_EVENT_STATUS_LABELS } from '@/lib/timelineEventStatus'
 import { cn } from '@/lib/utils'
 import type { Vendor } from '@/types/entities'
 
@@ -46,8 +46,8 @@ export function DayOfItemCard({ item, vendor, onToggleTask }: DayOfItemCardProps
               {timeLabel && <span className="font-mono text-xs font-semibold text-foreground">{timeLabel}</span>}
               <p className={cn('font-medium text-foreground', done && 'text-muted-foreground line-through')}>{title}</p>
             </div>
-            <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-              <span>{isTask ? TASK_STATUS_LABELS[item.task.status] : TIMELINE_EVENT_STATUS_LABELS[item.event.status]}</span>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              {isTask ? <TaskStatusBadge status={item.task.status} /> : <TimelineEventStatusBadge status={item.event.status} />}
               {phase && (
                 <>
                   <span aria-hidden="true">·</span>

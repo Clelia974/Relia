@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EmptyState } from '@/components/EmptyState'
 import { DayOfItemCard } from '@/features/dayof/components/DayOfItemCard'
+import { DayOfVendorSection } from '@/features/dayof/components/DayOfVendorSection'
 import { buildDayOfTimeline, filterDayOfTimelineByPhase, findMismatchedDayOfEvents, type DayOfItem } from '@/features/dayof/dayOfTimeline'
 import { TimelineConflictAlert } from '@/features/timeline/components/TimelineConflictAlert'
 import { TimelineConflictDialog } from '@/features/timeline/components/TimelineConflictDialog'
@@ -16,9 +17,11 @@ import { TimelineGanttView } from '@/features/timeline/components/TimelineGanttV
 import { DEFAULT_MIN_BUFFER_MINUTES, detectTimelineConflicts, type TimelineConflict } from '@/features/timeline/conflicts'
 import { formatTimeRange } from '@/features/timeline/timeRange'
 import { toTimelineEventPatch, type TimelineEventFormValues } from '@/features/timeline/timelineEventForm.schema'
+import { getWeddingAssignments } from '@/features/vendors/assignments'
 import { DAY_PHASE_LABELS, DAY_PHASE_OPTIONS } from '@/lib/dayPhase'
 import { TASK_STATUS_LABELS } from '@/lib/taskStatus'
 import { TIMELINE_EVENT_STATUS_LABELS } from '@/lib/timelineEventStatus'
+import { VENDOR_STATUS_LABELS } from '@/lib/vendorStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
 import type { DayPhase, TimelineEvent } from '@/types/entities'
@@ -49,6 +52,7 @@ export function WeddingDayOfTab() {
   const allTasks = useWorkspaceStore((s) => s.workspace.tasks)
   const allEvents = useWorkspaceStore((s) => s.workspace.timelineEvents)
   const allVendors = useWorkspaceStore((s) => s.workspace.vendors)
+  const allVendorWeddingLinks = useWorkspaceStore((s) => s.workspace.vendorWeddingLinks)
   const ignoredConflictIds = useWorkspaceStore((s) => s.workspace.ignoredConflictIds)
   const updateTaskStatus = useWorkspaceStore((s) => s.updateTaskStatus)
   const updateTimelineEvent = useWorkspaceStore((s) => s.updateTimelineEvent)
@@ -59,6 +63,11 @@ export function WeddingDayOfTab() {
   const vendors = allVendors.filter((v) => v.weddingIds.includes(wedding.id))
   const vendorById = useMemo(() => new Map(allVendors.map((v) => [v.id, v])), [allVendors])
   const vendorNameById = useMemo(() => new Map(allVendors.map((v) => [v.id, v.name])), [allVendors])
+  /** Statut + horaire d'arrivée de tous les prestataires du mariage — pas seulement ceux ayant un moment planning ce jour-là (cf. DayOfVendorSection). */
+  const vendorAssignments = useMemo(
+    () => getWeddingAssignments(allVendors, allVendorWeddingLinks, wedding.id),
+    [allVendors, allVendorWeddingLinks, wedding.id],
+  )
 
   const weddingDay = wedding.date.slice(0, 10)
   /** Périmètre strict jour J — mêmes tableaux utilisés par la liste et le Gantt, jamais deux filtres qui pourraient diverger. */
@@ -208,6 +217,8 @@ export function WeddingDayOfTab() {
             onEditEvent={openEdit}
           />
         )}
+
+        <DayOfVendorSection assignments={vendorAssignments} />
       </div>
 
       <div data-testid="dayof-print" className="print-only print-area flex flex-col gap-4">
@@ -240,6 +251,32 @@ export function WeddingDayOfTab() {
           </tbody>
         </table>
         {printRows.length === 0 && <p className="text-sm">Aucune tâche ni aucun moment prévu pour le jour du mariage.</p>}
+
+        {vendorAssignments.length > 0 && (
+          <>
+            <h2 className="text-base font-semibold">Prestataires</h2>
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-black/30 text-left">
+                  <th className="py-1 pr-3">Prestataire</th>
+                  <th className="py-1 pr-3">Statut</th>
+                  <th className="py-1 pr-3">Arrivée</th>
+                  <th className="py-1">Téléphone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vendorAssignments.map(({ vendor, link }) => (
+                  <tr key={vendor.id} className="border-b border-black/10">
+                    <td className="py-1 pr-3">{vendor.name}</td>
+                    <td className="py-1 pr-3">{VENDOR_STATUS_LABELS[link.status]}</td>
+                    <td className="py-1 pr-3">{link.arrivalTime ?? '—'}</td>
+                    <td className="py-1">{vendor.phone ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
 
       <TimelineEventForm

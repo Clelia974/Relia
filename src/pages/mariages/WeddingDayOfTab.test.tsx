@@ -136,7 +136,28 @@ describe('WeddingDayOfTab', () => {
     const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
     renderWithWedding(wedding)
 
-    expect(screenView().getByText('DJ Mix')).toBeInTheDocument()
-    expect(screenView().getByRole('link', { name: /Appeler/ })).toHaveAttribute('href', 'tel:0600000000')
+    // "DJ Mix" apparaît deux fois : sur le moment planning associé (DayOfItemCard) et dans la section Prestataires (DayOfVendorSection).
+    expect(screenView().getAllByText('DJ Mix').length).toBeGreaterThan(0)
+    const callLinks = screenView().getAllByRole('link', { name: /Appeler/ })
+    expect(callLinks.length).toBeGreaterThan(0)
+    for (const link of callLinks) expect(link).toHaveAttribute('href', 'tel:0600000000')
+  })
+
+  it('7. affiche le statut et l\'heure d\'arrivée de chaque prestataire, même sans moment planning associé', () => {
+    const weddingId = seedWedding()
+    useWorkspaceStore.getState().addVendor({ name: 'Fleuriste Rosa', category: 'Fleuriste', weddingIds: [weddingId] })
+    const vendorId = useWorkspaceStore.getState().addVendor({ name: 'Traiteur Bonté', category: 'Traiteur', weddingIds: [weddingId] })
+    useWorkspaceStore.getState().updateVendorAssignment(vendorId, weddingId, { status: 'confirme', arrivalTime: '09:00' })
+
+    const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
+    renderWithWedding(wedding)
+
+    // Fleuriste Rosa n'a aucun moment planning ce jour-là mais doit rester visible (heure d'arrivée manquante signalée).
+    expect(screenView().getByText('Fleuriste Rosa')).toBeInTheDocument()
+    expect(screenView().getByText('Horaire non renseigné')).toBeInTheDocument()
+
+    expect(screenView().getByText('Traiteur Bonté')).toBeInTheDocument()
+    expect(screenView().getByText('09:00')).toBeInTheDocument()
+    expect(screenView().getByText('Confirmé')).toBeInTheDocument()
   })
 })
