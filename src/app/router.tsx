@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
+import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
@@ -84,7 +85,14 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<RootGate />} />
-      <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute requireWorkspace={false}>
+            <OnboardingPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/connexion" element={<LoginPage />} />
       <Route path="/inscription" element={<SignupPage />} />
       <Route path="/mot-de-passe-oublie" element={<PasswordResetPage />} />
@@ -94,7 +102,13 @@ export function AppRouter() {
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
 
-      <Route element={<AppLayout />}>
+      <Route
+        element={
+          <ProtectedRoute requireWorkspace>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route path="aujourdhui" element={<AujourdHuiPage />} />
 
         <Route path="mariages">

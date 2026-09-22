@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -7,7 +7,24 @@ import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
 afterEach(cleanup)
-beforeEach(() => useWorkspaceStore.setState({ workspace: createEmptyWorkspace() }))
+
+/** useAuth parle à Supabase (réseau) — mocké ici, comme les autres tests qui rendent des composants en dépendant. */
+const useAuthMock = vi.hoisted(() => vi.fn())
+vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
+
+function mockAuth(isAuthenticated: boolean) {
+  useAuthMock.mockReturnValue({
+    user: isAuthenticated ? { id: 'u1', email: 'sophie@example.com' } : null,
+    isLoading: false,
+    isAuthenticated,
+    logout: vi.fn(),
+  })
+}
+
+beforeEach(() => {
+  useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
+  mockAuth(false)
+})
 
 function renderAt(path: string) {
   return render(
@@ -19,26 +36,67 @@ function renderAt(path: string) {
   )
 }
 
+const appLayoutNav = () => screen.queryByRole('navigation', { name: 'Navigation principale' })
+
 /**
- * Verrou de non-régression pour la structure auth/routing mise "en
- * réserve" pour la Phase 1 (ProtectedRoute, AuthenticatedHeader, useAuth) :
- * rien n'est encore branché dans router.tsx, donc le routing actuel doit
- * rester strictement identique — aucune redirection ni en-tête
- * authentifié ne doit apparaître avant que ces composants soient
- * explicitement câblés.
+ * ProtectedRoute est maintenant câblée (Étape 1, wiring) : compte requis
+ * pour tout le reste de l'app (AppLayout) et pour l'onboarding — cf.
+ * src/components/routing/README.md pour l'historique de la décision.
  */
-describe('AppRouter — routing actuel inchangé (structure auth réservée à la Phase 1)', () => {
-  it('« / » affiche toujours la landing publique, sans en-tête authentifié', () => {
+describe('AppRouter — routing protégé', () => {
+  it('« / » affiche la landing publique, sans en-tête authentifié, quand non connecté·e', () => {
     renderAt('/')
 
     expect(screen.getByRole('heading', { level: 1, name: 'Tout orchestré. Enfin la paix.' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Aller à mon application' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: "Aller à mon application" })).not.toBeInTheDocument()
   })
 
-  it('une route de l’app reste accessible directement sans espace de travail onboardé — aucune redirection vers /onboarding n’a été introduite', () => {
+  it('« / » affiche l’en-tête authentifié quand connecté·e', () => {
+    mockAuth(true)
+    renderAt('/')
+
+    expect(screen.getByRole('button', { name: "Aller à mon application" })).toBeInTheDocument()
+  })
+
+  it('/aujourdhui sans compte renvoie vers la landing (pas de redirection en boucle, pas de fuite de contenu protégé)', () => {
     renderAt('/aujourdhui')
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Votre espace est prêt.' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { level: 1, name: 'Tout orchestré. Enfin la paix.' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Tout orchestré. Enfin la paix.' })).toBeInTheDocument()
+    expect(appLayoutNav()).not.toBeInTheDocument()
+  })
+
+  it('/aujourdhui avec compte mais sans espace onboardé renvoie vers /onboarding', () => {
+    mockAuth(true)
+    renderAt('/aujourdhui')
+
+    expect(screen.getByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
+    expect(appLayoutNav()).not.toBeInTheDocument()
+  })
+
+  it('/aujourdhui avec compte et espace onboardé affiche l’app (sidebar)', () => {
+    mockAuth(true)
+    useWorkspaceStore.getState().completeOnboarding()
+    renderAt('/aujourdhui')
+
+    expect(appLayoutNav()).toBeInTheDocument()
+  })
+
+  it('/onboarding sans compte renvoie vers la landing', () => {
+    renderAt('/onboarding')
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Tout orchestré. Enfin la paix.' })).toBeInTheDocument()
+  })
+
+  it('/onboarding avec compte (sans espace) reste accessible', () => {
+    mockAuth(true)
+    renderAt('/onboarding')
+
+    expect(screen.getByRole('heading', { name: /Combien de mariages gérez-vous/ })).toBeInTheDocument()
+  })
+
+  it('les pages légales restent publiques, sans compte', () => {
+    renderAt('/confidentialite')
+
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
 })

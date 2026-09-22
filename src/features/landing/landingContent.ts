@@ -52,7 +52,7 @@ export const SOLUTION_POINTS = [
   },
   {
     title: 'Tes données restent les tiennes',
-    text: 'Aujourd’hui, elles sont stockées dans ton navigateur, sans compte à créer, et tu peux tout exporter à tout moment.',
+    text: 'Aujourd’hui, elles sont stockées dans ton navigateur — seul ton compte (email, mot de passe) est géré ailleurs — et tu peux tout exporter à tout moment.',
   },
 ]
 
@@ -75,7 +75,7 @@ export const FAQ = [
   },
   {
     q: 'Où sont stockées mes données ?',
-    a: 'Aujourd’hui, dans ton navigateur, sur ton appareil : rien n’est envoyé sur un serveur. Tu peux tout exporter et importer en JSON depuis les Paramètres. Une sauvegarde en ligne est en préparation ; quand elle arrivera, tu en seras informée et l’export restera disponible.',
+    a: 'Tes mariages, tâches, prestataires et finances restent dans ton navigateur, sur ton appareil. Seuls ton email et ton mot de passe (pour te connecter) sont gérés par notre prestataire d’authentification. Tu peux tout exporter et importer en JSON depuis les Paramètres. Une sauvegarde en ligne de tes données est en préparation ; quand elle arrivera, tu en seras informée et l’export restera disponible.',
   },
   {
     q: 'Est-ce que ça marche sans internet ?',

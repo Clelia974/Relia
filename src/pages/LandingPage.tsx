@@ -25,8 +25,10 @@ import {
   TESTIMONIALS,
   TRIAL_DAYS,
 } from '@/features/landing/landingContent'
+import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
@@ -39,6 +41,7 @@ const euro = (n: number) => `${n} €`
 
 export function LandingPage() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)
   const [billing, setBilling] = useState<'month' | 'year'>('month')
 
@@ -52,12 +55,16 @@ export function LandingPage() {
   }, [])
 
   const onboarded = useWorkspaceStore((s) => s.workspace.userProfile.onboarded)
-  const ctaLabel = onboarded ? "Ouvrir l'application" : 'Commencer gratuitement'
-  const start = () => navigate(onboarded ? '/aujourdhui' : '/onboarding')
-  /** Proposée uniquement tant que l'espace n'a jamais été configuré : charger la démo n'écrase ainsi aucune donnée. */
+  /** Compte requis pour tout le reste de l'app (cf. ProtectedRoute sur AppLayout/onboarding) : la landing doit d'abord faire créer un compte avant de proposer onboarding/app. */
+  const ctaLabel = !isAuthenticated ? 'Commencer gratuitement' : onboarded ? "Ouvrir l'application" : 'Continuer'
+  const start = () => {
+    if (!isAuthenticated) navigate('/inscription')
+    else navigate(onboarded ? '/aujourdhui' : '/onboarding')
+  }
+  /** Proposée uniquement tant que l'espace n'a jamais été configuré : charger la démo n'écrase ainsi aucune donnée. Sans compte, la démo pré-remplit l'espace local puis renvoie vers l'inscription — elle sera là, déjà peuplée, une fois connecté·e. */
   const openDemo = () => {
     resetWorkspace('demo')
-    navigate('/aujourdhui')
+    navigate(isAuthenticated ? '/aujourdhui' : '/inscription')
   }
 
   return (
@@ -68,6 +75,8 @@ export function LandingPage() {
       >
         Aller au contenu
       </a>
+
+      <AuthenticatedHeader />
 
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
@@ -128,7 +137,7 @@ export function LandingPage() {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                Aucune inscription · Tes données restent dans ton navigateur · Démo avec des mariages fictifs
+                Compte gratuit en 1 minute · Tes données restent dans ton navigateur · Démo avec des mariages fictifs
               </p>
             </div>
 
@@ -410,7 +419,7 @@ export function LandingPage() {
               Prêt à respirer le Jour J ?
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-primary-foreground/85">
-              Commence avec ton prochain mariage. Aucune inscription, tes données restent chez toi.
+              Commence avec ton prochain mariage. Compte gratuit, tes données restent chez toi.
             </p>
             <Button
               size="lg"

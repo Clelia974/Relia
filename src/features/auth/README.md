@@ -20,10 +20,6 @@
   Vérifiées en direct contre le vrai projet Supabase (`getSession()` répond
   correctement depuis `/nouveau-mot-de-passe`).
 
-`ProtectedRoute` et `AuthenticatedHeader` restent **en réserve** (cf.
-[`src/components/routing/README.md`](../../components/routing/README.md)) —
-rien n'est branché, la landing et le routing actuel n'ont pas changé.
-
 - **Sprint 4** — SQL exécuté (`supabase/sql/001_create_users_table.sql`) :
   `public.users` existe, RLS + trigger `on_auth_user_created` en place.
   Côté app : `userProfile.ts` (lecture typée, snake_case → camelCase) +
@@ -39,12 +35,13 @@ rien n'est branché, la landing et le routing actuel n'ont pas changé.
   hook existe, prêt pour un futur bandeau d'essai, mais aucune maquette ne
   le demande pour l'instant.
 
-## Après Sprint 4 — câblage (non commencé)
+## Câblage — fait ✅
 
-Voir la checklist complète dans
-[`src/components/routing/README.md`](../../components/routing/README.md) :
-brancher `ProtectedRoute` sur les routes de l'app, monter
-`AuthenticatedHeader`, décider du nouveau parcours landing → inscription.
-Les tests qui décrivent le comportement actuel (`router.test.tsx`,
-`LandingPage.test.tsx`) seront mis à jour à ce moment-là — pas avant, pour
-garder la suite toujours verte entre-temps.
+`ProtectedRoute` et `AuthenticatedHeader` sont branchés — compte requis
+pour toute l'app au-delà de la landing/pages légales. Détails, conséquences
+sur la copie de la landing, et décision restée ouverte (`hasWorkspace`
+purement local) : voir
+[`src/components/routing/README.md`](../../components/routing/README.md).
+
+**Étape 1 (Auth) est maintenant complète** : Sprints 1 à 4 + câblage.
+Prochaine étape naturelle : Étape 2 (sauvegarde en ligne / multi-appareil).

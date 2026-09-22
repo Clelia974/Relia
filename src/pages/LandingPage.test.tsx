@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -8,7 +8,24 @@ import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
 afterEach(cleanup)
-beforeEach(() => useWorkspaceStore.setState({ workspace: createEmptyWorkspace() }))
+
+/** useAuth parle à Supabase (réseau) — mocké ici pour isoler la page, comme ProtectedRoute.test.tsx/AuthenticatedHeader.test.tsx. */
+const useAuthMock = vi.hoisted(() => vi.fn())
+vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
+
+function mockAuth(isAuthenticated: boolean) {
+  useAuthMock.mockReturnValue({
+    user: isAuthenticated ? { id: 'u1', email: 'sophie@example.com' } : null,
+    isLoading: false,
+    isAuthenticated,
+    logout: vi.fn(),
+  })
+}
+
+beforeEach(() => {
+  useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
+  mockAuth(false)
+})
 
 function Where() {
   return <p data-testid="where">{useLocation().pathname}</p>
@@ -33,13 +50,36 @@ describe('LandingPage', () => {
     expect(h1[0].textContent).toBe('Tout orchestré. Enfin la paix.')
   })
 
-  it("le bouton principal mène à l'onboarding", () => {
+  it("sans compte : le bouton principal mène à l'inscription", () => {
     setup()
     fireEvent.click(screen.getAllByRole('button', { name: /Commencer gratuitement/ })[0])
+    expect(screen.getByTestId('where').textContent).toBe('/inscription')
+  })
+
+  it("avec un compte mais sans espace onboardé : le bouton principal mène à l'onboarding", () => {
+    mockAuth(true)
+    setup()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Continuer' })[0])
     expect(screen.getByTestId('where').textContent).toBe('/onboarding')
   })
 
-  it('« Voir une démo » charge des mariages fictifs et ouvre le tableau de bord', () => {
+  it("avec un compte et un espace onboardé : le bouton principal ouvre l'application", () => {
+    mockAuth(true)
+    useWorkspaceStore.getState().completeOnboarding()
+    setup()
+    fireEvent.click(screen.getAllByRole('button', { name: "Ouvrir l'application" })[0])
+    expect(screen.getByTestId('where').textContent).toBe('/aujourdhui')
+  })
+
+  it('« Voir une démo » charge des mariages fictifs ; sans compte, renvoie vers l’inscription (les données seront déjà là une fois connecté·e)', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: 'Voir une démo' }))
+    expect(useWorkspaceStore.getState().workspace.weddings.length).toBeGreaterThan(0)
+    expect(screen.getByTestId('where').textContent).toBe('/inscription')
+  })
+
+  it('« Voir une démo » avec un compte : ouvre directement le tableau de bord', () => {
+    mockAuth(true)
     setup()
     fireEvent.click(screen.getByRole('button', { name: 'Voir une démo' }))
     expect(useWorkspaceStore.getState().workspace.weddings.length).toBeGreaterThan(0)
@@ -59,7 +99,7 @@ describe('LandingPage', () => {
     ])
   })
 
-  it('n’invente ni témoignage, ni chiffre d’audience, ni mode hors-ligne', () => {
+  it('n’invente ni témoignage, ni chiffre d’audience, ni mode hors-ligne, ni « aucune inscription »', () => {
     expect(TESTIMONIALS).toEqual([])
     setup()
     expect(screen.queryByRole('heading', { name: /Ce que disent/ })).toBeNull()
@@ -67,6 +107,7 @@ describe('LandingPage', () => {
     expect(text).not.toMatch(/500\+/)
     expect(text).not.toMatch(/100\s?%\s?offline|100\s?%\s?hors/i)
     expect(text).not.toMatch(/rappel/i)
+    expect(text).not.toMatch(/aucune inscription/i)
   })
 
   it('les tarifs suivent le choix mensuel / annuel, avec le bon calcul de l’économie', () => {
@@ -89,10 +130,17 @@ describe('LandingPage', () => {
     for (const item of FAQ) expect(screen.getByText(item.q)).toBeTruthy()
   })
 
-  it('n’affiche aucun en-tête authentifié (AuthenticatedHeader reste réservé à la Phase 1, non branché)', () => {
+  it('sans compte : pas d’en-tête authentifié', () => {
     setup()
-    expect(screen.queryByRole('button', { name: 'Aller à mon application' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: "Aller à mon application" })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Menu du compte' })).not.toBeInTheDocument()
+  })
+
+  it('avec un compte : l’en-tête authentifié apparaît (CTA + menu compte)', () => {
+    mockAuth(true)
+    setup()
+    expect(screen.getByRole('button', { name: "Aller à mon application" })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Menu du compte' })).toBeInTheDocument()
   })
 
   it('toutes les images ont un texte alternatif et des dimensions', () => {
