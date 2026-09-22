@@ -1,4 +1,4 @@
-import { CalendarDays, FileText, Heart, ListChecks, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
+import { CalendarDays, CreditCard, FileText, Heart, ListChecks, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { cn } from '@/lib/utils'
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/prestataires', label: 'Prestataires', icon: Users },
   { to: '/propositions', label: 'Propositions', icon: FileText },
   { to: '/finances', label: 'Finances', icon: Wallet },
+  { to: '/paiement', label: 'Abonnement', icon: CreditCard },
   { to: '/parametres', label: 'Paramètres', icon: Settings },
 ]
 

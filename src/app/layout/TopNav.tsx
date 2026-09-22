@@ -21,6 +21,7 @@ const plusNav = [
   { to: '/prestataires', label: 'Prestataires' },
   { to: '/propositions', label: 'Propositions' },
   { to: '/finances', label: 'Finances' },
+  { to: '/paiement', label: 'Abonnement' },
   { to: '/parametres', label: 'Paramètres' },
 ]
 
