@@ -108,3 +108,32 @@ Même limite de test locale que `checkout-session.ts` ci-dessus (`api/*.ts`
 ne tourne pas sous `npm run dev`) — testé via les tests unitaires
 (`api/stripe/portal-session.test.ts`, `useStripeCustomerPortal.test.ts`),
 à vérifier en conditions réelles une fois déployé.
+
+## Offre de lancement (100 premières clientes)
+
+1 mois offert puis tarif verrouillé, tant que le nombre de places prises
+affiché reste un vrai compteur — jamais un chiffre codé en dur, cohérent
+avec la règle "sans preuve sociale, sans chiffre inventé" du reste de la
+landing.
+
+| Fichier | Rôle |
+|---|---|
+| `api/launch-offer-count.ts` | Point d'accès public (aucune authentification — appelé depuis la landing, visitée sans compte) : compte `public.users` où `is_launch_offer = true`, renvoie `{ limit, redeemed, remaining, available }`. Jamais de ligne individuelle exposée. |
+| `useLaunchOfferAvailability.ts` | Hook client, utilisé par la landing et `/paiement`. `offer` reste `null` tant que l'appel n'a pas abouti (jamais de place affichée par défaut). |
+| `api/stripe/checkout-session.ts` | Pour le price de l'offre (`VITE_STRIPE_PRICE_LAUNCH_OFFER`) : recompte les places prises au moment de la création de la session (jamais seulement confiance dans l'affichage front, qui peut être vieux de quelques secondes — cache CDN de 30s sur le compteur), pose `subscription_data.trial_period_days = 30` (le vrai mois offert, pas juste une mention) et `metadata.offer = 'launch_100'`. |
+| `api/stripe/webhook.ts` | `checkout.session.completed` : si `metadata.offer === 'launch_100'`, pose `is_launch_offer = true` sur `public.users` — c'est ce champ, jamais le price Stripe courant, qui est compté. |
+| `supabase/sql/004_add_launch_offer.sql` | Colonne `is_launch_offer` sur `public.users`. |
+| `src/pages/PaymentPage.tsx` | Carte visible seulement si `status` ∈ {trial, grace, expired} (jamais déjà payé) **et** `offer.available`. |
+| `src/pages/LandingPage.tsx` | Bandeau au-dessus des tarifs, même condition côté affichage — mais le blocage réel est côté serveur, pas ici. |
+
+**Pourquoi un price Stripe séparé** (`VITE_STRIPE_PRICE_LAUNCH_OFFER`,
+distinct de `VITE_STRIPE_PRICE_SOLO_MONTHLY`) plutôt qu'une réduction sur
+le prix standard : si le tarif standard augmente un jour, les clientes de
+l'offre de lancement doivent rester au prix promis sans interruption ni
+resouscription. Un price dédié le garantit structurellement ; un simple
+coupon ou une réduction en pourcentage suivrait le prix standard au
+contraire.
+
+**Étape manuelle** (comme pour Checkout/Webhook ci-dessus) : créer ce
+price dans Stripe Dashboard, l'ajouter à `VITE_STRIPE_PRICE_LAUNCH_OFFER`
+(local + Vercel), et exécuter `004_add_launch_offer.sql`.

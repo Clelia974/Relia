@@ -104,8 +104,21 @@ describe('POST /api/stripe/webhook', () => {
 
     expect(res.statusCode).toBe(200)
     expect(fromMock).toHaveBeenCalledWith('users')
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123' })
+    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: false })
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
+  })
+
+  it("checkout.session.completed avec metadata.offer = launch_100 : marque is_launch_offer (compté par l'offre de lancement)", async () => {
+    constructEventMock.mockReturnValue({
+      type: 'checkout.session.completed',
+      data: { object: { client_reference_id: 'u1', customer: 'cus_123', metadata: { offer: 'launch_100' } } },
+    })
+    const res = mockRes()
+
+    await handler(mockReq('{}', 'sig_valide'), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: true })
   })
 
   it('customer.subscription.deleted : retrouve l’utilisateur via stripe_customer_id (pas client_reference_id, absent sur cet objet)', async () => {

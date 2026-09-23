@@ -9,9 +9,11 @@ afterEach(cleanup)
 const useSubscriptionCheckMock = vi.hoisted(() => vi.fn())
 const useStripeCheckoutMock = vi.hoisted(() => vi.fn())
 const useStripeCustomerPortalMock = vi.hoisted(() => vi.fn())
+const useLaunchOfferAvailabilityMock = vi.hoisted(() => vi.fn())
 vi.mock('@/features/payment/useSubscriptionCheck', () => ({ useSubscriptionCheck: useSubscriptionCheckMock }))
 vi.mock('@/features/payment/useStripeCheckout', () => ({ useStripeCheckout: useStripeCheckoutMock }))
 vi.mock('@/features/payment/useStripeCustomerPortal', () => ({ useStripeCustomerPortal: useStripeCustomerPortalMock }))
+vi.mock('@/features/payment/useLaunchOfferAvailability', () => ({ useLaunchOfferAvailability: useLaunchOfferAvailabilityMock }))
 
 const createCheckoutSessionMock = vi.fn()
 const openCustomerPortalMock = vi.fn()
@@ -21,6 +23,8 @@ beforeEach(() => {
   openCustomerPortalMock.mockReset()
   useStripeCheckoutMock.mockReturnValue({ createCheckoutSession: createCheckoutSessionMock, isLoading: false, error: null })
   useStripeCustomerPortalMock.mockReturnValue({ openCustomerPortal: openCustomerPortalMock, isLoading: false, error: null })
+  // Par défaut, offre indisponible — la plupart des tests ne concernent pas l'offre de lancement.
+  useLaunchOfferAvailabilityMock.mockReturnValue({ offer: null, isLoading: false })
 })
 
 function renderPage(initialPath = '/paiement') {
@@ -112,6 +116,47 @@ describe('PaymentPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Passer au Pro' }))
 
     expect(createCheckoutSessionMock).toHaveBeenCalledWith(import.meta.env.VITE_STRIPE_PRICE_SOLO_YEARLY)
+  })
+
+  it("offre de lancement disponible et jamais encore payé : affiche la carte avec le nombre réel de places restantes", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 63, remaining: 37, available: true }, isLoading: false })
+
+    renderPage()
+
+    expect(screen.getByText('Offre de lancement — 100 premières clientes')).toBeInTheDocument()
+    expect(screen.getByText(/37 places restantes/)).toBeInTheDocument()
+  })
+
+  it("offre de lancement épuisée (available: false) : pas de carte, même en cours d'essai", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
+
+    renderPage()
+
+    expect(screen.queryByRole('button', { name: "Profiter de l'offre de lancement" })).not.toBeInTheDocument()
+  })
+
+  it("abonnement déjà actif : pas de carte offre de lancement, réservée aux comptes qui n'ont jamais payé", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'active', hasAccess: true, daysLeftInTrial: null, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 10, remaining: 90, available: true }, isLoading: false })
+
+    renderPage()
+
+    expect(screen.queryByRole('button', { name: "Profiter de l'offre de lancement" })).not.toBeInTheDocument()
+  })
+
+  it("clic sur l'offre de lancement appelle createCheckoutSession avec le price dédié", () => {
+    // Stubbé explicitement (jamais dépendant de .env.local, absent en CI et pas encore renseigné tant que le prix Stripe de l'offre n'a pas été créé côté tableau de bord).
+    vi.stubEnv('VITE_STRIPE_PRICE_LAUNCH_OFFER', 'price_launch_test')
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: "Profiter de l'offre de lancement" }))
+
+    expect(createCheckoutSessionMock).toHaveBeenCalledWith('price_launch_test')
+    vi.unstubAllEnvs()
   })
 
   it('paramètre ?paiement=annule affiche une notification puis nettoie l’URL', () => {

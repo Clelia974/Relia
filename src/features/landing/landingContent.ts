@@ -14,6 +14,18 @@ export const PRICE_ANNUAL = 290
 export const ANNUAL_FREE_MONTHS = Math.round((PRICE_MONTHLY * 12 - PRICE_ANNUAL) / PRICE_MONTHLY)
 
 /**
+ * Offre de lancement (100 premières clientes) — 1 mois offert puis tarif
+ * verrouillé (`VITE_STRIPE_PRICE_LAUNCH_OFFER`, un price Stripe dédié :
+ * si PRICE_MONTHLY augmente plus tard, ces clientes ne sont pas
+ * affectées). Le nombre de places prises vient toujours de
+ * `api/launch-offer-count.ts` (compteur réel côté serveur) — cette
+ * constante n'est que la limite, jamais un nombre "restant" affiché tel
+ * quel.
+ */
+export const LAUNCH_OFFER_LIMIT = 100
+export const LAUNCH_OFFER_FREE_MONTHS = 1
+
+/**
  * Listes reprises telles quelles par la landing (Tarifs) et la page
  * Abonnement (/paiement) — une seule source pour rester cohérent entre
  * les deux. "Sauvegarde en ligne" n'a plus le "(bientôt)" : elle existe

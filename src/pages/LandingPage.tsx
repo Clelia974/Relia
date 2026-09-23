@@ -19,6 +19,8 @@ import {
   CONTACT_EMAIL,
   FAQ,
   GRATUIT_FEATURES,
+  LAUNCH_OFFER_FREE_MONTHS,
+  LAUNCH_OFFER_LIMIT,
   PAIN_POINTS,
   PRICE_ANNUAL,
   PRICE_MONTHLY,
@@ -31,6 +33,7 @@ import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { PlanFeature } from '@/features/landing/components/PlanFeature'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
+import { useLaunchOfferAvailability } from '@/features/payment/useLaunchOfferAvailability'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -47,6 +50,7 @@ export function LandingPage() {
   const { isAuthenticated } = useAuth()
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)
   const [billing, setBilling] = useState<'month' | 'year'>('month')
+  const { offer: launchOffer } = useLaunchOfferAvailability()
 
   useEffect(() => {
     const root = document.documentElement
@@ -319,6 +323,15 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <h2 id="tarifs-titre" className={H2}>Tarifs simples, pas de piège</h2>
+
+              {launchOffer?.available && (
+                <p className="mx-auto mt-4 w-fit rounded-full border border-primary/30 bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground">
+                  Offre de lancement : {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, tarif verrouillé —{' '}
+                  {launchOffer.remaining} place{launchOffer.remaining > 1 ? 's' : ''} restante{launchOffer.remaining > 1 ? 's' : ''} sur{' '}
+                  {LAUNCH_OFFER_LIMIT}
+                </p>
+              )}
+
               <div
                 role="group"
                 aria-label="Périodicité de facturation"

@@ -13,6 +13,10 @@ afterEach(cleanup)
 const useAuthMock = vi.hoisted(() => vi.fn())
 vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
 
+/** Même raison : évite un vrai fetch('/api/launch-offer-count') dans les tests, et permet de tester l'offre affichée/masquée de façon déterministe. */
+const useLaunchOfferAvailabilityMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/payment/useLaunchOfferAvailability', () => ({ useLaunchOfferAvailability: useLaunchOfferAvailabilityMock }))
+
 function mockAuth(isAuthenticated: boolean) {
   useAuthMock.mockReturnValue({
     user: isAuthenticated ? { id: 'u1', email: 'sophie@example.com' } : null,
@@ -25,6 +29,8 @@ function mockAuth(isAuthenticated: boolean) {
 beforeEach(() => {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
   mockAuth(false)
+  // Par défaut, offre indisponible — la plupart des tests ne concernent pas l'offre de lancement.
+  useLaunchOfferAvailabilityMock.mockReturnValue({ offer: null, isLoading: false })
 })
 
 function Where() {
@@ -150,5 +156,17 @@ describe('LandingPage', () => {
       expect(img.getAttribute('width')).toBeTruthy()
       expect(img.getAttribute('height')).toBeTruthy()
     }
+  })
+
+  it("offre de lancement disponible : affiche le nombre réel de places restantes, jamais un chiffre codé en dur", () => {
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 63, remaining: 37, available: true }, isLoading: false })
+    setup()
+    expect(screen.getByText(/37 places restantes sur 100/)).toBeInTheDocument()
+  })
+
+  it("offre de lancement épuisée ou pas encore chargée : aucune bannière (pas de fausse urgence par défaut)", () => {
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
+    setup()
+    expect(screen.queryByText(/offre de lancement/i)).not.toBeInTheDocument()
   })
 })

@@ -63,10 +63,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.client_reference_id
         const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
+        // Posé par checkout-session.ts uniquement pour le price de l'offre de lancement — c'est ce qui est compté par api/launch-offer-count.ts, jamais recalculé à partir du price Stripe courant (qui peut changer sans affecter les clientes déjà verrouillées).
+        const isLaunchOffer = session.metadata?.offer === 'launch_100'
         if (userId) {
           const { error } = await supabaseAdmin
             .from('users')
-            .update({ subscription_status: 'active', stripe_customer_id: customerId ?? null })
+            .update({ subscription_status: 'active', stripe_customer_id: customerId ?? null, is_launch_offer: isLaunchOffer })
             .eq('id', userId)
           if (error) throw error
         }

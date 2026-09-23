@@ -4,8 +4,18 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PlanFeature } from '@/features/landing/components/PlanFeature'
-import { ANNUAL_FREE_MONTHS, GRATUIT_FEATURES, PRICE_ANNUAL, PRICE_MONTHLY, PRO_FEATURES, TRIAL_DAYS } from '@/features/landing/landingContent'
+import {
+  ANNUAL_FREE_MONTHS,
+  GRATUIT_FEATURES,
+  LAUNCH_OFFER_FREE_MONTHS,
+  LAUNCH_OFFER_LIMIT,
+  PRICE_ANNUAL,
+  PRICE_MONTHLY,
+  PRO_FEATURES,
+  TRIAL_DAYS,
+} from '@/features/landing/landingContent'
 import { SubscriptionStatusBadge } from '@/features/payment/components/SubscriptionStatusBadge'
+import { useLaunchOfferAvailability } from '@/features/payment/useLaunchOfferAvailability'
 import { useStripeCheckout } from '@/features/payment/useStripeCheckout'
 import { useStripeCustomerPortal } from '@/features/payment/useStripeCustomerPortal'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
@@ -27,8 +37,12 @@ export function PaymentPage() {
   const { createCheckoutSession, isLoading: isCheckoutLoading, error: checkoutError } = useStripeCheckout()
   const { openCustomerPortal, isLoading: isPortalLoading, error: portalError } = useStripeCustomerPortal()
   const { weddingCount, limit: weddingLimit, limitReached: weddingLimitReached } = useWeddingLimit()
+  const { offer: launchOffer } = useLaunchOfferAvailability()
   const [billing, setBilling] = useState<'month' | 'year'>('month')
   const [searchParams, setSearchParams] = useSearchParams()
+
+  // Réservée aux comptes qui n'ont encore jamais payé — "100 premières clientes", pas une réduction de réabonnement.
+  const isEligibleForLaunchOffer = status === 'trial' || status === 'grace' || status === 'expired'
 
   useEffect(() => {
     const result = searchParams.get('paiement')
@@ -50,6 +64,15 @@ export function PaymentPage() {
       return
     }
     createCheckoutSession(priceId)
+  }
+
+  const launchOfferPriceId = import.meta.env.VITE_STRIPE_PRICE_LAUNCH_OFFER as string | undefined
+  const handleLaunchOffer = () => {
+    if (!launchOfferPriceId) {
+      toast.error("Configuration de paiement incomplète — contactez le support.")
+      return
+    }
+    createCheckoutSession(launchOfferPriceId)
   }
 
   return (
@@ -96,6 +119,28 @@ export function PaymentPage() {
               {!isPortalLoading && 'Gérer mon abonnement et mes factures'}
             </Button>
             {portalError && <p className="text-sm text-risk">{portalError}</p>}
+          </CardContent>
+        </Card>
+      )}
+
+      {isEligibleForLaunchOffer && launchOffer?.available && (
+        <Card className="border-2 border-primary">
+          <CardHeader>
+            <CardTitle>Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes</CardTitle>
+            <CardDescription>
+              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis {euro(PRICE_MONTHLY)}/mois verrouillé — même
+              si le tarif standard augmente plus tard, ce prix reste le vôtre tant que vous restez abonnée.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="text-sm text-muted-foreground">
+              {launchOffer.remaining} place{launchOffer.remaining > 1 ? 's' : ''} restante{launchOffer.remaining > 1 ? 's' : ''} sur{' '}
+              {LAUNCH_OFFER_LIMIT}.
+            </p>
+            <Button size="lg" className="w-fit" loading={isCheckoutLoading} onClick={handleLaunchOffer}>
+              {!isCheckoutLoading && "Profiter de l'offre de lancement"}
+            </Button>
+            {checkoutError && <p className="text-sm text-risk">{checkoutError}</p>}
           </CardContent>
         </Card>
       )}

@@ -1,16 +1,25 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { createSessionMock } = vi.hoisted(() => ({ createSessionMock: vi.fn() }))
+const { createSessionMock, headMock } = vi.hoisted(() => ({ createSessionMock: vi.fn(), headMock: vi.fn() }))
 vi.mock('stripe', () => ({
   default: class {
     checkout = { sessions: { create: createSessionMock } }
   },
 }))
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({ from: () => ({ select: () => ({ eq: () => headMock() }) }) }),
+}))
 
 process.env.STRIPE_SECRET_KEY = 'sk_test_fake'
+process.env.VITE_SUPABASE_URL = 'https://example.supabase.co'
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-fake'
 process.env.VITE_STRIPE_PRICE_SOLO_MONTHLY = 'price_month_123'
 process.env.VITE_STRIPE_PRICE_SOLO_YEARLY = 'price_year_456'
+process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER = 'price_launch_789'
+
+// Par défaut, "0 place prise" — la plupart des tests ne concernent pas l'offre de lancement.
+headMock.mockResolvedValue({ count: 0, error: null })
 
 const { default: handler } = await import('./checkout-session')
 
@@ -81,6 +90,54 @@ describe('POST /api/stripe/checkout-session', () => {
         line_items: [{ price: 'price_month_123', quantity: 1 }],
       }),
     )
+  })
+
+  it("crée la session de l'offre de lancement avec le mois offert (trial_period_days) et le tag de metadata, tant qu'il reste des places", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-launch' })
+    headMock.mockReset().mockResolvedValue({ count: 42, error: null })
+    const res = mockRes()
+
+    await handler(
+      { method: 'POST', body: { priceId: 'price_launch_789', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
+      res,
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(createSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        line_items: [{ price: 'price_launch_789', quantity: 1 }],
+        subscription_data: { trial_period_days: 30 },
+        metadata: { offer: 'launch_100' },
+      }),
+    )
+  })
+
+  it("refuse l'offre de lancement une fois les 100 places prises, sans jamais créer de session", async () => {
+    headMock.mockReset().mockResolvedValue({ count: 100, error: null })
+    const res = mockRes()
+
+    await handler(
+      { method: 'POST', body: { priceId: 'price_launch_789', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
+      res,
+    )
+
+    expect(res.statusCode).toBe(400)
+    expect(createSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("un priceId standard (mensuel/annuel) ne déclenche jamais le mois offert ni le comptage de l'offre de lancement", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-abc' })
+    headMock.mockReset()
+    const res = mockRes()
+
+    await handler(
+      { method: 'POST', body: { priceId: 'price_month_123', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
+      res,
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(headMock).not.toHaveBeenCalled()
+    expect(createSessionMock).toHaveBeenCalledWith(expect.not.objectContaining({ subscription_data: expect.anything() }))
   })
 
   it('renvoie 500 avec un message lisible si Stripe échoue', async () => {
