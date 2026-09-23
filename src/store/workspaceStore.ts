@@ -53,7 +53,7 @@ let pendingCorruptedRaw: string | null = null
 let pendingReadUnavailable = false
 
 type NewWeddingInput = Pick<Wedding, 'coupleName' | 'date' | 'venue' | 'soldAmount' | 'clientBudget' | 'status'> &
-  Partial<Pick<Wedding, 'notes' | 'vendorIds'>>
+  Partial<Pick<Wedding, 'notes' | 'vendorIds' | 'clientAddress' | 'clientPhone'>>
 
 /** Champs propres à UNE affectation mariage↔prestataire (jamais stockés sur Vendor). */
 export type VendorAssignmentPatch = Partial<
@@ -288,6 +288,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           archived: false,
           vendorIds: input.vendorIds ?? [],
           notes: input.notes,
+          clientAddress: input.clientAddress,
+          clientPhone: input.clientPhone,
           createdAt: timestamp,
           updatedAt: timestamp,
         }

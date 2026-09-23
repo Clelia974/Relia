@@ -6,6 +6,7 @@ import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
+import { LandingPageTest } from '@/pages/LandingPageTest'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
 import { RootGate } from '@/pages/RootGate'
@@ -86,6 +87,8 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<RootGate />} />
+      {/* Page de test isolée (audit gbcrea.com) — supprimable avec ce fichier + src/pages/LandingPageTest.tsx + src/features/landing/test/. */}
+      <Route path="/landing-test" element={<LandingPageTest />} />
       <Route
         path="/onboarding"
         element={

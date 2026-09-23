@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { ProposalTemplateForm } from '@/features/proposals/components/ProposalTemplateForm'
 import { useSyncToCloud } from '@/features/sync/useSyncToCloud'
+import { ImportWeddingsFromExcel } from '@/features/weddings/components/ImportWeddingsFromExcel'
 import { readFileAsDataUrl } from '@/lib/readFileAsDataUrl'
 import { VAT_STATUS_LABELS, VAT_STATUS_OPTIONS, vatApplies } from '@/lib/vatStatus'
 import { exportWorkspaceToFile, parseWorkspaceFile } from '@/lib/workspace/importExport'
@@ -448,6 +449,19 @@ export function ParametresPage() {
             <RotateCcw className="size-4" aria-hidden="true" />
             Réinitialiser mes données
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Importer tes mariages depuis Excel</CardTitle>
+          <CardDescription>
+            Tu as déjà tes mariages (et tes prestataires) dans un tableur ? Télécharge le modèle, remplis-le (ou copie
+            tes données dedans), puis importe-le. Tâches et matériel s'ajoutent ensuite mariage par mariage dans RELIA.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <ImportWeddingsFromExcel />
         </CardContent>
       </Card>
 

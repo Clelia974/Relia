@@ -41,6 +41,11 @@ describe('coordonnées du client sur les devis et les factures', () => {
     expect(state().workspace.weddings[0]).toMatchObject(contact)
   })
 
+  it('les coordonnées du client peuvent être renseignées dès la création du mariage', () => {
+    const id = state().createWedding({ coupleName: 'B', date: '2026-06-06T00:00:00.000Z', venue: '', soldAmount: 0, clientBudget: 0, status: 'prospect', ...contact })
+    expect(state().workspace.weddings.find((w) => w.id === id)).toMatchObject(contact)
+  })
+
   it('un devis enregistre les coordonnées reçues à la création', () => {
     const id = state().createProposal({ ...proposalInput(), ...contact })
     expect(state().workspace.proposals.find((p) => p.id === id)).toMatchObject(contact)
