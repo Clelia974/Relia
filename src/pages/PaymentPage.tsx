@@ -7,6 +7,7 @@ import { PlanFeature } from '@/features/landing/components/PlanFeature'
 import { ANNUAL_FREE_MONTHS, GRATUIT_FEATURES, PRICE_ANNUAL, PRICE_MONTHLY, PRO_FEATURES, TRIAL_DAYS } from '@/features/landing/landingContent'
 import { SubscriptionStatusBadge } from '@/features/payment/components/SubscriptionStatusBadge'
 import { useStripeCheckout } from '@/features/payment/useStripeCheckout'
+import { useStripeCustomerPortal } from '@/features/payment/useStripeCustomerPortal'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
 import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
 import { cn } from '@/lib/utils'
@@ -24,6 +25,7 @@ const STATUS_MESSAGE: Record<string, string> = {
 export function PaymentPage() {
   const { status, daysLeftInTrial, isLoading } = useSubscriptionCheck()
   const { createCheckoutSession, isLoading: isCheckoutLoading, error: checkoutError } = useStripeCheckout()
+  const { openCustomerPortal, isLoading: isPortalLoading, error: portalError } = useStripeCustomerPortal()
   const { weddingCount, limit: weddingLimit, limitReached: weddingLimitReached } = useWeddingLimit()
   const [billing, setBilling] = useState<'month' | 'year'>('month')
   const [searchParams, setSearchParams] = useSearchParams()
@@ -80,6 +82,23 @@ export function PaymentPage() {
           </CardContent>
         )}
       </Card>
+
+      {(status === 'active' || status === 'cancelled') && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Gérer mon abonnement</CardTitle>
+            <CardDescription>
+              Moyen de paiement, factures, ou annulation — tout se passe sur une page sécurisée gérée par Stripe.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            <Button variant="outline" className="w-fit" loading={isPortalLoading} onClick={openCustomerPortal}>
+              {!isPortalLoading && 'Gérer mon abonnement et mes factures'}
+            </Button>
+            {portalError && <p className="text-sm text-risk">{portalError}</p>}
+          </CardContent>
+        </Card>
+      )}
 
       {status !== 'active' && (
         <Card>

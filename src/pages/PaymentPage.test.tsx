@@ -8,14 +8,19 @@ afterEach(cleanup)
 
 const useSubscriptionCheckMock = vi.hoisted(() => vi.fn())
 const useStripeCheckoutMock = vi.hoisted(() => vi.fn())
+const useStripeCustomerPortalMock = vi.hoisted(() => vi.fn())
 vi.mock('@/features/payment/useSubscriptionCheck', () => ({ useSubscriptionCheck: useSubscriptionCheckMock }))
 vi.mock('@/features/payment/useStripeCheckout', () => ({ useStripeCheckout: useStripeCheckoutMock }))
+vi.mock('@/features/payment/useStripeCustomerPortal', () => ({ useStripeCustomerPortal: useStripeCustomerPortalMock }))
 
 const createCheckoutSessionMock = vi.fn()
+const openCustomerPortalMock = vi.fn()
 
 beforeEach(() => {
   createCheckoutSessionMock.mockReset()
+  openCustomerPortalMock.mockReset()
   useStripeCheckoutMock.mockReturnValue({ createCheckoutSession: createCheckoutSessionMock, isLoading: false, error: null })
+  useStripeCustomerPortalMock.mockReturnValue({ openCustomerPortal: openCustomerPortalMock, isLoading: false, error: null })
 })
 
 function renderPage(initialPath = '/paiement') {
@@ -52,6 +57,32 @@ describe('PaymentPage', () => {
     expect(screen.getByText('Pro actif')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Passer au Pro' })).not.toBeInTheDocument()
     expect(screen.queryByText('Comparer les offres')).not.toBeInTheDocument()
+  })
+
+  it('abonnement actif ou annulé : propose le portail Stripe (moyen de paiement, factures, annulation)', () => {
+    for (const status of ['active', 'cancelled'] as const) {
+      useSubscriptionCheckMock.mockReturnValue({ status, hasAccess: status === 'active', daysLeftInTrial: null, isLoading: false })
+      const { unmount } = renderPage()
+      expect(screen.getByRole('button', { name: 'Gérer mon abonnement et mes factures' })).toBeInTheDocument()
+      unmount()
+    }
+  })
+
+  it("en cours d'essai : pas de carte portail Stripe (aucun abonnement Stripe n'existe encore)", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 5, isLoading: false })
+
+    renderPage()
+
+    expect(screen.queryByRole('button', { name: 'Gérer mon abonnement et mes factures' })).not.toBeInTheDocument()
+  })
+
+  it('clic sur "Gérer mon abonnement" ouvre le portail Stripe', () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'active', hasAccess: true, daysLeftInTrial: null, isLoading: false })
+
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: 'Gérer mon abonnement et mes factures' }))
+
+    expect(openCustomerPortalMock).toHaveBeenCalled()
   })
 
   it('non-Pro : affiche le tableau comparatif Gratuit / Pro (même contenu que la landing)', () => {

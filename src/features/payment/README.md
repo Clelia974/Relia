@@ -80,3 +80,31 @@ créé, donc aucun impact possible sur la Vue Jour J.
 tournent que sur Vercel (déployé, ou via `vercel dev` si besoin de tester
 en local). Le bouton "Passer au Pro" appellera `/api/stripe/checkout-session`
 qui n'existe pas en `npm run dev` local ; à tester une fois déployé.
+
+## Portail client Stripe (gestion de l'abonnement)
+
+Manquait jusqu'ici : une cliente abonnée ne pouvait ni changer sa carte,
+ni télécharger une facture, ni résilier elle-même — tout serait passé par
+un email au support. Le portail de facturation Stripe (page hébergée par
+Stripe, pas de formulaire construit ici) couvre les trois.
+
+| Fichier | Rôle |
+|---|---|
+| `api/stripe/portal-session.ts` | Fonction serveur — crée la session de portail pour le `stripe_customer_id` du compte authentifié. |
+| `useStripeCustomerPortal.ts` | Hook, même principe que `useStripeCheckout.ts` (redirection, pas d'iframe). |
+| `src/pages/PaymentPage.tsx` | Carte « Gérer mon abonnement », visible seulement si `status` est `active` ou `cancelled` — avant ça, aucun `stripe_customer_id` n'existe encore. |
+
+**Vérification d'identité côté serveur, jamais côté client** : contrairement
+à `checkout-session.ts` (qui accepte un `userId` envoyé par le client,
+suffisant pour *démarrer* un abonnement au nom de l'email fourni),
+`portal-session.ts` vérifie le jeton d'accès Supabase envoyé en en-tête
+`Authorization` et en déduit lui-même l'utilisateur. Nécessaire ici parce
+que ce portail donne accès à des moyens de paiement et un historique de
+facturation déjà existants — accepter un `userId` du corps de la requête
+aurait permis à n'importe qui d'ouvrir le portail de facturation de
+n'importe quel autre compte en changeant cette seule valeur.
+
+Même limite de test locale que `checkout-session.ts` ci-dessus (`api/*.ts`
+ne tourne pas sous `npm run dev`) — testé via les tests unitaires
+(`api/stripe/portal-session.test.ts`, `useStripeCustomerPortal.test.ts`),
+à vérifier en conditions réelles une fois déployé.
