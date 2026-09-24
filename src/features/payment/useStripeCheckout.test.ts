@@ -2,18 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import { useStripeCheckout } from '@/features/payment/useStripeCheckout'
 
-const useAuthMock = vi.hoisted(() => vi.fn())
-vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
+const getSessionMock = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/supabase', () => ({ supabase: { auth: { getSession: getSessionMock } } }))
 
 const originalLocation = window.location
 
 beforeEach(() => {
-  useAuthMock.mockReturnValue({
-    user: { id: 'u1', email: 'sophie@example.com' },
-    isLoading: false,
-    isAuthenticated: true,
-    logout: vi.fn(),
-  })
+  getSessionMock.mockResolvedValue({ data: { session: { access_token: 'token-abc' } } })
   // window.location.href = ... n'est pas navigable dans jsdom sans stub — on remplace l'objet entier.
   Object.defineProperty(window, 'location', { value: { ...originalLocation, href: '' }, writable: true })
 })
@@ -24,7 +19,7 @@ afterEach(() => {
 })
 
 describe('useStripeCheckout', () => {
-  it('crée la session côté serveur puis redirige vers Stripe', async () => {
+  it('envoie le jeton de session courant (jamais un userId/userEmail affirmé par le client) puis redirige vers Stripe', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ url: 'https://checkout.stripe.com/session-123' }),
@@ -39,7 +34,8 @@ describe('useStripeCheckout', () => {
       '/api/stripe/checkout-session',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ priceId: 'price_test_123', userId: 'u1', userEmail: 'sophie@example.com' }),
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer token-abc' },
+        body: JSON.stringify({ priceId: 'price_test_123' }),
       }),
     )
     expect(window.location.href).toBe('https://checkout.stripe.com/session-123')
@@ -60,8 +56,8 @@ describe('useStripeCheckout', () => {
     expect(window.location.href).toBe('')
   })
 
-  it('refuse sans compte connecté', async () => {
-    useAuthMock.mockReturnValue({ user: null, isLoading: false, isAuthenticated: false, logout: vi.fn() })
+  it('refuse sans session active, sans appeler le serveur', async () => {
+    getSessionMock.mockResolvedValue({ data: { session: null } })
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
 

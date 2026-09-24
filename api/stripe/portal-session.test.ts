@@ -91,7 +91,7 @@ describe('POST /api/stripe/portal-session', () => {
     )
   })
 
-  it('renvoie 500 avec un message lisible si Stripe échoue', async () => {
+  it('renvoie 500 avec un message générique (jamais le détail interne) si Stripe échoue', async () => {
     getUserMock.mockReset().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
     singleMock.mockReset().mockResolvedValue({ data: { stripe_customer_id: 'cus_abc123' }, error: null })
     createPortalSessionMock.mockReset().mockImplementation(async () => {
@@ -102,6 +102,6 @@ describe('POST /api/stripe/portal-session', () => {
     await handler(mockReq({ headers: { authorization: 'Bearer bon-jeton' } }), res)
 
     expect(res.statusCode).toBe(500)
-    expect(res.body).toEqual({ error: 'Stripe indisponible' })
+    expect(res.body).toEqual({ error: 'Erreur interne.' })
   })
 })

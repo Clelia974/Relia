@@ -58,13 +58,13 @@ describe('GET /api/launch-offer-count', () => {
     expect(res.body).toEqual({ limit: 100, redeemed: 130, remaining: 0, available: false })
   })
 
-  it('renvoie 500 avec un message lisible si Supabase échoue', async () => {
+  it('renvoie 500 avec un message générique (jamais le détail interne) si Supabase échoue', async () => {
     maybeSingleMock.mockReset().mockResolvedValue({ data: null, error: { message: 'Supabase indisponible' } })
     const res = mockRes()
 
     await handler({ method: 'GET' } as VercelRequest, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res.body).toEqual({ error: 'Supabase indisponible' })
+    expect(res.body).toEqual({ error: 'Erreur interne.' })
   })
 })

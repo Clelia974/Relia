@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { requireEnv } from '../_lib/requireEnv.js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
+const stripe = new Stripe(requireEnv('STRIPE_SECRET_KEY'))
 
 /**
  * Client admin (clé service_role) — contourne RLS, jamais utilisé
@@ -10,7 +11,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
  * SUPABASE_SERVICE_ROLE_KEY par VITE_ : ça la ferait embarquer dans le
  * bundle client.
  */
-const supabaseAdmin = createClient(process.env.VITE_SUPABASE_URL ?? '', process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
+const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
+const webhookSecret = requireEnv('STRIPE_WEBHOOK_SECRET')
 
 // Désactive le parsing JSON par défaut : constructEvent exige le corps brut, non ré-encodé, pour vérifier la signature.
 export const config = { api: { bodyParser: false } }
@@ -41,7 +43,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const signature = req.headers['stripe-signature']
-  const secret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
   if (!signature || typeof signature !== 'string') {
     res.status(400).json({ error: 'Signature Stripe manquante.' })
     return
@@ -50,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let event: Stripe.Event
   try {
     const rawBody = await readRawBody(req)
-    event = stripe.webhooks.constructEvent(rawBody, signature, secret)
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   } catch (err) {
     console.error('Signature webhook Stripe invalide :', err)
     res.status(400).json({ error: 'Signature invalide.' })

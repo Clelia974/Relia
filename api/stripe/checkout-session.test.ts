@@ -1,14 +1,21 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { createSessionMock, maybeSingleMock } = vi.hoisted(() => ({ createSessionMock: vi.fn(), maybeSingleMock: vi.fn() }))
+const { createSessionMock, maybeSingleMock, getUserMock } = vi.hoisted(() => ({
+  createSessionMock: vi.fn(),
+  maybeSingleMock: vi.fn(),
+  getUserMock: vi.fn(),
+}))
 vi.mock('stripe', () => ({
   default: class {
     checkout = { sessions: { create: createSessionMock } }
   },
 }))
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }) }),
+  createClient: () => ({
+    auth: { getUser: getUserMock },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }),
+  }),
 }))
 
 process.env.STRIPE_SECRET_KEY = 'sk_test_fake'
@@ -21,6 +28,8 @@ process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL = 'price_launch_annual_987'
 
 // Par défaut, "0 place prise" — la plupart des tests ne concernent pas l'offre de lancement.
 maybeSingleMock.mockResolvedValue({ data: { redeemed_count: 0 }, error: null })
+// Par défaut, jeton valide pour "sophie@example.com" (u1) — les tests qui veulent un jeton invalide le remplacent explicitement.
+getUserMock.mockResolvedValue({ data: { user: { id: 'u1', email: 'sophie@example.com' } }, error: null })
 
 const { default: handler } = await import('./checkout-session.js')
 
@@ -37,6 +46,10 @@ function mockRes() {
   return res
 }
 
+function mockReq(overrides: Partial<VercelRequest> = {}): VercelRequest {
+  return { method: 'POST', headers: { authorization: 'Bearer bon-jeton' }, ...overrides } as VercelRequest
+}
+
 /**
  * Pas de beforeEach ici (délibérément) : un beforeEach dans ce fichier
  * précis fait déclencher à Vitest un faux "unhandled rejection" sur le
@@ -50,17 +63,35 @@ describe('POST /api/stripe/checkout-session', () => {
   it('refuse les méthodes autres que POST', async () => {
     createSessionMock.mockReset()
     const res = mockRes()
-    await handler({ method: 'GET' } as VercelRequest, res)
+    await handler(mockReq({ method: 'GET' }), res)
     expect(res.statusCode).toBe(405)
+  })
+
+  it("refuse une requête sans jeton d'accès", async () => {
+    createSessionMock.mockReset()
+    const res = mockRes()
+    await handler(mockReq({ headers: {} }), res)
+    expect(res.statusCode).toBe(401)
+    expect(createSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("refuse un jeton d'accès invalide, sans jamais faire confiance à un userId/userEmail fourni par le client", async () => {
+    createSessionMock.mockReset()
+    getUserMock.mockReset().mockResolvedValue({ data: { user: null }, error: new Error('invalid token') })
+    const res = mockRes()
+    await handler(
+      mockReq({ headers: { authorization: 'Bearer faux-jeton' }, body: { priceId: 'price_month_123' } }),
+      res,
+    )
+    expect(res.statusCode).toBe(401)
+    expect(createSessionMock).not.toHaveBeenCalled()
+    getUserMock.mockReset().mockResolvedValue({ data: { user: { id: 'u1', email: 'sophie@example.com' } }, error: null })
   })
 
   it('refuse un priceId hors liste blanche (jamais confiance dans le client)', async () => {
     createSessionMock.mockReset()
     const res = mockRes()
-    await handler(
-      { method: 'POST', body: { priceId: 'price_arbitraire', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_arbitraire' } }), res)
     expect(res.statusCode).toBe(400)
     expect(createSessionMock).not.toHaveBeenCalled()
   })
@@ -68,18 +99,15 @@ describe('POST /api/stripe/checkout-session', () => {
   it('refuse des champs manquants', async () => {
     createSessionMock.mockReset()
     const res = mockRes()
-    await handler({ method: 'POST', body: { priceId: 'price_month_123' } } as VercelRequest, res)
+    await handler(mockReq({ body: {} }), res)
     expect(res.statusCode).toBe(400)
   })
 
-  it('crée la session et renvoie son URL pour un priceId valide', async () => {
+  it("crée la session pour l'utilisateur authentifié (identité tirée du jeton, pas du corps de la requête) et renvoie son URL", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-abc' })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_month_123', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
 
     expect(res.statusCode).toBe(200)
     expect(res.body).toEqual({ url: 'https://checkout.stripe.com/session-abc' })
@@ -98,10 +126,7 @@ describe('POST /api/stripe/checkout-session', () => {
     maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 42 }, error: null })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_launch_789', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_launch_789' } }), res)
 
     expect(res.statusCode).toBe(200)
     expect(createSessionMock).toHaveBeenCalledWith(
@@ -118,10 +143,7 @@ describe('POST /api/stripe/checkout-session', () => {
     maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 10 }, error: null })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_launch_annual_987', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_launch_annual_987' } }), res)
 
     expect(res.statusCode).toBe(200)
     expect(createSessionMock).toHaveBeenCalledWith(
@@ -137,10 +159,7 @@ describe('POST /api/stripe/checkout-session', () => {
     maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 100 }, error: null })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_launch_annual_987', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_launch_annual_987' } }), res)
 
     expect(res.statusCode).toBe(400)
     expect(createSessionMock).not.toHaveBeenCalled()
@@ -150,10 +169,7 @@ describe('POST /api/stripe/checkout-session', () => {
     maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 100 }, error: null })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_launch_789', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_launch_789' } }), res)
 
     expect(res.statusCode).toBe(400)
     expect(createSessionMock).not.toHaveBeenCalled()
@@ -164,28 +180,22 @@ describe('POST /api/stripe/checkout-session', () => {
     maybeSingleMock.mockReset()
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_month_123', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
 
     expect(res.statusCode).toBe(200)
     expect(maybeSingleMock).not.toHaveBeenCalled()
     expect(createSessionMock).toHaveBeenCalledWith(expect.not.objectContaining({ subscription_data: expect.anything() }))
   })
 
-  it('renvoie 500 avec un message lisible si Stripe échoue', async () => {
+  it('renvoie 500 avec un message générique (jamais le détail interne) si Stripe échoue', async () => {
     createSessionMock.mockReset().mockImplementation(async () => {
       throw new Error('Stripe indisponible')
     })
     const res = mockRes()
 
-    await handler(
-      { method: 'POST', body: { priceId: 'price_month_123', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
-      res,
-    )
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
 
     expect(res.statusCode).toBe(500)
-    expect(res.body).toEqual({ error: 'Stripe indisponible' })
+    expect(res.body).toEqual({ error: 'Erreur interne.' })
   })
 })

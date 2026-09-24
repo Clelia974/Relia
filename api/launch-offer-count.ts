@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
+import { requireEnv } from './_lib/requireEnv.js'
 
-const supabaseAdmin = createClient(process.env.VITE_SUPABASE_URL ?? '', process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
+const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
 
 const LAUNCH_OFFER_LIMIT = 100
 
@@ -25,7 +26,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data, error } = await supabaseAdmin.from('launch_offer_counter').select('redeemed_count').eq('id', 1).maybeSingle()
 
   if (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Erreur lecture du compteur offre de lancement :', error.message)
+    res.status(500).json({ error: 'Erreur interne.' })
     return
   }
 

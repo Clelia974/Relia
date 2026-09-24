@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { requireEnv } from '../_lib/requireEnv.js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
+const stripe = new Stripe(requireEnv('STRIPE_SECRET_KEY'))
 
 /**
  * Client admin (clé service_role) — même convention que webhook.ts :
@@ -10,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
  * deux choses : vérifier le jeton d'accès envoyé par le client
  * (`auth.getUser`) et lire `stripe_customer_id` sur `public.users`.
  */
-const supabaseAdmin = createClient(process.env.VITE_SUPABASE_URL ?? '', process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
+const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
 
 /**
  * Retrouve l'utilisateur Supabase à partir du jeton d'accès envoyé par le
@@ -48,7 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .eq('id', userId)
     .maybeSingle()
   if (profileError) {
-    res.status(500).json({ error: profileError.message })
+    console.error('Erreur lecture du profil Supabase :', profileError.message)
+    res.status(500).json({ error: 'Erreur interne.' })
     return
   }
   if (!profile?.stripe_customer_id) {
@@ -67,6 +69,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur Stripe inconnue.'
     console.error('Erreur création session du portail Stripe :', message)
-    res.status(500).json({ error: message })
+    res.status(500).json({ error: 'Erreur interne.' })
   }
 }

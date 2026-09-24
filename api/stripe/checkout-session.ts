@@ -1,9 +1,28 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { requireEnv } from '../_lib/requireEnv.js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
-const supabaseAdmin = createClient(process.env.VITE_SUPABASE_URL ?? '', process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
+const stripe = new Stripe(requireEnv('STRIPE_SECRET_KEY'))
+const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
+
+/**
+ * Retrouve l'utilisatrice à partir du jeton d'accès envoyé par le client
+ * (en-tête Authorization), jamais d'un userId/userEmail fourni dans le
+ * corps de la requête : la session Stripe créée ici détermine QUEL compte
+ * Supabase sera marqué "actif" par le webhook (client_reference_id) —
+ * accepter ces champs tels quels permettrait à n'importe qui d'activer
+ * l'abonnement d'un tiers en payant avec sa propre carte. Même garde-fou
+ * que api/stripe/portal-session.ts.
+ */
+async function getVerifiedUser(req: VercelRequest): Promise<{ id: string; email: string } | null> {
+  const header = req.headers.authorization
+  if (!header?.startsWith('Bearer ')) return null
+  const token = header.slice('Bearer '.length)
+  const { data, error } = await supabaseAdmin.auth.getUser(token)
+  if (error || !data.user?.email) return null
+  return { id: data.user.id, email: data.user.email }
+}
 
 /** Deux prices dédiés (mensuel + annuel) — même prix Stripe verrouillé quelle que soit la périodicité choisie par la cliente. */
 const LAUNCH_OFFER_PRICE_IDS = new Set(
@@ -33,9 +52,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return
   }
 
-  const { priceId, userId, userEmail } = (req.body ?? {}) as { priceId?: string; userId?: string; userEmail?: string }
-  if (!priceId || !userId || !userEmail) {
-    res.status(400).json({ error: 'Champs requis manquants (priceId, userId, userEmail).' })
+  const user = await getVerifiedUser(req)
+  if (!user) {
+    res.status(401).json({ error: 'Session invalide ou expirée — reconnectez-vous.' })
+    return
+  }
+
+  const { priceId } = (req.body ?? {}) as { priceId?: string }
+  if (!priceId) {
+    res.status(400).json({ error: 'Champ requis manquant (priceId).' })
     return
   }
   if (!ALLOWED_PRICE_IDS.has(priceId)) {
@@ -56,7 +81,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('id', 1)
       .maybeSingle()
     if (counterError) {
-      res.status(500).json({ error: counterError.message })
+      console.error('Erreur lecture du compteur offre de lancement :', counterError.message)
+      res.status(500).json({ error: 'Erreur interne.' })
       return
     }
     if ((counter?.redeemed_count ?? 0) >= LAUNCH_OFFER_LIMIT) {
@@ -70,9 +96,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      customer_email: userEmail,
+      customer_email: user.email,
       // Seul champ qui relie la session à notre utilisateur Supabase — lu dans le webhook checkout.session.completed.
-      client_reference_id: userId,
+      client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/paiement?paiement=succes`,
       cancel_url: `${siteUrl}/paiement?paiement=annule`,
@@ -92,6 +118,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur Stripe inconnue.'
     console.error('Erreur création session de paiement Stripe :', message)
-    res.status(500).json({ error: message })
+    res.status(500).json({ error: 'Erreur interne.' })
   }
 }
