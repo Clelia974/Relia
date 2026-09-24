@@ -126,9 +126,9 @@ export const FAQ = [
 
 /** Identité de l'éditeur — à compléter avant l'ouverture au public : ces valeurs alimentent les pages légales. */
 export const LEGAL = {
-  name: '[NOM OU RAISON SOCIALE — À COMPLÉTER]',
-  country: '[PAYS — À COMPLÉTER]',
-  address: '[ADRESSE — À COMPLÉTER]',
-  siteUrl: '[URL DU SITE — À COMPLÉTER]',
+  name: 'EI Clélia Blard — Evenements Clés',
+  country: 'France',
+  address: '15 Impasse François Saint-Amand, 97430, La Réunion',
+  siteUrl: 'https://relia-app.vercel.app',
   updatedOn: '20 septembre 2026',
 } as const
