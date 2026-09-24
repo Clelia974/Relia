@@ -145,7 +145,7 @@ export function PaymentPage() {
               {(
                 [
                   ['month', 'Mensuel'],
-                  ['year', `Annuel · ${LAUNCH_OFFER_ANNUAL_FREE_MONTHS} mois offerts`],
+                  ['year', 'Annuel'],
                 ] as const
               ).map(([value, label]) => (
                 <button
@@ -167,6 +167,16 @@ export function PaymentPage() {
               {billing === 'month' ? euro(LAUNCH_OFFER_PRICE_MONTHLY) : euro(LAUNCH_OFFER_PRICE_ANNUAL)}
               <span className="text-base font-normal text-muted-foreground">{billing === 'month' ? ' / mois' : ' / an'}</span>
             </p>
+
+            {/* Les deux avantages sont volontairement distingués : le mois offert (propre à cette offre) et la remise
+                annuelle (identique pour toutes les clientes, offre ou pas) — jamais additionnés en "3 mois offerts",
+                ce qui laisserait croire que la remise annuelle est un bonus réservé aux 100 premières. */}
+            {billing === 'year' && (
+              <p className="text-sm text-muted-foreground">
+                {euro(LAUNCH_OFFER_PRICE_ANNUAL)}/an au lieu de {euro(LAUNCH_OFFER_PRICE_MONTHLY * 12)}/an : la remise annuelle habituelle
+                ({LAUNCH_OFFER_ANNUAL_FREE_MONTHS} mois) s'ajoute au mois offert de l'offre de lancement, mais n'en fait pas partie.
+              </p>
+            )}
 
             <p className="text-sm text-muted-foreground">
               {launchOffer.remaining} place{launchOffer.remaining > 1 ? 's' : ''} restante{launchOffer.remaining > 1 ? 's' : ''} sur{' '}

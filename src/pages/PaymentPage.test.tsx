@@ -170,6 +170,18 @@ describe('PaymentPage', () => {
     expect(screen.getByText('29 €')).toBeInTheDocument()
   })
 
+  it('offre de lancement en annuel : distingue le mois offert de la remise annuelle, ne dit jamais "3 mois offerts"', () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })
+
+    renderPage()
+    const launchGroup = screen.getByRole('group', { name: /offre de lancement/i })
+    fireEvent.click(within(launchGroup).getByRole('button', { name: 'Annuel' }))
+
+    expect(screen.getByText(/290 €\/an au lieu de 348 €\/an/)).toBeInTheDocument()
+    expect(screen.queryByText(/3 mois offerts/i)).not.toBeInTheDocument()
+  })
+
   it("offre de lancement : bascule Annuel puis clic appelle createCheckoutSession avec le price annuel dédié de l'offre", () => {
     vi.stubEnv('VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL', 'price_launch_annual_test')
     useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
