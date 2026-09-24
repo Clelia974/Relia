@@ -5,7 +5,12 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
 const supabaseAdmin = createClient(process.env.VITE_SUPABASE_URL ?? '', process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
 
-const LAUNCH_OFFER_PRICE_ID = process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER
+/** Deux prices dédiés (mensuel + annuel) — même prix Stripe verrouillé quelle que soit la périodicité choisie par la cliente. */
+const LAUNCH_OFFER_PRICE_IDS = new Set(
+  [process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER, process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL].filter(
+    (id): id is string => Boolean(id),
+  ),
+)
 const LAUNCH_OFFER_LIMIT = 100
 /** Identifie une session créée pour l'offre de lancement — lu par le webhook pour ne compter que ces abonnements-là dans is_launch_offer. */
 const LAUNCH_OFFER_METADATA = { offer: 'launch_100' }
@@ -17,7 +22,7 @@ const LAUNCH_OFFER_METADATA = { offer: 'launch_100' }
  * paiement pour un prix arbitraire.
  */
 const ALLOWED_PRICE_IDS = new Set(
-  [process.env.VITE_STRIPE_PRICE_SOLO_MONTHLY, process.env.VITE_STRIPE_PRICE_SOLO_YEARLY, LAUNCH_OFFER_PRICE_ID].filter(
+  [process.env.VITE_STRIPE_PRICE_SOLO_MONTHLY, process.env.VITE_STRIPE_PRICE_SOLO_YEARLY, ...LAUNCH_OFFER_PRICE_IDS].filter(
     (id): id is string => Boolean(id),
   ),
 )
@@ -38,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return
   }
 
-  const isLaunchOffer = Boolean(LAUNCH_OFFER_PRICE_ID) && priceId === LAUNCH_OFFER_PRICE_ID
+  const isLaunchOffer = LAUNCH_OFFER_PRICE_IDS.has(priceId)
   if (isLaunchOffer) {
     // Re-vérifié ici, jamais laissé à la seule discrétion de l'affichage front : la landing peut afficher un
     // nombre de places vieux de quelques secondes (cache CDN), donc le blocage réel doit être posé au moment

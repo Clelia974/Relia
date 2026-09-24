@@ -120,20 +120,30 @@ landing.
 |---|---|
 | `api/launch-offer-count.ts` | Point d'accès public (aucune authentification — appelé depuis la landing, visitée sans compte) : compte `public.users` où `is_launch_offer = true`, renvoie `{ limit, redeemed, remaining, available }`. Jamais de ligne individuelle exposée. |
 | `useLaunchOfferAvailability.ts` | Hook client, utilisé par la landing et `/paiement`. `offer` reste `null` tant que l'appel n'a pas abouti (jamais de place affichée par défaut). |
-| `api/stripe/checkout-session.ts` | Pour le price de l'offre (`VITE_STRIPE_PRICE_LAUNCH_OFFER`) : recompte les places prises au moment de la création de la session (jamais seulement confiance dans l'affichage front, qui peut être vieux de quelques secondes — cache CDN de 30s sur le compteur), pose `subscription_data.trial_period_days = 30` (le vrai mois offert, pas juste une mention) et `metadata.offer = 'launch_100'`. |
+| `api/stripe/checkout-session.ts` | Pour les prices de l'offre (`VITE_STRIPE_PRICE_LAUNCH_OFFER` mensuel, `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL` annuel) : recompte les places prises au moment de la création de la session (jamais seulement confiance dans l'affichage front, qui peut être vieux de quelques secondes — cache CDN de 30s sur le compteur), pose `subscription_data.trial_period_days = 30` (le vrai mois offert, pas juste une mention) et `metadata.offer = 'launch_100'`. Les deux prices partagent le même compteur/la même limite de 100. |
 | `api/stripe/webhook.ts` | `checkout.session.completed` : si `metadata.offer === 'launch_100'`, pose `is_launch_offer = true` sur `public.users` — c'est ce champ, jamais le price Stripe courant, qui est compté. |
 | `supabase/sql/004_add_launch_offer.sql` | Colonne `is_launch_offer` sur `public.users`. |
-| `src/pages/PaymentPage.tsx` | Carte visible seulement si `status` ∈ {trial, grace, expired} (jamais déjà payé) **et** `offer.available`. |
+| `src/pages/PaymentPage.tsx` | Carte visible seulement si `status` ∈ {trial, grace, expired} (jamais déjà payé) **et** `offer.available` ; a son propre bascule Mensuel/Annuel, sur le même state `billing` que la carte "Passer au Pro". |
 | `src/pages/LandingPage.tsx` | Bandeau au-dessus des tarifs, même condition côté affichage — mais le blocage réel est côté serveur, pas ici. |
 
-**Pourquoi un price Stripe séparé** (`VITE_STRIPE_PRICE_LAUNCH_OFFER`,
-distinct de `VITE_STRIPE_PRICE_SOLO_MONTHLY`) plutôt qu'une réduction sur
-le prix standard : si le tarif standard augmente un jour, les clientes de
-l'offre de lancement doivent rester au prix promis sans interruption ni
-resouscription. Un price dédié le garantit structurellement ; un simple
-coupon ou une réduction en pourcentage suivrait le prix standard au
-contraire.
+**Pourquoi des prices Stripe séparés** (`VITE_STRIPE_PRICE_LAUNCH_OFFER(_ANNUAL)`,
+distincts de `VITE_STRIPE_PRICE_SOLO_MONTHLY`/`_YEARLY`) plutôt qu'une
+réduction sur le prix standard : si le tarif standard augmente un jour,
+les clientes de l'offre de lancement doivent rester au prix promis sans
+interruption ni resouscription. Des prices dédiés le garantissent
+structurellement ; un simple coupon ou une réduction en pourcentage
+suivrait le prix standard au contraire.
 
-**Étape manuelle** (comme pour Checkout/Webhook ci-dessus) : créer ce
-price dans Stripe Dashboard, l'ajouter à `VITE_STRIPE_PRICE_LAUNCH_OFFER`
-(local + Vercel), et exécuter `004_add_launch_offer.sql`.
+**Prix verrouillé par l'offre : l'ancien tarif, pas le nouveau.**
+`LAUNCH_OFFER_PRICE_MONTHLY`/`LAUNCH_OFFER_PRICE_ANNUAL` (29 €/290 €,
+`landingContent.ts`) sont volontairement distincts de `PRICE_MONTHLY`/
+`PRICE_ANNUAL` (passés à 39 €/390 € le 2026-09-24) : l'offre a du sens
+seulement si elle protège d'une vraie augmentation future.
+
+**Étape manuelle** (comme pour Checkout/Webhook ci-dessus) : créer les
+deux prices (mensuel + annuel) dans Stripe Dashboard, les ajouter à
+`VITE_STRIPE_PRICE_LAUNCH_OFFER` / `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL`
+(local + Vercel), et exécuter `004_add_launch_offer.sql`. Le tarif
+standard (39 €/390 €) suppose aussi que `VITE_STRIPE_PRICE_SOLO_MONTHLY`/
+`_YEARLY` pointent vers de nouveaux prices Stripe à ce nouveau montant
+(un price Stripe existant ne se modifie pas, il se remplace).

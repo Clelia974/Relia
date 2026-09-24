@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { GRATUIT_FEATURES, PRO_FEATURES } from '@/features/landing/landingContent'
 import { PaymentPage } from '@/pages/PaymentPage'
@@ -156,6 +156,33 @@ describe('PaymentPage', () => {
     fireEvent.click(screen.getByRole('button', { name: "Profiter de l'offre de lancement" }))
 
     expect(createCheckoutSessionMock).toHaveBeenCalledWith('price_launch_test')
+    vi.unstubAllEnvs()
+  })
+
+  it("offre de lancement : affiche le tarif verrouillé (29€/290€), pas le tarif standard (39€/390€)", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })
+
+    renderPage()
+
+    const launchGroup = screen.getByRole('group', { name: /offre de lancement/i })
+    expect(within(launchGroup).getByRole('button', { name: 'Mensuel' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('29 €')).toBeInTheDocument()
+  })
+
+  it("offre de lancement : bascule Annuel puis clic appelle createCheckoutSession avec le price annuel dédié de l'offre", () => {
+    vi.stubEnv('VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL', 'price_launch_annual_test')
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })
+
+    renderPage()
+    const launchGroup = screen.getByRole('group', { name: /offre de lancement/i })
+    fireEvent.click(within(launchGroup).getByRole('button', { name: /Annuel/ }))
+    expect(screen.getByText('290 €')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: "Profiter de l'offre de lancement" }))
+
+    expect(createCheckoutSessionMock).toHaveBeenCalledWith('price_launch_annual_test')
     vi.unstubAllEnvs()
   })
 

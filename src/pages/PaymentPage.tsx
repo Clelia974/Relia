@@ -7,8 +7,11 @@ import { PlanFeature } from '@/features/landing/components/PlanFeature'
 import {
   ANNUAL_FREE_MONTHS,
   GRATUIT_FEATURES,
+  LAUNCH_OFFER_ANNUAL_FREE_MONTHS,
   LAUNCH_OFFER_FREE_MONTHS,
   LAUNCH_OFFER_LIMIT,
+  LAUNCH_OFFER_PRICE_ANNUAL,
+  LAUNCH_OFFER_PRICE_MONTHLY,
   PRICE_ANNUAL,
   PRICE_MONTHLY,
   PRO_FEATURES,
@@ -66,7 +69,8 @@ export function PaymentPage() {
     createCheckoutSession(priceId)
   }
 
-  const launchOfferPriceId = import.meta.env.VITE_STRIPE_PRICE_LAUNCH_OFFER as string | undefined
+  const launchOfferPriceIdEnvKey = billing === 'month' ? 'VITE_STRIPE_PRICE_LAUNCH_OFFER' : 'VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL'
+  const launchOfferPriceId = import.meta.env[launchOfferPriceIdEnvKey as keyof ImportMetaEnv] as string | undefined
   const handleLaunchOffer = () => {
     if (!launchOfferPriceId) {
       toast.error("Configuration de paiement incomplète — contactez le support.")
@@ -128,15 +132,47 @@ export function PaymentPage() {
           <CardHeader>
             <CardTitle>Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes</CardTitle>
             <CardDescription>
-              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis {euro(PRICE_MONTHLY)}/mois verrouillé — même
-              si le tarif standard augmente plus tard, ce prix reste le vôtre tant que vous restez abonnée.
+              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis ce tarif verrouillé — même si le tarif
+              standard augmente plus tard, il reste le vôtre tant que vous restez abonnée.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+          <CardContent className="flex flex-col gap-5">
+            <div
+              role="group"
+              aria-label="Périodicité de facturation — offre de lancement"
+              className="inline-flex w-fit rounded-full border border-border bg-card p-1 text-sm"
+            >
+              {(
+                [
+                  ['month', 'Mensuel'],
+                  ['year', `Annuel · ${LAUNCH_OFFER_ANNUAL_FREE_MONTHS} mois offerts`],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={billing === value}
+                  onClick={() => setBilling(value)}
+                  className={cn(
+                    'rounded-full px-4 py-1.5 font-medium transition-[color,background-color] duration-200',
+                    billing === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <p className="font-heading text-4xl font-semibold tracking-tight text-foreground">
+              {billing === 'month' ? euro(LAUNCH_OFFER_PRICE_MONTHLY) : euro(LAUNCH_OFFER_PRICE_ANNUAL)}
+              <span className="text-base font-normal text-muted-foreground">{billing === 'month' ? ' / mois' : ' / an'}</span>
+            </p>
+
             <p className="text-sm text-muted-foreground">
               {launchOffer.remaining} place{launchOffer.remaining > 1 ? 's' : ''} restante{launchOffer.remaining > 1 ? 's' : ''} sur{' '}
               {LAUNCH_OFFER_LIMIT}.
             </p>
+
             <Button size="lg" className="w-fit" loading={isCheckoutLoading} onClick={handleLaunchOffer}>
               {!isCheckoutLoading && "Profiter de l'offre de lancement"}
             </Button>

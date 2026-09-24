@@ -17,6 +17,7 @@ process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-fake'
 process.env.VITE_STRIPE_PRICE_SOLO_MONTHLY = 'price_month_123'
 process.env.VITE_STRIPE_PRICE_SOLO_YEARLY = 'price_year_456'
 process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER = 'price_launch_789'
+process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL = 'price_launch_annual_987'
 
 // Par défaut, "0 place prise" — la plupart des tests ne concernent pas l'offre de lancement.
 headMock.mockResolvedValue({ count: 0, error: null })
@@ -110,6 +111,39 @@ describe('POST /api/stripe/checkout-session', () => {
         metadata: { offer: 'launch_100' },
       }),
     )
+  })
+
+  it("crée aussi la session de l'offre de lancement pour le price annuel dédié, même mois offert et même metadata", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-launch-annual' })
+    headMock.mockReset().mockResolvedValue({ count: 10, error: null })
+    const res = mockRes()
+
+    await handler(
+      { method: 'POST', body: { priceId: 'price_launch_annual_987', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
+      res,
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(createSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        line_items: [{ price: 'price_launch_annual_987', quantity: 1 }],
+        subscription_data: { trial_period_days: 30 },
+        metadata: { offer: 'launch_100' },
+      }),
+    )
+  })
+
+  it("refuse aussi le price annuel de l'offre une fois les 100 places prises (même compteur que le mensuel)", async () => {
+    headMock.mockReset().mockResolvedValue({ count: 100, error: null })
+    const res = mockRes()
+
+    await handler(
+      { method: 'POST', body: { priceId: 'price_launch_annual_987', userId: 'u1', userEmail: 'sophie@example.com' } } as VercelRequest,
+      res,
+    )
+
+    expect(res.statusCode).toBe(400)
+    expect(createSessionMock).not.toHaveBeenCalled()
   })
 
   it("refuse l'offre de lancement une fois les 100 places prises, sans jamais créer de session", async () => {

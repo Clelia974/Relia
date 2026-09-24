@@ -8,22 +8,28 @@
 export const BILLING_LIVE = true
 
 export const TRIAL_DAYS = 14
-export const PRICE_MONTHLY = 29
-export const PRICE_ANNUAL = 290
-/** 12 × 29 € = 348 € ; 290 € par an = 58 € d'économie, soit 2 mois offerts. */
+export const PRICE_MONTHLY = 39
+export const PRICE_ANNUAL = 390
+/** 12 × 39 € = 468 € ; 390 € par an = 78 € d'économie, soit 2 mois offerts. */
 export const ANNUAL_FREE_MONTHS = Math.round((PRICE_MONTHLY * 12 - PRICE_ANNUAL) / PRICE_MONTHLY)
 
 /**
  * Offre de lancement (100 premières clientes) — 1 mois offert puis tarif
- * verrouillé (`VITE_STRIPE_PRICE_LAUNCH_OFFER`, un price Stripe dédié :
- * si PRICE_MONTHLY augmente plus tard, ces clientes ne sont pas
- * affectées). Le nombre de places prises vient toujours de
- * `api/launch-offer-count.ts` (compteur réel côté serveur) — cette
- * constante n'est que la limite, jamais un nombre "restant" affiché tel
- * quel.
+ * verrouillé sur l'ANCIEN prix (29 €/mois, 290 €/an), sur des prices
+ * Stripe dédiés (`VITE_STRIPE_PRICE_LAUNCH_OFFER`,
+ * `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL`) : si PRICE_MONTHLY/PRICE_ANNUAL
+ * augmentent plus tard, ces clientes ne sont pas affectées. Le nombre de
+ * places prises vient toujours de `api/launch-offer-count.ts` (compteur
+ * réel côté serveur) — cette constante n'est que la limite, jamais un
+ * nombre "restant" affiché tel quel.
  */
 export const LAUNCH_OFFER_LIMIT = 100
 export const LAUNCH_OFFER_FREE_MONTHS = 1
+export const LAUNCH_OFFER_PRICE_MONTHLY = 29
+export const LAUNCH_OFFER_PRICE_ANNUAL = 290
+export const LAUNCH_OFFER_ANNUAL_FREE_MONTHS = Math.round(
+  (LAUNCH_OFFER_PRICE_MONTHLY * 12 - LAUNCH_OFFER_PRICE_ANNUAL) / LAUNCH_OFFER_PRICE_MONTHLY,
+)
 
 /**
  * Listes reprises telles quelles par la landing (Tarifs) et la page
