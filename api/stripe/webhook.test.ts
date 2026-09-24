@@ -31,7 +31,7 @@ process.env.STRIPE_WEBHOOK_SECRET = 'whsec_fake'
 process.env.VITE_SUPABASE_URL = 'https://fake.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service_role_fake'
 
-const { default: handler } = await import('./webhook')
+const { default: handler } = await import('./webhook.js')
 
 /**
  * Pas de valeur par défaut pour `signature` : un paramètre explicitement

@@ -24,7 +24,7 @@ process.env.STRIPE_SECRET_KEY = 'sk_test_fake'
 process.env.VITE_SUPABASE_URL = 'https://example.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-fake'
 
-const { default: handler } = await import('./portal-session')
+const { default: handler } = await import('./portal-session.js')
 
 function mockRes() {
   const res = { statusCode: 0, body: undefined as unknown } as VercelResponse & { statusCode: number; body: unknown }

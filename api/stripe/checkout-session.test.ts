@@ -22,7 +22,7 @@ process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL = 'price_launch_annual_987'
 // Par défaut, "0 place prise" — la plupart des tests ne concernent pas l'offre de lancement.
 maybeSingleMock.mockResolvedValue({ data: { redeemed_count: 0 }, error: null })
 
-const { default: handler } = await import('./checkout-session')
+const { default: handler } = await import('./checkout-session.js')
 
 function mockRes() {
   const res = { statusCode: 0, body: undefined as unknown } as VercelResponse & { statusCode: number; body: unknown }

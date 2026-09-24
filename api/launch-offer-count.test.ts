@@ -9,7 +9,7 @@ vi.mock('@supabase/supabase-js', () => ({
 process.env.VITE_SUPABASE_URL = 'https://example.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-fake'
 
-const { default: handler } = await import('./launch-offer-count')
+const { default: handler } = await import('./launch-offer-count.js')
 
 function mockRes() {
   const res = { statusCode: 0, body: undefined as unknown, headers: {} as Record<string, string> } as VercelResponse & {
