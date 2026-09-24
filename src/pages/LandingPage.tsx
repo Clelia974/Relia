@@ -72,12 +72,14 @@ export function LandingPage() {
             <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-            <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
-            <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Fonctionnalités</a>
+            <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
             <a href="#tarifs" className="transition-colors hover:text-foreground">Tarifs</a>
             <a href="#questions" className="transition-colors hover:text-foreground">Questions</a>
           </nav>
           <div className="flex items-center gap-2">
+            {!isAuthenticated && (
+              <Button variant="ghost" size="sm" onClick={() => navigate('/connexion')}>Se connecter</Button>
+            )}
             <Button size="sm" onClick={start}>{ctaLabel}</Button>
           </div>
         </div>
