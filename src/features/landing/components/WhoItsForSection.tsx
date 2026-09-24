@@ -4,6 +4,7 @@ import { Check, X } from 'lucide-react'
 const FOR_YOU = [
   'Tu organises plusieurs mariages en parallèle',
   'Tes tâches, prestataires et finances sont éparpillés entre plusieurs outils',
+  'Tu as déjà tes mariages dans un tableur — importe-les en quelques minutes',
   'Tu veux essayer 14 jours, sans carte bancaire',
 ]
 

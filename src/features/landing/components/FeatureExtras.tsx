@@ -1,4 +1,4 @@
-import { FileText, Moon, Search, Sheet } from 'lucide-react'
+import { FileSpreadsheet, FileText, Moon, Search, Sheet } from 'lucide-react'
 
 /**
  * "Et aussi" — Matériel/Prestataires/Bilan sont maintenant dans le
@@ -7,6 +7,7 @@ import { FileText, Moon, Search, Sheet } from 'lucide-react'
  * qu'en texte inline discret.
  */
 const EXTRAS = [
+  { icon: FileSpreadsheet, label: 'Import de tes mariages depuis Excel' },
   { icon: Search, label: 'Recherche instantanée (Ctrl + K)' },
   { icon: FileText, label: 'Suivi du contrat' },
   { icon: Moon, label: 'Mode sombre' },
