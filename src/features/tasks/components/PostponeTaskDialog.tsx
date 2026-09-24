@@ -44,7 +44,7 @@ export function PostponeTaskDialog({ open, onOpenChange, task, onConfirm }: Post
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Reporter la tâche</DialogTitle>
           <DialogDescription>{task?.title}</DialogDescription>

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { CloudUpload, Download, RotateCcw, Upload, X } from 'lucide-react'
+import { CloudDownload, CloudUpload, Download, Palette, RotateCcw, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -15,25 +15,29 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ProposalTemplateForm } from '@/features/proposals/components/ProposalTemplateForm'
+import { useRestoreFromCloud } from '@/features/sync/useRestoreFromCloud'
 import { useSyncToCloud } from '@/features/sync/useSyncToCloud'
+import { TaskTemplateForm } from '@/features/tasks/components/TaskTemplateForm'
 import { ImportWeddingsFromExcel } from '@/features/weddings/components/ImportWeddingsFromExcel'
 import { readFileAsDataUrl } from '@/lib/readFileAsDataUrl'
 import { VAT_STATUS_LABELS, VAT_STATUS_OPTIONS, vatApplies } from '@/lib/vatStatus'
 import { exportWorkspaceToFile, parseWorkspaceFile } from '@/lib/workspace/importExport'
 import { useWorkspaceStore } from '@/store/workspaceStore'
-import type { BusinessConfig, ProposalTemplate, VatStatus, Workspace } from '@/types/entities'
+import type { BusinessConfig, ProposalTemplate, ProposalTier, VatStatus, Workspace } from '@/types/entities'
 
 const DEFAULT_BRAND_COLOR = '#9C6B3F'
 const MAX_LOGO_FILE_SIZE = 1024 * 1024
 
 export function ParametresPage() {
   const { syncNow, isSyncing, error: syncError, lastSyncedAt } = useSyncToCloud()
+  const { restoreNow, isRestoring, error: restoreError } = useRestoreFromCloud()
 
   const workspace = useWorkspaceStore((s) => s.workspace)
   const replaceWorkspace = useWorkspaceStore((s) => s.replaceWorkspace)
@@ -42,13 +46,25 @@ export function ParametresPage() {
   const updateBusinessConfig = useWorkspaceStore((s) => s.updateBusinessConfig)
   const proposalTemplates = useWorkspaceStore((s) => s.workspace.proposalTemplates)
   const updateProposalTemplate = useWorkspaceStore((s) => s.updateProposalTemplate)
+  const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
+  const setTaskTemplate = useWorkspaceStore((s) => s.setTaskTemplate)
+
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
 
   const [displayName, setDisplayName] = useState(workspace.userProfile.displayName)
+  const [lastName, setLastName] = useState(workspace.userProfile.lastName ?? '')
 
   const saveDisplayName = () => {
     const trimmed = displayName.trim()
     if (trimmed === workspace.userProfile.displayName) return
     updateUserProfile({ displayName: trimmed })
+    toast.success('Votre profil a été mis à jour.')
+  }
+
+  const saveLastName = () => {
+    const trimmed = lastName.trim()
+    if (trimmed === (workspace.userProfile.lastName ?? '')) return
+    updateUserProfile({ lastName: trimmed || undefined })
     toast.success('Votre profil a été mis à jour.')
   }
 
@@ -88,8 +104,20 @@ export function ParametresPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingImport, setPendingImport] = useState<Workspace | null>(null)
+  const [pendingCloudRestore, setPendingCloudRestore] = useState<Workspace | null>(null)
   const [resetOpen, setResetOpen] = useState(false)
   const [resetMode, setResetMode] = useState<'empty' | 'demo'>('empty')
+
+  const handleRestoreClick = async () => {
+    const workspace = await restoreNow()
+    if (workspace) setPendingCloudRestore(workspace)
+  }
+  const confirmCloudRestore = () => {
+    if (!pendingCloudRestore) return
+    replaceWorkspace(pendingCloudRestore)
+    setPendingCloudRestore(null)
+    toast.success('Votre sauvegarde en ligne a été restaurée.')
+  }
 
   const logoInputRef = useRef<HTMLInputElement>(null)
   const [isLogoUploading, setIsLogoUploading] = useState(false)
@@ -115,12 +143,21 @@ export function ParametresPage() {
   }
   const removeLogo = () => saveBusinessField({ logoDataUrl: undefined })
 
-  const [editingTemplate, setEditingTemplate] = useState<ProposalTemplate | null>(null)
+  const brandColorInputRef = useRef<HTMLInputElement>(null)
+
+  const [expandedTier, setExpandedTier] = useState<ProposalTier | null>(null)
   const handleTemplateSubmit = (values: { label: string; tagline: string; showOnDocuments: boolean; lines: ProposalTemplate['lines'] }) => {
-    if (!editingTemplate) return
-    updateProposalTemplate(editingTemplate.tier, { label: values.label, tagline: values.tagline || undefined, showOnDocuments: values.showOnDocuments, lines: values.lines })
-    setEditingTemplate(null)
+    if (!expandedTier) return
+    updateProposalTemplate(expandedTier, { label: values.label, tagline: values.tagline || undefined, showOnDocuments: values.showOnDocuments, lines: values.lines })
+    setExpandedTier(null)
     toast.success('Formule mise à jour.')
+  }
+
+  const [isEditingTaskTemplate, setIsEditingTaskTemplate] = useState(false)
+  const handleTaskTemplateSubmit = (items: Workspace['taskTemplate']) => {
+    setTaskTemplate(items)
+    setIsEditingTaskTemplate(false)
+    toast.success('Checklist de démarrage mise à jour.')
   }
 
   const handleExport = () => {
@@ -171,27 +208,75 @@ export function ParametresPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Profil</CardTitle>
-          <CardDescription>Utilisé pour vous saluer sur le tableau de bord « Aujourd'hui ».</CardDescription>
+          <CardTitle>Profil & entreprise</CardTitle>
+          <CardDescription>
+            Votre identité (tableau de bord « Aujourd'hui ») et les informations utilisées sur vos propositions et
+            factures indicatives.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-1.5 sm:w-80">
-          <Label htmlFor="display-name">Votre prénom</Label>
-          <Input
-            id="display-name"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            onBlur={saveDisplayName}
-            placeholder="Ex. Clélia"
-          />
+        <CardContent className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            {workspace.businessConfig.logoDataUrl ? (
+              <img
+                src={workspace.businessConfig.logoDataUrl}
+                alt="Logo de l'entreprise"
+                className="size-10 shrink-0 rounded-md border border-border object-contain"
+              />
+            ) : (
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-dashed border-border text-[10px] text-muted-foreground">
+                Logo
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">
+                {[workspace.userProfile.displayName, workspace.userProfile.lastName].filter(Boolean).join(' ') || 'Profil non renseigné'}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {workspace.businessConfig.companyName || 'Entreprise non renseignée'}
+              </p>
+            </div>
+          </div>
+          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setIsEditingProfile(true)}>
+            Modifier
+          </Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Entreprise</CardTitle>
-          <CardDescription>Utilisé sur vos propositions et factures indicatives.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+      <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
+        <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Modifier le profil et l'entreprise</DialogTitle>
+            <DialogDescription>
+              Votre identité (tableau de bord) et les informations utilisées sur vos propositions et factures
+              indicatives.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="display-name">Votre prénom</Label>
+              <Input
+                id="display-name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                onBlur={saveDisplayName}
+                placeholder="Ex. Clélia"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="last-name">
+                Votre nom <span className="font-normal text-muted-foreground">(facultatif)</span>
+              </Label>
+              <Input
+                id="last-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onBlur={saveLastName}
+                placeholder="Ex. Dupont"
+              />
+            </div>
+          </div>
+
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="biz-name">Nom de l'entreprise</Label>
@@ -354,24 +439,35 @@ export function ParametresPage() {
                 Couleur de marque <span className="font-normal text-muted-foreground">(facultatif)</span>
               </Label>
               <div className="flex items-center gap-3">
-                <input
-                  id="biz-brand-color"
-                  type="color"
-                  value={workspace.businessConfig.brandColor ?? DEFAULT_BRAND_COLOR}
-                  onChange={(e) => saveBusinessField({ brandColor: e.target.value })}
-                  className="h-9 w-14 rounded-md border border-border bg-transparent p-1 outline-none transition-colors hover:border-foreground/25 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                <span
+                  aria-hidden="true"
+                  className="size-9 shrink-0 rounded-md border border-border"
+                  style={{ backgroundColor: workspace.businessConfig.brandColor ?? DEFAULT_BRAND_COLOR }}
                 />
+                <Button type="button" variant="outline" size="sm" onClick={() => brandColorInputRef.current?.click()}>
+                  <Palette className="size-4" aria-hidden="true" />
+                  {workspace.businessConfig.brandColor ? 'Changer la couleur' : 'Choisir une couleur'}
+                </Button>
                 {workspace.businessConfig.brandColor && (
                   <Button type="button" variant="outline" size="sm" onClick={() => saveBusinessField({ brandColor: undefined })}>
                     Réinitialiser
                   </Button>
                 )}
+                <input
+                  ref={brandColorInputRef}
+                  id="biz-brand-color"
+                  type="color"
+                  value={workspace.businessConfig.brandColor ?? DEFAULT_BRAND_COLOR}
+                  onChange={(e) => saveBusinessField({ brandColor: e.target.value })}
+                  className="hidden"
+                />
               </div>
               <p className="text-xs text-muted-foreground">Remplace l'accent Relia par défaut sur vos documents.</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
@@ -379,21 +475,52 @@ export function ParametresPage() {
           <CardDescription>Ces 3 formules préconfigurent les lignes proposées à la création d'un devis. Vous pouvez les renommer, ou choisir que leur nom n'apparaisse pas sur les devis.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 grid-cols-1 sm:grid-cols-3">
-          {proposalTemplates.map((template) => (
-            <Card key={template.tier}>
-              <CardContent className="flex flex-col gap-2">
-                <p className="font-heading text-lg font-semibold text-foreground">{template.label}</p>
-                {template.tagline && <p className="text-sm text-muted-foreground">{template.tagline}</p>}
-                {template.showOnDocuments === false && <p className="text-xs text-muted-foreground">Nom masqué sur les devis</p>}
-                <p className="text-xs text-muted-foreground">
-                  {template.lines.length} ligne{template.lines.length !== 1 ? 's' : ''} préconfigurée{template.lines.length !== 1 ? 's' : ''}
-                </p>
-                <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setEditingTemplate(template)}>
-                  Modifier la formule
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {proposalTemplates.map((template) =>
+            expandedTier === template.tier ? (
+              <Card key={template.tier} className="sm:col-span-3">
+                <CardContent>
+                  <ProposalTemplateForm
+                    key={template.tier}
+                    template={template}
+                    onSubmit={handleTemplateSubmit}
+                    onCancel={() => setExpandedTier(null)}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <Card key={template.tier}>
+                <CardContent className="flex flex-col gap-2">
+                  <p className="font-heading text-lg font-semibold text-foreground">{template.label}</p>
+                  {template.tagline && <p className="text-sm text-muted-foreground">{template.tagline}</p>}
+                  {template.showOnDocuments === false && <p className="text-xs text-muted-foreground">Nom masqué sur les devis</p>}
+                  <p className="text-xs text-muted-foreground">
+                    {template.lines.length} ligne{template.lines.length !== 1 ? 's' : ''} préconfigurée{template.lines.length !== 1 ? 's' : ''}
+                  </p>
+                  <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setExpandedTier(template.tier)}>
+                    Modifier les formulaires
+                  </Button>
+                </CardContent>
+              </Card>
+            ),
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Checklist de démarrage</CardTitle>
+          <CardDescription>
+            Ces étapes sont ajoutées automatiquement (si vous le souhaitez, case à cocher) à la création d'un nouveau
+            mariage, à la date indiquée par rapport à celle du mariage.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <p className="text-sm text-muted-foreground">
+            {taskTemplate.length} étape{taskTemplate.length !== 1 ? 's' : ''} configurée{taskTemplate.length !== 1 ? 's' : ''}
+          </p>
+          <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setIsEditingTaskTemplate(true)}>
+            Modifier la checklist
+          </Button>
         </CardContent>
       </Card>
 
@@ -401,17 +528,28 @@ export function ParametresPage() {
         <CardHeader>
           <CardTitle>Sauvegarde en ligne</CardTitle>
           <CardDescription>
-            Vos mariages, tâches, prestataires et finances restent dans ce navigateur — la sauvegarde en ligne est une
-            copie de secours, à votre demande, pour les retrouver sur un autre appareil. Jamais utilisée pendant la
-            Vue Jour J, qui reste 100&nbsp;% locale.
+            Vos mariages, tâches, prestataires et finances restent dans ce navigateur. "Sauvegarder maintenant" envoie
+            une copie en ligne, à votre demande — restaurée automatiquement dès votre première connexion sur un
+            nouvel appareil encore vide. Sur un appareil qui contient déjà des données, utilisez "Restaurer depuis le
+            cloud" pour la retirer explicitement (elle remplace tout ce qui est enregistré ici). Ce n'est pas une
+            synchronisation en continu : si vous travaillez sur plusieurs appareils, sauvegardez depuis celui où vous
+            venez de travailler avant de basculer sur l'autre. Jamais utilisée pendant la Vue Jour J, qui reste
+            100&nbsp;% locale.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Button loading={isSyncing} onClick={syncNow} className="w-fit">
-            {!isSyncing && <CloudUpload className="size-4" aria-hidden="true" />}
-            Sauvegarder maintenant
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button loading={isSyncing} onClick={syncNow} className="w-fit">
+              {!isSyncing && <CloudUpload className="size-4" aria-hidden="true" />}
+              Sauvegarder maintenant
+            </Button>
+            <Button variant="outline" loading={isRestoring} onClick={handleRestoreClick} className="w-fit">
+              {!isRestoring && <CloudDownload className="size-4" aria-hidden="true" />}
+              Restaurer depuis le cloud
+            </Button>
+          </div>
           {syncError && <p className="text-sm text-risk">{syncError}</p>}
+          {restoreError && <p className="text-sm text-risk">{restoreError}</p>}
           {lastSyncedAt && !syncError && (
             <p className="text-xs text-muted-foreground">
               Dernière sauvegarde : {format(new Date(lastSyncedAt), "d MMM yyyy 'à' HH:mm", { locale: fr })}
@@ -482,6 +620,24 @@ export function ParametresPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={pendingCloudRestore !== null} onOpenChange={(open) => !open && setPendingCloudRestore(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remplacer vos données actuelles ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Votre dernière sauvegarde en ligne contient {pendingCloudRestore?.weddings.length ?? 0} mariage(s) et{' '}
+              {pendingCloudRestore?.tasks.length ?? 0} tâche(s). La restaurer remplacera entièrement les données
+              actuellement enregistrées dans ce navigateur — cette action est irréversible sans une sauvegarde de vos
+              données actuelles.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCloudRestore}>Restaurer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -518,13 +674,12 @@ export function ParametresPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {editingTemplate && (
-        <ProposalTemplateForm
-          key={editingTemplate.tier}
-          open={editingTemplate !== null}
-          onOpenChange={(open) => !open && setEditingTemplate(null)}
-          template={editingTemplate}
-          onSubmit={handleTemplateSubmit}
+      {isEditingTaskTemplate && (
+        <TaskTemplateForm
+          open={isEditingTaskTemplate}
+          onOpenChange={setIsEditingTaskTemplate}
+          template={taskTemplate}
+          onSubmit={handleTaskTemplateSubmit}
         />
       )}
     </div>

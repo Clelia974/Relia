@@ -84,7 +84,7 @@ export function TimelineEventForm({ open, onOpenChange, event, defaultDate, vend
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Modifier le moment' : 'Ajouter un moment'}</DialogTitle>
           <DialogDescription>

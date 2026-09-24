@@ -3,7 +3,6 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PROPOSAL_CATEGORY_SUGGESTIONS } from '@/features/proposals/templates'
@@ -37,14 +36,19 @@ function emptyDraftLine(): DraftLine {
 }
 
 interface ProposalTemplateFormProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
   template: ProposalTemplate
   onSubmit: (values: { label: string; tagline: string; showOnDocuments: boolean; lines: ProposalTemplateLine[] }) => void
+  onCancel: () => void
 }
 
-/** Le parent doit remonter ce composant (prop `key`) à chaque ouverture — voir ExpenseForm pour la même convention. */
-export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }: ProposalTemplateFormProps) {
+/**
+ * Rendue en place dans la carte du forfait (Paramètres), pas dans une
+ * fenêtre séparée : éditer 3 formules à la fois dans des boîtes modales
+ * empilées était plus difficile à suivre qu'une carte qui se déplie.
+ * Le parent doit remonter ce composant (prop `key`) à chaque ouverture —
+ * voir ExpenseForm pour la même convention.
+ */
+export function ProposalTemplateForm({ template, onSubmit, onCancel }: ProposalTemplateFormProps) {
   const [label, setLabel] = useState(template.label)
   const [tagline, setTagline] = useState(template.tagline ?? '')
   const [showOnDocuments, setShowOnDocuments] = useState(template.showOnDocuments !== false)
@@ -102,140 +106,129 @@ export function ProposalTemplateForm({ open, onOpenChange, template, onSubmit }:
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Modifier la formule</DialogTitle>
-          <DialogDescription>
-            Ces lignes préconfigurées initialisent une nouvelle proposition — elles restent modifiables ligne par ligne une fois la proposition créée.
-          </DialogDescription>
-        </DialogHeader>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="tpl-label">Nom de la formule</Label>
+          <Input id="tpl-label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex. Silver" />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="tpl-tagline">
+            Accroche <span className="font-normal text-muted-foreground">(facultatif)</span>
+          </Label>
+          <Input id="tpl-tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Ex. Une formule essentielle…" />
+        </div>
+      </div>
 
-        <form className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1" onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="tpl-label">Nom de la formule</Label>
-              <Input id="tpl-label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex. Silver" />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="tpl-tagline">
-                Accroche <span className="font-normal text-muted-foreground">(facultatif)</span>
-              </Label>
-              <Input id="tpl-tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Ex. Une formule essentielle…" />
-            </div>
-          </div>
+      <div className="flex items-start gap-2.5">
+        <Checkbox id="tpl-show" checked={showOnDocuments} onCheckedChange={(checked) => setShowOnDocuments(checked === true)} className="mt-0.5" />
+        <Label htmlFor="tpl-show" className="flex flex-col items-start gap-0.5 font-normal">
+          <span className="text-foreground">Afficher le nom de la formule sur les devis</span>
+          <span className="text-xs text-muted-foreground">
+            Décoché : le nom reste visible pour vous, mais n'apparaît ni dans le titre proposé ni sur le devis remis au client.
+          </span>
+        </Label>
+      </div>
 
-          <div className="flex items-start gap-2.5">
-            <Checkbox id="tpl-show" checked={showOnDocuments} onCheckedChange={(checked) => setShowOnDocuments(checked === true)} className="mt-0.5" />
-            <Label htmlFor="tpl-show" className="flex flex-col items-start gap-0.5 font-normal">
-              <span className="text-foreground">Afficher le nom de la formule sur les devis</span>
-              <span className="text-xs text-muted-foreground">
-                Décoché : le nom reste visible pour vous, mais n'apparaît ni dans le titre proposé ni sur le devis remis au client.
-              </span>
-            </Label>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-heading text-sm font-semibold text-foreground">Lignes préconfigurées</h3>
+        <Button type="button" variant="outline" size="sm" onClick={addLine}>
+          <Plus className="size-4" aria-hidden="true" />
+          Ajouter une ligne
+        </Button>
+      </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-heading text-sm font-semibold text-foreground">Lignes préconfigurées</h3>
-            <Button type="button" variant="outline" size="sm" onClick={addLine}>
-              <Plus className="size-4" aria-hidden="true" />
-              Ajouter une ligne
-            </Button>
-          </div>
+      <div className="flex flex-col gap-3">
+        {lines.map((line, index) => (
+          <Card key={line.id}>
+            <CardContent className="flex flex-col gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-xs font-medium text-muted-foreground">Ligne {index + 1}</p>
+                <button
+                  type="button"
+                  aria-label="Supprimer cette ligne"
+                  onClick={() => removeLine(line.id)}
+                  className="relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
+                >
+                  <Trash2 className="size-4" aria-hidden="true" />
+                </button>
+              </div>
 
-          <div className="flex flex-col gap-3">
-            {lines.map((line, index) => (
-              <Card key={line.id}>
-                <CardContent className="flex flex-col gap-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-xs font-medium text-muted-foreground">Ligne {index + 1}</p>
-                    <button
-                      type="button"
-                      aria-label="Supprimer cette ligne"
-                      onClick={() => removeLine(line.id)}
-                      className="relative rounded-md p-1.5 text-muted-foreground transition-colors after:absolute after:-inset-3.5 hover:bg-accent hover:text-risk"
-                    >
-                      <Trash2 className="size-4" aria-hidden="true" />
-                    </button>
-                  </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor={`tpl-${line.id}-description`}>Description</Label>
+                <Input
+                  id={`tpl-${line.id}-description`}
+                  value={line.description}
+                  onChange={(e) => setLineField(line.id, { description: e.target.value })}
+                  placeholder="Ex. Centres de table"
+                />
+              </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={`tpl-${line.id}-description`}>Description</Label>
-                    <Input
-                      id={`tpl-${line.id}-description`}
-                      value={line.description}
-                      onChange={(e) => setLineField(line.id, { description: e.target.value })}
-                      placeholder="Ex. Centres de table"
-                    />
-                  </div>
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor={`tpl-${line.id}-category`}>Catégorie</Label>
+                  <Input
+                    id={`tpl-${line.id}-category`}
+                    list={`tpl-categories-${line.id}`}
+                    value={line.category}
+                    onChange={(e) => setLineField(line.id, { category: e.target.value })}
+                    placeholder="Ex. Décoration"
+                  />
+                  <datalist id={`tpl-categories-${line.id}`}>
+                    {PROPOSAL_CATEGORY_SUGGESTIONS.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor={`tpl-${line.id}-quantity`}>Quantité</Label>
+                  <Input
+                    id={`tpl-${line.id}-quantity`}
+                    inputMode="decimal"
+                    value={line.quantity}
+                    onChange={(e) => setLineField(line.id, { quantity: e.target.value })}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor={`tpl-${line.id}-unitPrice`}>Prix unitaire</Label>
+                  <Input
+                    id={`tpl-${line.id}-unitPrice`}
+                    inputMode="decimal"
+                    value={line.unitPrice}
+                    onChange={(e) => setLineField(line.id, { unitPrice: e.target.value })}
+                  />
+                </div>
+              </div>
 
-                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor={`tpl-${line.id}-category`}>Catégorie</Label>
-                      <Input
-                        id={`tpl-${line.id}-category`}
-                        list={`tpl-categories-${line.id}`}
-                        value={line.category}
-                        onChange={(e) => setLineField(line.id, { category: e.target.value })}
-                        placeholder="Ex. Décoration"
-                      />
-                      <datalist id={`tpl-categories-${line.id}`}>
-                        {PROPOSAL_CATEGORY_SUGGESTIONS.map((c) => (
-                          <option key={c} value={c} />
-                        ))}
-                      </datalist>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor={`tpl-${line.id}-quantity`}>Quantité</Label>
-                      <Input
-                        id={`tpl-${line.id}-quantity`}
-                        inputMode="decimal"
-                        value={line.quantity}
-                        onChange={(e) => setLineField(line.id, { quantity: e.target.value })}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor={`tpl-${line.id}-unitPrice`}>Prix unitaire</Label>
-                      <Input
-                        id={`tpl-${line.id}-unitPrice`}
-                        inputMode="decimal"
-                        value={line.unitPrice}
-                        onChange={(e) => setLineField(line.id, { unitPrice: e.target.value })}
-                      />
-                    </div>
-                  </div>
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="flex items-center gap-2 text-sm text-foreground">
+                  <Checkbox
+                    checked={line.included}
+                    onCheckedChange={(checked) => setLineField(line.id, { included: checked === true })}
+                  />
+                  Service inclus
+                </label>
+                <label className="flex items-center gap-2 text-sm text-foreground">
+                  <Checkbox
+                    checked={line.optional}
+                    onCheckedChange={(checked) => setLineField(line.id, { optional: checked === true })}
+                  />
+                  Option facultative
+                </label>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-                  <div className="flex flex-wrap items-center gap-4">
-                    <label className="flex items-center gap-2 text-sm text-foreground">
-                      <Checkbox
-                        checked={line.included}
-                        onCheckedChange={(checked) => setLineField(line.id, { included: checked === true })}
-                      />
-                      Service inclus
-                    </label>
-                    <label className="flex items-center gap-2 text-sm text-foreground">
-                      <Checkbox
-                        checked={line.optional}
-                        onCheckedChange={(checked) => setLineField(line.id, { optional: checked === true })}
-                      />
-                      Option facultative
-                    </label>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {error && <p className="text-sm text-risk">{error}</p>}
 
-          {error && <p className="text-sm text-risk">{error}</p>}
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
-            </Button>
-            <Button type="submit">Enregistrer la formule</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <div className="flex justify-end gap-2 pt-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Annuler
+        </Button>
+        <Button type="submit">Enregistrer la formule</Button>
+      </div>
+    </form>
   )
 }

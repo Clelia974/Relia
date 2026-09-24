@@ -79,7 +79,7 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Modifier la tâche' : 'Nouvelle tâche'}</DialogTitle>
           <DialogDescription>
@@ -151,17 +151,18 @@ export function TaskForm({ open, onOpenChange, task, defaultWeddingId, weddings,
             </Field>
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-            <Field label="Date d'échéance" htmlFor="t-due" error={errors.dueDate}>
-              <Input
-                id="t-due"
-                type="date"
-                value={values.dueDate}
-                onChange={(e) => setField('dueDate', e.target.value)}
-                aria-invalid={Boolean(errors.dueDate)}
-                aria-describedby={errors.dueDate ? 't-due-error' : undefined}
-              />
-            </Field>
+          <Field label="Date d'échéance" htmlFor="t-due" error={errors.dueDate}>
+            <Input
+              id="t-due"
+              type="date"
+              value={values.dueDate}
+              onChange={(e) => setField('dueDate', e.target.value)}
+              aria-invalid={Boolean(errors.dueDate)}
+              aria-describedby={errors.dueDate ? 't-due-error' : undefined}
+            />
+          </Field>
+
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Date de début" htmlFor="t-start" optional>
               <Input id="t-start" type="date" value={values.startDate} onChange={(e) => setField('startDate', e.target.value)} />
             </Field>
@@ -298,7 +299,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={htmlFor}>
+      <Label htmlFor={htmlFor} className="whitespace-nowrap">
         {label}
         {optional && <span className="ml-1 font-normal text-muted-foreground">(facultatif)</span>}
       </Label>

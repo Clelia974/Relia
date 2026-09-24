@@ -99,6 +99,8 @@ export const BusinessConfigSchema = z.object({
 export const UserProfileSchema = z.object({
   id,
   displayName: z.string(),
+  /** Nom de famille, facultatif — pas encore utilisé pour distinguer plusieurs profils (agence), mais permet déjà de différencier deux prénoms identiques sur les documents. */
+  lastName: z.string().optional(),
   onboarded: z.boolean(),
   onboardingAnswers: z
     .object({
@@ -220,6 +222,19 @@ export const TaskSchema = z.object({
   phase: DayPhaseSchema.optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
+})
+
+/**
+ * Une étape de la checklist de démarrage, générée à la création d'un
+ * mariage (cf. buildDefaultTasksForWedding) — `dayOffset` en jours par
+ * rapport à la date du mariage (négatif = avant, positif = après).
+ * Paramétrable depuis Paramètres ; la valeur par défaut vient de
+ * createDefaultTaskTemplate (src/features/tasks/defaultTaskTemplate.ts).
+ */
+export const TaskTemplateItemSchema = z.object({
+  id,
+  title: z.string().min(1, 'Le titre de l’étape est obligatoire.'),
+  dayOffset: z.number().int(),
 })
 
 export const TimelineEventTypeSchema = z.enum(['jalon', 'jour_j', 'livraison_prestataire'])
@@ -598,6 +613,7 @@ export const WorkspaceSchema = z
     soldServices: z.array(SoldServiceSchema).default([]),
     /** Formules de devis personnalisables — jamais vide en pratique (cf. migrateWorkspace, qui réinjecte les 3 formules par défaut si absentes). */
     proposalTemplates: z.array(ProposalTemplateSchema).default([]),
+    taskTemplate: z.array(TaskTemplateItemSchema).default([]),
     clientDecisions: z.array(ClientDecisionSchema),
     invoices: z.array(InvoiceSchema),
     equipmentItems: z.array(EquipmentItemSchema).default([]),
@@ -727,6 +743,7 @@ export type SoldServiceStatus = z.infer<typeof SoldServiceStatusSchema>
 export type SoldService = z.infer<typeof SoldServiceSchema>
 export type ProposalTemplateLine = z.infer<typeof ProposalTemplateLineSchema>
 export type ProposalTemplate = z.infer<typeof ProposalTemplateSchema>
+export type TaskTemplateItem = z.infer<typeof TaskTemplateItemSchema>
 export type ClientDecision = z.infer<typeof ClientDecisionSchema>
 export type ContractStatus = z.infer<typeof ContractStatusSchema>
 export type Contract = z.infer<typeof ContractSchema>

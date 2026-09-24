@@ -91,8 +91,8 @@ export function LandingPage() {
       <main id="contenu" className="flex flex-col">
         {/* 1 — HERO */}
         <section id="haut" className="overflow-hidden pb-16 pt-12 sm:pb-24 sm:pt-20">
-          <div className={CONTAINER}>
-            <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8">
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+            <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
               <div className="mx-auto flex max-w-2xl flex-col items-start gap-6 text-left animate-page-in lg:mx-0">
                 <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-thread-text">
                   <span className="size-1.5 rounded-full bg-thread" aria-hidden="true" />
@@ -159,7 +159,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La solution</p>
-              <h2 className={cn(H2, 'mt-2')}>Rencontre Relia</h2>
+              <h2 className={cn(H2, 'mt-2')}>Découvre Relia</h2>
               <p className="mt-3 text-muted-foreground">
                 RELIA est née d’une question simple : et si le Jour J n’était pas un chaos organisé, mais tout simplement…
                 organisé ? Elle est pensée pour les décoratrices et décorateurs de mariage indépendants.

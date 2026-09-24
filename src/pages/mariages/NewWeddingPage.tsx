@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { emptyWeddingFormValues, WeddingFormSchema, type WeddingFormValues } from '@/features/weddings/weddingForm.schema'
 import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
 import { WEDDING_STATUS_LABELS, WEDDING_STATUS_OPTIONS } from '@/lib/weddingStatus'
@@ -15,10 +17,14 @@ import { useWorkspaceStore } from '@/store/workspaceStore'
 export function NewWeddingPage() {
   const navigate = useNavigate()
   const createWedding = useWorkspaceStore((s) => s.createWedding)
+  const addTask = useWorkspaceStore((s) => s.addTask)
+  const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
   const { canCreate, weddingCount, limit } = useWeddingLimit()
 
   const [values, setValues] = useState<WeddingFormValues>(emptyWeddingFormValues())
   const [errors, setErrors] = useState<Partial<Record<keyof WeddingFormValues, string>>>({})
+  const [generateDefaultTasks, setGenerateDefaultTasks] = useState(true)
+  const templateCount = taskTemplate.length || createDefaultTaskTemplate().length
 
   const setField = <K extends keyof WeddingFormValues>(key: K, value: WeddingFormValues[K]) => {
     setValues((v) => ({ ...v, [key]: value }))
@@ -39,9 +45,10 @@ export function NewWeddingPage() {
     }
 
     setErrors({})
+    const weddingDate = new Date(result.data.date).toISOString()
     const id = createWedding({
       coupleName: result.data.coupleName,
-      date: new Date(result.data.date).toISOString(),
+      date: weddingDate,
       venue: result.data.venue,
       soldAmount: result.data.soldAmount === '' ? 0 : Number(result.data.soldAmount),
       clientBudget: result.data.clientBudget === '' ? 0 : Number(result.data.clientBudget),
@@ -49,7 +56,14 @@ export function NewWeddingPage() {
       notes: result.data.notes.trim() || undefined,
     })
 
-    toast.success('Votre mariage a été créé.')
+    if (generateDefaultTasks) {
+      const template = taskTemplate.length > 0 ? taskTemplate : createDefaultTaskTemplate()
+      const defaultTasks = buildDefaultTasksForWedding(id, weddingDate, template)
+      for (const task of defaultTasks) addTask(task)
+      toast.success(`Votre mariage a été créé avec ${defaultTasks.length} tâches de démarrage.`)
+    } else {
+      toast.success('Votre mariage a été créé.')
+    }
     navigate(`/mariages/${id}`, { state: { justCreated: true } })
   }
 
@@ -168,6 +182,23 @@ export function NewWeddingPage() {
                 onChange={(e) => setField('notes', e.target.value)}
               />
             </Field>
+
+            <label htmlFor="generateDefaultTasks" className="flex items-start gap-2.5 text-sm">
+              <Checkbox
+                id="generateDefaultTasks"
+                checked={generateDefaultTasks}
+                onCheckedChange={(checked) => setGenerateDefaultTasks(checked === true)}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="font-medium text-foreground">Générer une checklist de démarrage</span>
+                <span className="block text-muted-foreground">
+                  {templateCount} tâche{templateCount > 1 ? 's' : ''} ajoutée{templateCount > 1 ? 's' : ''}{' '}
+                  automatiquement, à modifier ou supprimer ensuite librement. Le modèle se personnalise depuis
+                  Paramètres.
+                </span>
+              </span>
+            </label>
 
             <div className="flex justify-end gap-3 pt-2">
               <Button type="button" variant="outline" onClick={() => navigate(-1)}>

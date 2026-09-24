@@ -23,7 +23,7 @@ export function PainPointCards() {
           restante plutôt que de s'étaler sur une ligne à part). */}
       <li className="flex items-center rounded-xl border-2 border-primary bg-card p-6 sm:col-span-2 lg:col-span-1">
         <p className="font-heading text-xl font-semibold leading-snug text-primary">
-          Ce n’est pas toi. C’est l’outil qui manque.
+          Ce n’est pas toi. C’est l’outil qui te manque.
         </p>
       </li>
     </ul>

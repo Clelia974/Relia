@@ -1,13 +1,13 @@
-import { FileSpreadsheet, FileText, Moon, Search, Sheet } from 'lucide-react'
+import { FileText, Moon, Search, Sheet } from 'lucide-react'
 
 /**
  * "Et aussi" — Matériel/Prestataires/Bilan sont maintenant dans le
  * carrousel (FeatureCarousel), donc ce composant ne garde que les
  * fonctionnalités annexes de LandingPage.tsx, en chips visibles plutôt
- * qu'en texte inline discret.
+ * qu'en texte inline discret. L'import Excel a sa propre vignette dans le
+ * carrousel (première étape) — pas de doublon ici.
  */
 const EXTRAS = [
-  { icon: FileSpreadsheet, label: 'Import de tes mariages depuis Excel' },
   { icon: Search, label: 'Recherche instantanée (Ctrl + K)' },
   { icon: FileText, label: 'Suivi du contrat' },
   { icon: Moon, label: 'Mode sombre' },

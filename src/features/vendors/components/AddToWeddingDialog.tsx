@@ -21,7 +21,7 @@ export function AddToWeddingDialog({ vendor, weddings, onOpenChange, onConfirm }
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md" {...returnFocus}>
+      <DialogContent className="sm:max-w-md" {...returnFocus}>
         <DialogHeader>
           <DialogTitle>Ajouter à un mariage</DialogTitle>
           <DialogDescription>

@@ -60,7 +60,7 @@ export function EquipmentItemForm({ open, onOpenChange, item, onSubmit }: Equipm
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Modifier l'élément" : 'Ajouter un élément'}</DialogTitle>
           <DialogDescription>

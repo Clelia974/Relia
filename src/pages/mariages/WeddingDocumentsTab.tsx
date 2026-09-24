@@ -205,7 +205,7 @@ export function WeddingDocumentsTab() {
       </Tabs>
 
       <Dialog open={templatePickerOpen} onOpenChange={setTemplatePickerOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Choisir une formule</DialogTitle>
             <DialogDescription>Chaque formule est entièrement personnalisable une fois créée.</DialogDescription>

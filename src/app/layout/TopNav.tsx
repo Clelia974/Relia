@@ -1,4 +1,4 @@
-import { Menu, Search } from 'lucide-react'
+import { LogOut, Menu, Search } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import {
@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const mainNav = [
@@ -21,8 +22,11 @@ const plusNav = [
   { to: '/prestataires', label: 'Prestataires' },
   { to: '/propositions', label: 'Propositions' },
   { to: '/finances', label: 'Finances' },
-  { to: '/paiement', label: 'Abonnement' },
+]
+
+const accountNav = [
   { to: '/parametres', label: 'Paramètres' },
+  { to: '/paiement', label: 'Abonnement' },
 ]
 
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -30,12 +34,14 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 /** En-tête léger — logo + menu, affiché uniquement en dessous de `lg` (la navigation principale vit dans la Sidebar). */
 export function TopNav({ onSearch }: { onSearch: () => void }) {
+  const { logout } = useAuth()
+
   return (
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Relia — Aujourd'hui">
           <img src="/brand/relia-monogram.svg" alt="" className="size-7" />
-          <span className="font-heading text-lg font-semibold text-foreground">Relia</span>
+          <span className="font-heading text-lg font-semibold text-primary">Relia</span>
         </NavLink>
 
         <div className="flex items-center gap-1">
@@ -74,6 +80,18 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
                   </NavLink>
                 </DropdownMenuItem>
               ))}
+              <DropdownMenuSeparator />
+              {accountNav.map((item) => (
+                <DropdownMenuItem key={item.to} asChild>
+                  <NavLink to={item.to} className={mobileNavLinkClass}>
+                    {item.label}
+                  </NavLink>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem variant="destructive" onSelect={logout}>
+                <LogOut className="size-4" aria-hidden="true" />
+                Déconnexion
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

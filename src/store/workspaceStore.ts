@@ -28,6 +28,7 @@ import type {
   SoldServiceStatus,
   Task,
   TaskStatus,
+  TaskTemplateItem,
   TimelineEvent,
   UiPreferences,
   UserProfile,
@@ -254,6 +255,9 @@ interface WorkspaceStoreState {
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
   updateProposalTemplate: (tier: ProposalTier, patch: Pick<ProposalTemplate, 'label' | 'tagline' | 'lines' | 'showOnDocuments'>) => void
+
+  /** Remplace la checklist de démarrage en une fois (sauvegarde depuis Paramètres) — jamais générée sans confirmation explicite de l'utilisatrice. */
+  setTaskTemplate: (items: TaskTemplateItem[]) => void
 
   updateOnboardingAnswers: (patch: Partial<NonNullable<UserProfile['onboardingAnswers']>>) => void
   completeOnboarding: () => void
@@ -1169,6 +1173,10 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             : [...templates, { tier, ...patch }]
           return { workspace: { ...state.workspace, proposalTemplates } }
         })
+      },
+
+      setTaskTemplate: (items) => {
+        set((state) => ({ workspace: { ...state.workspace, taskTemplate: items } }))
       },
 
       updateOnboardingAnswers: (patch) => {

@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 import { SOLUTION_POINTS } from '@/features/landing/landingContent'
 
 /**
- * Porté depuis LandingPage.tsx ("Rencontre RELIA") — même contenu et même
+ * Porté depuis LandingPage.tsx ("Découvre Relia") — même contenu et même
  * structure que la vraie landing, c'est le pont narratif entre le problème
  * et "Comment ça marche" qui manquait dans la version test.
  */

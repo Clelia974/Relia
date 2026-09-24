@@ -108,7 +108,7 @@ export const FAQ = [
   },
   {
     q: 'Où sont stockées mes données ?',
-    a: 'Tes mariages, tâches, prestataires et finances restent dans ton navigateur, sur ton appareil. Seuls ton email et ton mot de passe (pour te connecter) sont gérés par notre prestataire d’authentification. Tu peux tout exporter et importer en JSON depuis les Paramètres. Une sauvegarde en ligne de tes données est en préparation ; quand elle arrivera, tu en seras informée et l’export restera disponible.',
+    a: 'Tes mariages, tâches, prestataires et finances restent dans ton navigateur, sur ton appareil. Seuls ton email et ton mot de passe (pour te connecter) sont gérés par notre prestataire d’authentification. Depuis les Paramètres, un bouton « Sauvegarder maintenant » envoie une copie en ligne, à la demande. Sur un nouvel appareil jamais utilisé, cette copie se restaure automatiquement dès ta première connexion. Sur un appareil qui contient déjà des données (le tien, par exemple, si tu changes de téléphone), utilise le bouton « Restaurer depuis le cloud » pour la retirer explicitement — elle remplace alors tout ce qui est enregistré sur cet appareil, une confirmation te sera demandée avant. Ce n’est pas une synchronisation en continu : si tu passes d’un appareil à l’autre régulièrement, pense à sauvegarder depuis celui où tu viens de travailler, sinon les changements n’apparaissent pas tout seuls ailleurs. L’export/import JSON manuel reste disponible en complément, à tout moment.',
   },
   {
     q: 'Est-ce que ça marche sans internet ?',

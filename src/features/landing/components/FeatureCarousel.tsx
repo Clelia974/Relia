@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClipboardCheck, Clock, type LucideIcon, Package, Users, Wallet } from 'lucide-react'
+import { ClipboardCheck, Clock, FileSpreadsheet, type LucideIcon, Package, Users, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Step =
@@ -15,6 +15,15 @@ type Step =
  * données réelles, pas la démo "Bonjour Démonstration").
  */
 const STEPS: Step[] = [
+  {
+    kind: 'screenshot',
+    icon: FileSpreadsheet,
+    label: 'Import',
+    title: 'Déjà tes mariages dans un tableur ? Importe-les en une fois',
+    text: 'Glisse ton fichier Excel avec tes mariages, prestataires et budgets — RELIA reprend tout, sans ressaisie manuelle.',
+    image: '/landing/import.jpg',
+    alt: 'Aperçu de l’import d’un mariage et d’un prestataire depuis un fichier Excel dans RELIA',
+  },
   {
     kind: 'screenshot',
     icon: ClipboardCheck,

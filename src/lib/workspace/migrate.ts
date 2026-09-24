@@ -1,4 +1,5 @@
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
+import { createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { CURRENT_SCHEMA_VERSION, WorkspaceSchema } from '@/schemas/workspace'
 import { generateId } from '@/lib/id'
 import type { Workspace } from '@/types/entities'
@@ -300,10 +301,16 @@ export function migrateWorkspace(raw: unknown): MigrationResult {
   // Données antérieures à l'introduction des formules personnalisables (ou
   // workspace vidé par erreur) : on réinjecte les 3 formules par défaut
   // plutôt que de laisser l'utilisatrice sans aucune formule disponible.
-  const workspace =
+  const withProposalTemplates =
     parsed.data.proposalTemplates.length > 0
       ? parsed.data
       : { ...parsed.data, proposalTemplates: createDefaultProposalTemplates() }
+
+  // Même principe pour la checklist de démarrage (données antérieures à son introduction).
+  const workspace =
+    withProposalTemplates.taskTemplate.length > 0
+      ? withProposalTemplates
+      : { ...withProposalTemplates, taskTemplate: createDefaultTaskTemplate() }
 
   return { ok: true, workspace }
 }

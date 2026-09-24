@@ -50,7 +50,7 @@ export function TimelineConflictDialog({ open, onOpenChange, conflict, events, o
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Conflit de planning</DialogTitle>
           <DialogDescription className="whitespace-pre-line">{conflict.message}</DialogDescription>

@@ -65,7 +65,7 @@ export function ScopeChangeForm({ open, onOpenChange, scopeChange, defaultDate, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Modifier la demande' : 'Ajouter une demande'}</DialogTitle>
           <DialogDescription>

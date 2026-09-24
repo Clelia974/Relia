@@ -1,7 +1,17 @@
-import { CalendarDays, CreditCard, FileText, Heart, ListChecks, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, LogOut, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { InitialsBadge } from '@/components/InitialsBadge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useAuth } from '@/hooks/useAuth'
+import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
 import { cn } from '@/lib/utils'
+import { useWorkspaceStore } from '@/store/workspaceStore'
 
 const navItems = [
   { to: '/aujourdhui', label: "Aujourd'hui", end: true, icon: Sun },
@@ -11,8 +21,6 @@ const navItems = [
   { to: '/prestataires', label: 'Prestataires', icon: Users },
   { to: '/propositions', label: 'Propositions', icon: FileText },
   { to: '/finances', label: 'Finances', icon: Wallet },
-  { to: '/paiement', label: 'Abonnement', icon: CreditCard },
-  { to: '/parametres', label: 'Paramètres', icon: Settings },
 ]
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -24,12 +32,18 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
 export function Sidebar({ onSearch }: { onSearch: () => void }) {
+  const { logout } = useAuth()
+  const { status } = useSubscriptionCheck()
+  const displayName = useWorkspaceStore((s) => s.workspace.userProfile.displayName)
+  const planLabel = status === 'active' ? 'Solo' : 'Gratuit'
+  const navigate = useNavigate()
+
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center justify-between px-6 pb-4 pt-7">
         <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Relia — Aujourd'hui">
           <img src="/brand/relia-monogram.svg" alt="" className="size-8" />
-          <span className="font-heading text-xl font-semibold tracking-tight text-foreground">Relia</span>
+          <span className="font-heading text-xl font-semibold tracking-tight text-primary">Relia</span>
         </NavLink>
         <ThemeToggle />
       </div>
@@ -47,7 +61,7 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
         </button>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-6 pt-2" aria-label="Navigation principale">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pt-2" aria-label="Navigation principale">
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
             <item.icon className="size-4 shrink-0" aria-hidden="true" />
@@ -55,6 +69,39 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
           </NavLink>
         ))}
       </nav>
+
+      <div className="border-t border-sidebar-border px-4 py-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center gap-2.5 rounded-lg p-1.5 text-left transition-colors hover:bg-accent/60"
+              aria-label="Menu du compte"
+            >
+              <InitialsBadge name={displayName || '?'} className="size-8 text-[11px]" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium text-foreground">{displayName || 'Mon compte'}</span>
+                <span className="block text-xs text-muted-foreground">{planLabel}</span>
+              </span>
+              <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="top" className="w-56">
+            <DropdownMenuItem onSelect={() => navigate('/parametres')}>
+              <Settings className="size-4" aria-hidden="true" />
+              Paramètres
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate('/paiement')}>
+              <CreditCard className="size-4" aria-hidden="true" />
+              Abonnement
+            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive" onSelect={logout}>
+              <LogOut className="size-4" aria-hidden="true" />
+              Déconnexion
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </aside>
   )
 }

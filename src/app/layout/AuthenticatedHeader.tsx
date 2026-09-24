@@ -29,7 +29,7 @@ export function AuthenticatedHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2" aria-label="Relia">
           <img src="/brand/relia-monogram.svg" alt="" className="size-7" />
-          <span className="font-heading text-lg font-semibold text-foreground">Relia</span>
+          <span className="font-heading text-lg font-semibold text-primary">Relia</span>
         </Link>
 
         <div className="flex items-center gap-3">

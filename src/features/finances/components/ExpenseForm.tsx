@@ -59,7 +59,7 @@ export function ExpenseForm({ open, onOpenChange, expense, defaultDate, onSubmit
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Modifier la dépense' : 'Ajouter une dépense'}</DialogTitle>
           <DialogDescription>

@@ -39,7 +39,7 @@ export function SoldServiceForm({ open, onOpenChange, onSubmit }: SoldServiceFor
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Ajouter une prestation vendue</DialogTitle>
           <DialogDescription>Pour un service vendu après la proposition initiale (ex. un ajout demandé par le couple).</DialogDescription>

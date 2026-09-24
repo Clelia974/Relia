@@ -15,7 +15,7 @@ const template = (overrides: Partial<ProposalTemplate> = {}): ProposalTemplate =
 
 function setup(t: ProposalTemplate) {
   const onSubmit = vi.fn()
-  render(<ProposalTemplateForm open onOpenChange={vi.fn()} template={t} onSubmit={onSubmit} />)
+  render(<ProposalTemplateForm template={t} onSubmit={onSubmit} onCancel={vi.fn()} />)
   return onSubmit
 }
 

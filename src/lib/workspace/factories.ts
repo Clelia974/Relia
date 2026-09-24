@@ -1,5 +1,6 @@
 import { addDays, subDays } from 'date-fns'
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
+import { createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { generateId } from '@/lib/id'
 import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 import type { Workspace } from '@/types/entities'
@@ -30,6 +31,7 @@ export function createEmptyWorkspace(): Workspace {
     documentCounters: {},
     soldServices: [],
     proposalTemplates: createDefaultProposalTemplates(),
+    taskTemplate: createDefaultTaskTemplate(),
     clientDecisions: [],
     invoices: [],
     equipmentItems: [],
@@ -599,6 +601,7 @@ export function createDemoWorkspace(): Workspace {
     documentCounters: {},
     soldServices: [],
     proposalTemplates: createDefaultProposalTemplates(),
+    taskTemplate: createDefaultTaskTemplate(),
     clientDecisions,
     invoices: [],
     equipmentItems: [],
