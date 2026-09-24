@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { createSessionMock, headMock } = vi.hoisted(() => ({ createSessionMock: vi.fn(), headMock: vi.fn() }))
+const { createSessionMock, maybeSingleMock } = vi.hoisted(() => ({ createSessionMock: vi.fn(), maybeSingleMock: vi.fn() }))
 vi.mock('stripe', () => ({
   default: class {
     checkout = { sessions: { create: createSessionMock } }
   },
 }))
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ from: () => ({ select: () => ({ eq: () => headMock() }) }) }),
+  createClient: () => ({ from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }) }),
 }))
 
 process.env.STRIPE_SECRET_KEY = 'sk_test_fake'
@@ -20,7 +20,7 @@ process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER = 'price_launch_789'
 process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL = 'price_launch_annual_987'
 
 // Par défaut, "0 place prise" — la plupart des tests ne concernent pas l'offre de lancement.
-headMock.mockResolvedValue({ count: 0, error: null })
+maybeSingleMock.mockResolvedValue({ data: { redeemed_count: 0 }, error: null })
 
 const { default: handler } = await import('./checkout-session')
 
@@ -95,7 +95,7 @@ describe('POST /api/stripe/checkout-session', () => {
 
   it("crée la session de l'offre de lancement avec le mois offert (trial_period_days) et le tag de metadata, tant qu'il reste des places", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-launch' })
-    headMock.mockReset().mockResolvedValue({ count: 42, error: null })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 42 }, error: null })
     const res = mockRes()
 
     await handler(
@@ -115,7 +115,7 @@ describe('POST /api/stripe/checkout-session', () => {
 
   it("crée aussi la session de l'offre de lancement pour le price annuel dédié, même mois offert et même metadata", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-launch-annual' })
-    headMock.mockReset().mockResolvedValue({ count: 10, error: null })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 10 }, error: null })
     const res = mockRes()
 
     await handler(
@@ -134,7 +134,7 @@ describe('POST /api/stripe/checkout-session', () => {
   })
 
   it("refuse aussi le price annuel de l'offre une fois les 100 places prises (même compteur que le mensuel)", async () => {
-    headMock.mockReset().mockResolvedValue({ count: 100, error: null })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 100 }, error: null })
     const res = mockRes()
 
     await handler(
@@ -147,7 +147,7 @@ describe('POST /api/stripe/checkout-session', () => {
   })
 
   it("refuse l'offre de lancement une fois les 100 places prises, sans jamais créer de session", async () => {
-    headMock.mockReset().mockResolvedValue({ count: 100, error: null })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 100 }, error: null })
     const res = mockRes()
 
     await handler(
@@ -161,7 +161,7 @@ describe('POST /api/stripe/checkout-session', () => {
 
   it("un priceId standard (mensuel/annuel) ne déclenche jamais le mois offert ni le comptage de l'offre de lancement", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-abc' })
-    headMock.mockReset()
+    maybeSingleMock.mockReset()
     const res = mockRes()
 
     await handler(
@@ -170,7 +170,7 @@ describe('POST /api/stripe/checkout-session', () => {
     )
 
     expect(res.statusCode).toBe(200)
-    expect(headMock).not.toHaveBeenCalled()
+    expect(maybeSingleMock).not.toHaveBeenCalled()
     expect(createSessionMock).toHaveBeenCalledWith(expect.not.objectContaining({ subscription_data: expect.anything() }))
   })
 

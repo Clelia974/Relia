@@ -120,9 +120,28 @@ landing.
 |---|---|
 | `api/launch-offer-count.ts` | Point d'accès public (aucune authentification — appelé depuis la landing, visitée sans compte) : compte `public.users` où `is_launch_offer = true`, renvoie `{ limit, redeemed, remaining, available }`. Jamais de ligne individuelle exposée. |
 | `useLaunchOfferAvailability.ts` | Hook client, utilisé par la landing et `/paiement`. `offer` reste `null` tant que l'appel n'a pas abouti (jamais de place affichée par défaut). |
-| `api/stripe/checkout-session.ts` | Pour les prices de l'offre (`VITE_STRIPE_PRICE_LAUNCH_OFFER` mensuel, `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL` annuel) : recompte les places prises au moment de la création de la session (jamais seulement confiance dans l'affichage front, qui peut être vieux de quelques secondes — cache CDN de 30s sur le compteur), pose `subscription_data.trial_period_days = 30` (le vrai mois offert, pas juste une mention) et `metadata.offer = 'launch_100'`. Les deux prices partagent le même compteur/la même limite de 100. |
-| `api/stripe/webhook.ts` | `checkout.session.completed` : si `metadata.offer === 'launch_100'`, pose `is_launch_offer = true` sur `public.users` — c'est ce champ, jamais le price Stripe courant, qui est compté. |
-| `supabase/sql/004_add_launch_offer.sql` | Colonne `is_launch_offer` sur `public.users`. |
+| `api/stripe/checkout-session.ts` | Pour les prices de l'offre (`VITE_STRIPE_PRICE_LAUNCH_OFFER` mensuel, `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL` annuel) : lit le compteur (pré-vérification rapide, pas le blocage définitif — cf. ci-dessous), pose `subscription_data.trial_period_days = 30` (le vrai mois offert, pas juste une mention), `payment_method_collection: 'always'` (la carte est toujours enregistrée pendant Checkout, même en essai) et `metadata.offer = 'launch_100'`. |
+| `api/stripe/webhook.ts` | `checkout.session.completed` avec `metadata.offer === 'launch_100'` : appelle `claim_launch_offer_slot()` (fonction Postgres, cf. ci-dessous) pour réserver **atomiquement** une place, seulement à la confirmation du paiement — jamais à la création de la session, pour qu'un abandon de paiement ne consomme aucune place. |
+| `supabase/sql/004_add_launch_offer.sql` | Colonne `is_launch_offer` sur `public.users` (pratique pour retrouver quelles clientes en profitent). |
+| `supabase/sql/005_launch_offer_counter.sql` | Table `launch_offer_counter` (une ligne) + fonction `claim_launch_offer_slot()` — source de vérité réelle du nombre de places prises. |
+
+**Pourquoi un compteur dédié plutôt qu'un `count(*) on users`** : un COUNT lu
+puis un UPDATE écrit séparément n'est jamais atomique — deux webhooks
+Stripe traités en parallèle (deux clientes qui payent au même instant)
+pourraient tous les deux lire "99" et tous les deux passer, dépassant la
+limite de 100. `claim_launch_offer_slot()` fait tout en une seule
+instruction SQL (`UPDATE ... WHERE redeemed_count < 100 RETURNING ...`) :
+Postgres verrouille la ligne le temps de la requête, donc au plus 100
+appels peuvent réussir, quel que soit le nombre de webhooks reçus en même
+temps. `api/launch-offer-count.ts` lit ce même compteur (jamais un
+`count(*)` séparé qui pourrait diverger).
+
+**Cas limite accepté** : si malgré tout une 101ᵉ cliente passait le
+paiement (webhooks arrivés dans une fenêtre vraiment minuscule), son
+abonnement Stripe reste actif au tarif verrouillé — on n'annule jamais un
+paiement déjà accepté — mais elle n'est pas comptée dans les 100 et un
+`console.warn` le signale. À traiter manuellement si ça arrive (support),
+pas une erreur applicative.
 | `src/pages/PaymentPage.tsx` | Carte visible seulement si `status` ∈ {trial, grace, expired} (jamais déjà payé) **et** `offer.available` ; a son propre bascule Mensuel/Annuel, sur le même state `billing` que la carte "Passer au Pro". |
 | `src/pages/LandingPage.tsx` | Bandeau au-dessus des tarifs, même condition côté affichage — mais le blocage réel est côté serveur, pas ici. |
 
@@ -143,7 +162,8 @@ seulement si elle protège d'une vraie augmentation future.
 **Étape manuelle** (comme pour Checkout/Webhook ci-dessus) : créer les
 deux prices (mensuel + annuel) dans Stripe Dashboard, les ajouter à
 `VITE_STRIPE_PRICE_LAUNCH_OFFER` / `VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL`
-(local + Vercel), et exécuter `004_add_launch_offer.sql`. Le tarif
-standard (39 €/390 €) suppose aussi que `VITE_STRIPE_PRICE_SOLO_MONTHLY`/
-`_YEARLY` pointent vers de nouveaux prices Stripe à ce nouveau montant
-(un price Stripe existant ne se modifie pas, il se remplace).
+(local + Vercel), et exécuter `004_add_launch_offer.sql` **puis**
+`005_launch_offer_counter.sql` (dans cet ordre). Le tarif standard
+(39 €/390 €) suppose aussi que `VITE_STRIPE_PRICE_SOLO_MONTHLY`/`_YEARLY`
+pointent vers de nouveaux prices Stripe à ce nouveau montant (un price
+Stripe existant ne se modifie pas, il se remplace).

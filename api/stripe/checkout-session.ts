@@ -45,18 +45,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const isLaunchOffer = LAUNCH_OFFER_PRICE_IDS.has(priceId)
   if (isLaunchOffer) {
-    // Re-vérifié ici, jamais laissé à la seule discrétion de l'affichage front : la landing peut afficher un
-    // nombre de places vieux de quelques secondes (cache CDN), donc le blocage réel doit être posé au moment
-    // de la création de la session, pas seulement au chargement de la page.
-    const { count, error: countError } = await supabaseAdmin
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('is_launch_offer', true)
-    if (countError) {
-      res.status(500).json({ error: countError.message })
+    // Pré-vérification rapide, pour ne pas envoyer une cliente sur Stripe Checkout si l'offre est déjà
+    // visiblement terminée. Ce n'est PAS le blocage définitif : un abandon de paiement ne doit jamais
+    // consommer de place, donc la place n'est réellement accordée qu'à la confirmation (webhook,
+    // claim_launch_offer_slot — incrémentation atomique, jamais plus de 100 réussites même sous
+    // concurrence). Lire le même compteur ici évite juste une redirection inutile vers Stripe.
+    const { data: counter, error: counterError } = await supabaseAdmin
+      .from('launch_offer_counter')
+      .select('redeemed_count')
+      .eq('id', 1)
+      .maybeSingle()
+    if (counterError) {
+      res.status(500).json({ error: counterError.message })
       return
     }
-    if ((count ?? 0) >= LAUNCH_OFFER_LIMIT) {
+    if ((counter?.redeemed_count ?? 0) >= LAUNCH_OFFER_LIMIT) {
       res.status(400).json({ error: "L'offre de lancement est terminée — les 100 places ont déjà été prises." })
       return
     }
@@ -73,6 +76,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/paiement?paiement=succes`,
       cancel_url: `${siteUrl}/paiement?paiement=annule`,
+      // Explicite plutôt que de compter sur le défaut Stripe : la carte est toujours collectée pendant le
+      // Checkout, y compris avec un essai (trial_period_days) — jamais un "essai" qui ne débiterait personne
+      // ensuite faute de moyen de paiement enregistré.
+      payment_method_collection: 'always',
       ...(isLaunchOffer
         ? {
             // Premier prélèvement repoussé de 30 jours — le vrai mois offert, pas juste une mention marketing.

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { headMock } = vi.hoisted(() => ({ headMock: vi.fn() }))
+const { maybeSingleMock } = vi.hoisted(() => ({ maybeSingleMock: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ from: () => ({ select: () => ({ eq: () => headMock() }) }) }),
+  createClient: () => ({ from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }) }),
 }))
 
 process.env.VITE_SUPABASE_URL = 'https://example.supabase.co'
@@ -39,8 +39,8 @@ describe('GET /api/launch-offer-count', () => {
     expect(res.statusCode).toBe(405)
   })
 
-  it('renvoie le nombre de places restantes, sans exposer de ligne individuelle', async () => {
-    headMock.mockReset().mockResolvedValue({ count: 37, error: null })
+  it('renvoie le nombre de places restantes, lu depuis le compteur atomique (jamais un count(*) séparé)', async () => {
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 37 }, error: null })
     const res = mockRes()
 
     await handler({ method: 'GET' } as VercelRequest, res)
@@ -50,7 +50,7 @@ describe('GET /api/launch-offer-count', () => {
   })
 
   it('offre épuisée : remaining à 0, available à false, jamais négatif', async () => {
-    headMock.mockReset().mockResolvedValue({ count: 130, error: null })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 130 }, error: null })
     const res = mockRes()
 
     await handler({ method: 'GET' } as VercelRequest, res)
@@ -59,7 +59,7 @@ describe('GET /api/launch-offer-count', () => {
   })
 
   it('renvoie 500 avec un message lisible si Supabase échoue', async () => {
-    headMock.mockReset().mockResolvedValue({ count: null, error: { message: 'Supabase indisponible' } })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: null, error: { message: 'Supabase indisponible' } })
     const res = mockRes()
 
     await handler({ method: 'GET' } as VercelRequest, res)

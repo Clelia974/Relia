@@ -19,17 +19,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return
   }
 
-  const { count, error } = await supabaseAdmin
-    .from('users')
-    .select('id', { count: 'exact', head: true })
-    .eq('is_launch_offer', true)
+  // Lu depuis le même compteur atomique que le webhook incrémente (launch_offer_counter, cf.
+  // 005_launch_offer_counter.sql) — jamais un `count(*)` séparé sur `users`, qui pourrait diverger
+  // de ce qui a réellement été accordé sous concurrence.
+  const { data, error } = await supabaseAdmin.from('launch_offer_counter').select('redeemed_count').eq('id', 1).maybeSingle()
 
   if (error) {
     res.status(500).json({ error: error.message })
     return
   }
 
-  const redeemed = count ?? 0
+  const redeemed = data?.redeemed_count ?? 0
   const remaining = Math.max(0, LAUNCH_OFFER_LIMIT - redeemed)
 
   // Mise en cache courte côté CDN Vercel : ce nombre change rarement à la minute près, inutile de retaper Supabase à chaque chargement de la landing.

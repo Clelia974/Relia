@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { constructEventMock, updateMock, eqUpdateMock, maybeSingleMock, eqSelectMock, fromMock } = vi.hoisted(() => {
+const { constructEventMock, updateMock, eqUpdateMock, maybeSingleMock, eqSelectMock, fromMock, rpcMock } = vi.hoisted(() => {
   const maybeSingleMock = vi.fn()
   const eqSelectMock = vi.fn(() => ({ maybeSingle: maybeSingleMock }))
   const selectMock = vi.fn(() => ({ eq: eqSelectMock }))
@@ -15,6 +15,7 @@ const { constructEventMock, updateMock, eqUpdateMock, maybeSingleMock, eqSelectM
     maybeSingleMock,
     eqSelectMock,
     fromMock,
+    rpcMock: vi.fn(),
   }
 })
 
@@ -23,7 +24,7 @@ vi.mock('stripe', () => ({
     webhooks = { constructEvent: constructEventMock }
   },
 }))
-vi.mock('@supabase/supabase-js', () => ({ createClient: vi.fn(() => ({ from: fromMock })) }))
+vi.mock('@supabase/supabase-js', () => ({ createClient: vi.fn(() => ({ from: fromMock, rpc: rpcMock })) }))
 
 process.env.STRIPE_SECRET_KEY = 'sk_test_fake'
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_fake'
@@ -66,6 +67,8 @@ beforeEach(() => {
   eqUpdateMock.mockReset().mockResolvedValue({ error: null })
   maybeSingleMock.mockReset()
   fromMock.mockClear()
+  // Par défaut, la place est accordée (compteur < 100) — les tests qui veulent l'offre épuisée le redéfinissent.
+  rpcMock.mockReset().mockResolvedValue({ data: 1, error: null })
 })
 
 describe('POST /api/stripe/webhook', () => {
@@ -104,6 +107,7 @@ describe('POST /api/stripe/webhook', () => {
 
     expect(res.statusCode).toBe(200)
     expect(fromMock).toHaveBeenCalledWith('users')
+    expect(rpcMock).not.toHaveBeenCalled()
     expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: false })
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
   })
@@ -118,7 +122,35 @@ describe('POST /api/stripe/webhook', () => {
     await handler(mockReq('{}', 'sig_valide'), res)
 
     expect(res.statusCode).toBe(200)
+    expect(rpcMock).toHaveBeenCalledWith('claim_launch_offer_slot')
     expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: true })
+  })
+
+  it("offre de lancement déjà à 100 places (claim_launch_offer_slot ne renvoie aucune ligne) : active quand même l'abonnement déjà payé, mais ne le compte pas", async () => {
+    rpcMock.mockResolvedValue({ data: null, error: null })
+    constructEventMock.mockReturnValue({
+      type: 'checkout.session.completed',
+      data: { object: { client_reference_id: 'u1', customer: 'cus_123', metadata: { offer: 'launch_100' } } },
+    })
+    const res = mockRes()
+
+    await handler(mockReq('{}', 'sig_valide'), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: false })
+  })
+
+  it("claim_launch_offer_slot est appelée pour chaque webhook simultané : jamais plus de 100 réussites même sous concurrence (garanti par l'UPDATE atomique en base, pas par ce test — vérifié ici juste que l'appel a bien lieu par événement)", async () => {
+    constructEventMock.mockReturnValue({
+      type: 'checkout.session.completed',
+      data: { object: { client_reference_id: 'u1', customer: 'cus_123', metadata: { offer: 'launch_100' } } },
+    })
+    const res1 = mockRes()
+    const res2 = mockRes()
+
+    await Promise.all([handler(mockReq('{}', 'sig_valide'), res1), handler(mockReq('{}', 'sig_valide'), res2)])
+
+    expect(rpcMock).toHaveBeenCalledTimes(2)
   })
 
   it('customer.subscription.deleted : retrouve l’utilisateur via stripe_customer_id (pas client_reference_id, absent sur cet objet)', async () => {
