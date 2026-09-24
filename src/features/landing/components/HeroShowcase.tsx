@@ -1,4 +1,5 @@
 import { CheckCircle2, Clock, Wallet } from 'lucide-react'
+import { TRIAL_DAYS } from '@/features/landing/landingContent'
 
 /**
  * Visuel du hero (colonne droite) — inspiré de la mise en scène gbcrea.com
@@ -37,7 +38,13 @@ export function HeroShowcase() {
           <span className="size-2.5 rounded-full bg-success" aria-hidden="true" />
           <span className="ml-2 text-xs text-muted-foreground">Jour J</span>
         </div>
-        <img src="/landing/jour-j.jpg" alt="Déroulé du Jour J dans l'application Relia" className="block w-full" />
+        <img
+          src="/landing/jour-j.jpg"
+          alt="Déroulé du Jour J dans l'application Relia"
+          width={1200}
+          height={682}
+          className="block w-full"
+        />
       </div>
 
       {/* Badges flottants — détachés à l'extérieur du cadre, faits vrais (pas de statistiques d'usage) */}
@@ -62,7 +69,7 @@ export function HeroShowcase() {
         style={{ animationDelay: '760ms' }}
       >
         <CheckCircle2 className="size-3.5 text-success" aria-hidden="true" />
-        Essai 14 jours, sans CB
+        Essai {TRIAL_DAYS} jours, sans CB
       </span>
     </div>
   )

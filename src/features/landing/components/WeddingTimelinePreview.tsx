@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { addDays, format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { ArrowRight, Check } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,8 +28,13 @@ function buildMilestones(weddingDate: Date) {
   ].map((step) => ({ ...step, date: addDays(weddingDate, step.dayOffset) }))
 }
 
-export function WeddingTimelinePreview() {
-  const navigate = useNavigate()
+interface WeddingTimelinePreviewProps {
+  /** Auth-aware, passé par LandingPage.tsx — jamais un navigate('/inscription') en dur : une utilisatrice déjà connectée ne doit pas être renvoyée vers l'inscription. */
+  ctaLabel: string
+  onStart: () => void
+}
+
+export function WeddingTimelinePreview({ ctaLabel, onStart }: WeddingTimelinePreviewProps) {
   const [dateInput, setDateInput] = useState('')
   const [revealedFor, setRevealedFor] = useState<Date | null>(null)
 
@@ -82,8 +86,8 @@ export function WeddingTimelinePreview() {
 
           <li className="animate-notice-in mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: `${milestones.length * 90}ms` }}>
             <p className="text-sm text-muted-foreground">Envie de piloter vraiment ce déroulé, avec tes prestataires et ton budget ?</p>
-            <Button variant="outline" onClick={() => navigate('/inscription')}>
-              Commencer gratuitement
+            <Button variant="outline" onClick={onStart}>
+              {ctaLabel}
             </Button>
           </li>
         </ol>

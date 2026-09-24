@@ -15,6 +15,26 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 }
 
 /**
+ * jsdom ne fournit pas non plus IntersectionObserver — utilisé par
+ * FeatureCarousel (landing) pour suivre quelle fenêtre du carrousel est
+ * visible. Le stub n'observe jamais réellement : le carrousel reste sur
+ * sa première étape dans les tests, ce qui est le comportement attendu
+ * au montage de toute façon.
+ */
+class IntersectionObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return []
+  }
+}
+
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  globalThis.IntersectionObserver = IntersectionObserverStub as unknown as typeof IntersectionObserver
+}
+
+/**
  * jsdom ne fournit pas non plus Element.scrollIntoView — nécessaire à Radix
  * Select dès qu'on ouvre le menu (recherche l'item actif pour le centrer).
  */

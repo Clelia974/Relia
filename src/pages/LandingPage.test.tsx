@@ -92,16 +92,19 @@ describe('LandingPage', () => {
     expect(screen.getByTestId('where').textContent).toBe('/aujourdhui')
   })
 
-  it('les huit sections attendues sont présentes, dans un ordre lisible', () => {
+  it('les sections attendues sont présentes, dans un ordre lisible', () => {
     setup()
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
-      'Le chaos du Jour J n’est pas une fatalité',
-      'Rencontre RELIA',
-      'Ce que tu peux faire avec RELIA',
+      'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
+      'Tu connais déjà ces situations',
+      'Rencontre Relia',
+      'Ce que tu peux faire avec Relia',
+      'Avant Relia. Après Relia.',
+      'Relia a été pensé pour les personnes qui ont déjà une base',
       'Tarifs simples, pas de piège',
-      'Questions fréquentes',
-      'Prêt à respirer le Jour J ?',
+      'Tout ce que tu te demandes avant de commencer',
+      'Prêt·e à respirer le Jour J ?',
     ])
   })
 
@@ -168,5 +171,14 @@ describe('LandingPage', () => {
     useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
     setup()
     expect(screen.queryByText(/offre de lancement/i)).not.toBeInTheDocument()
+  })
+
+  it('offre de lancement en annuel : distingue le mois offert de la remise annuelle, ne dit jamais "3 mois offerts"', () => {
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: /Annuel/ }))
+
+    expect(screen.getByText(/290 €\/an au lieu de 348 €\/an/)).toBeInTheDocument()
+    expect(screen.queryByText(/3 mois offerts/i)).not.toBeInTheDocument()
   })
 })
