@@ -63,27 +63,30 @@ export function LandingPage() {
         Aller au contenu
       </a>
 
-      <AuthenticatedHeader />
-
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" className="flex items-center gap-2" aria-label="RELIA — haut de page">
-            <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
-          </a>
-          <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-            <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
-            <a href="#tarifs" className="transition-colors hover:text-foreground">Tarifs</a>
-            <a href="#questions" className="transition-colors hover:text-foreground">Questions</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            {!isAuthenticated && (
+      {/* Un seul en-tête à la fois : AuthenticatedHeader une fois connectée (CTA app + menu compte),
+          celui-ci sinon (nav de la page + Se connecter/Commencer) — les deux affichés ensemble
+          dupliquaient le bouton d'accès à l'application. */}
+      {isAuthenticated ? (
+        <AuthenticatedHeader />
+      ) : (
+        <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
+          <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
+            <a href="#haut" className="flex items-center gap-2" aria-label="RELIA — haut de page">
+              <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
+              <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
+            </a>
+            <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+              <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
+              <a href="#tarifs" className="transition-colors hover:text-foreground">Tarifs</a>
+              <a href="#questions" className="transition-colors hover:text-foreground">Questions</a>
+            </nav>
+            <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate('/connexion')}>Se connecter</Button>
-            )}
-            <Button size="sm" onClick={start}>{ctaLabel}</Button>
+              <Button size="sm" onClick={start}>{ctaLabel}</Button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <main id="contenu" className="flex flex-col">
         {/* 1 — HERO */}
