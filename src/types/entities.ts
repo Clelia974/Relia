@@ -35,6 +35,7 @@ export type {
   Task,
   TaskPriority,
   TaskStatus,
+  TaskTemplateItem,
   TaskWaitingOn,
   TimelineEvent,
   TimelineEventStatus,
