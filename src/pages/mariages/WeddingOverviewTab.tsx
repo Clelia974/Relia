@@ -12,12 +12,29 @@ import { getWeddingAssignments } from '@/features/vendors/assignments'
 import { countConfirmed, countTotal, findNextVendorToContact, hasUrgentVendor } from '@/features/vendors/summary'
 import { TaskEmptyState } from '@/features/tasks/components/TaskEmptyState'
 import { computeWeddingTaskStats, findNextPriorityTask } from '@/features/tasks/summary'
+import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { WeddingEditForm } from '@/features/weddings/components/WeddingEditForm'
 import type { WeddingEditFormValues } from '@/features/weddings/weddingEditForm.schema'
 import { currency } from '@/lib/currency'
 import { WEDDING_STATUS_LABELS } from '@/lib/weddingStatus'
 import { useWorkspaceStore } from '@/store/workspaceStore'
+import type { WeddingStatus } from '@/types/entities'
 import type { WeddingOutletContext } from '@/pages/mariages/WeddingLayout'
+
+/** Actions rapides proposées selon le statut courant — au-delà de "Devis envoyé" (Signé et suite), le pipeline détaillé prend le relais, plus besoin de raccourcis. */
+const QUICK_STATUS_ACTIONS: Partial<Record<WeddingStatus, { label: string; next: WeddingStatus }[]>> = {
+  prospect: [
+    { label: 'Marquer comme répondu', next: 'repondu' },
+    { label: 'Marquer en attente de réponse', next: 'en_attente_reponse' },
+  ],
+  repondu: [
+    { label: 'Marquer en attente de réponse', next: 'en_attente_reponse' },
+    { label: 'Marquer devis envoyé', next: 'devis_envoye' },
+  ],
+  en_attente_reponse: [{ label: 'Marquer devis envoyé', next: 'devis_envoye' }],
+  devis_envoye: [{ label: 'Marquer comme signé', next: 'signe' }],
+}
+const CANCELABLE_STATUSES = new Set<WeddingStatus>(['prospect', 'repondu', 'en_attente_reponse', 'devis_envoye'])
 
 const NEXT_STEPS = [
   { to: 'prestataires', label: 'Ajouter des prestataires', icon: Users },
@@ -48,8 +65,31 @@ export function WeddingOverviewTab() {
   const allTimelineEvents = useWorkspaceStore((s) => s.workspace.timelineEvents)
   const hasTimelineEvents = allTimelineEvents.some((e) => e.weddingId === wedding.id)
   const updateWedding = useWorkspaceStore((s) => s.updateWedding)
+  const addTask = useWorkspaceStore((s) => s.addTask)
+  const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
   const [editOpen, setEditOpen] = useState(false)
   const [editFocusField, setEditFocusField] = useState<'notes' | undefined>(undefined)
+
+  /**
+   * Le passage à "Signé" est le seul déclencheur de la checklist de démarrage — jamais à la
+   * création (cf. retour utilisatrice : générer des tâches pour un simple prospect qui ne
+   * signera peut-être jamais est une perte de temps).
+   */
+  const handleQuickStatusChange = (next: WeddingStatus) => {
+    updateWedding(wedding.id, { status: next })
+    if (next === 'signe') {
+      const template = taskTemplate.length > 0 ? taskTemplate : createDefaultTaskTemplate()
+      for (const task of buildDefaultTasksForWedding(wedding.id, wedding.date, template)) addTask(task)
+      toast.success('Mariage signé — checklist de démarrage générée.')
+    } else {
+      toast.success(`Statut mis à jour : ${WEDDING_STATUS_LABELS[next]}.`)
+    }
+  }
+
+  const handleCancel = () => {
+    updateWedding(wedding.id, { status: 'annule' })
+    toast.success('Mariage marqué comme annulé.')
+  }
 
   const handleEditSubmit = (values: WeddingEditFormValues) => {
     updateWedding(wedding.id, {
@@ -126,6 +166,21 @@ export function WeddingOverviewTab() {
             <Field label="Statut du mariage" value={WEDDING_STATUS_LABELS[wedding.status]} />
             <Field label="Créé le" value={format(new Date(wedding.createdAt), 'd MMMM yyyy', { locale: fr })} />
           </dl>
+
+          {(QUICK_STATUS_ACTIONS[wedding.status] || CANCELABLE_STATUSES.has(wedding.status)) && (
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+              {QUICK_STATUS_ACTIONS[wedding.status]?.map((action) => (
+                <Button key={action.next} size="sm" onClick={() => handleQuickStatusChange(action.next)}>
+                  {action.label}
+                </Button>
+              ))}
+              {CANCELABLE_STATUSES.has(wedding.status) && (
+                <Button size="sm" variant="outline" onClick={handleCancel}>
+                  Marquer comme annulé
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

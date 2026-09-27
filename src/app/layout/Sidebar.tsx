@@ -2,6 +2,7 @@ import { CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, Log
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InitialsBadge } from '@/components/InitialsBadge'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/hooks/useAuth'
+import { useNewLeadsBadge } from '@/features/leads/useNewLeadsBadge'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -37,6 +39,7 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
   const displayName = useWorkspaceStore((s) => s.workspace.userProfile.displayName)
   const planLabel = status === 'active' ? 'Solo' : 'Gratuit'
   const navigate = useNavigate()
+  const newLeadsCount = useNewLeadsBadge()
 
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
@@ -65,7 +68,12 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
             <item.icon className="size-4 shrink-0" aria-hidden="true" />
-            {item.label}
+            <span className="flex-1">{item.label}</span>
+            {item.to === '/mariages' && newLeadsCount > 0 && (
+              <Badge variant="default" className="h-5 min-w-5 justify-center rounded-full px-1.5">
+                {newLeadsCount}
+              </Badge>
+            )}
           </NavLink>
         ))}
       </nav>

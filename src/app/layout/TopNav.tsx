@@ -1,6 +1,7 @@
 import { LogOut, Menu, Search } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/hooks/useAuth'
+import { useNewLeadsBadge } from '@/features/leads/useNewLeadsBadge'
 import { cn } from '@/lib/utils'
 
 const mainNav = [
@@ -35,6 +37,7 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
 /** En-tête léger — logo + menu, affiché uniquement en dessous de `lg` (la navigation principale vit dans la Sidebar). */
 export function TopNav({ onSearch }: { onSearch: () => void }) {
   const { logout } = useAuth()
+  const newLeadsCount = useNewLeadsBadge()
 
   return (
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
@@ -62,13 +65,24 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
                 className="relative flex size-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
               >
                 <Menu className="size-5" aria-hidden="true" />
+                {newLeadsCount > 0 && (
+                  <span
+                    className="absolute right-1.5 top-1.5 size-2 rounded-full bg-primary"
+                    aria-label={`${newLeadsCount} nouvelle(s) demande(s)`}
+                  />
+                )}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-48">
               {mainNav.map((item) => (
                 <DropdownMenuItem key={item.to} asChild>
-                  <NavLink to={item.to} end={item.end} className={mobileNavLinkClass}>
+                  <NavLink to={item.to} end={item.end} className={cn(mobileNavLinkClass, 'flex items-center justify-between')}>
                     {item.label}
+                    {item.to === '/mariages' && newLeadsCount > 0 && (
+                      <Badge variant="default" className="h-5 min-w-5 justify-center rounded-full px-1.5">
+                        {newLeadsCount}
+                      </Badge>
+                    )}
                   </NavLink>
                 </DropdownMenuItem>
               ))}

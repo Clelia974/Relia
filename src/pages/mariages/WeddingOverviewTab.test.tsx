@@ -36,6 +36,48 @@ function setup(overrides: Partial<Wedding> = {}) {
   return { weddingId, wedding }
 }
 
+describe('WeddingOverviewTab — pipeline demande → devis → signature', () => {
+  it('un prospect propose "Marquer comme répondu" et "Marquer en attente de réponse"', () => {
+    const { weddingId, wedding } = setup({ status: 'prospect' })
+    renderWithWedding(wedding)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme répondu' }))
+
+    const updated = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
+    expect(updated.status).toBe('repondu')
+  })
+
+  it('marquer un devis envoyé comme signé génère la checklist de démarrage', () => {
+    const { weddingId, wedding } = setup({ status: 'devis_envoye' })
+    expect(useWorkspaceStore.getState().workspace.tasks.filter((t) => t.weddingId === weddingId)).toHaveLength(0)
+    renderWithWedding(wedding)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme signé' }))
+
+    const state = useWorkspaceStore.getState().workspace
+    const updated = state.weddings.find((w) => w.id === weddingId)!
+    expect(updated.status).toBe('signe')
+    expect(state.tasks.filter((t) => t.weddingId === weddingId).length).toBeGreaterThan(0)
+  })
+
+  it('un prospect peut être marqué comme annulé', () => {
+    const { weddingId, wedding } = setup({ status: 'prospect' })
+    renderWithWedding(wedding)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme annulé' }))
+
+    const updated = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
+    expect(updated.status).toBe('annule')
+  })
+
+  it("un mariage déjà signé n'affiche aucune action rapide de pipeline", () => {
+    const { wedding } = setup({ status: 'signe' })
+    renderWithWedding(wedding)
+
+    expect(screen.queryByRole('button', { name: /marquer/i })).toBeNull()
+  })
+})
+
 describe('WeddingOverviewTab — modification du mariage', () => {
   it('affiche un bouton "Modifier" qui ouvre le formulaire', () => {
     const { wedding } = setup()
