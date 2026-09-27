@@ -33,7 +33,7 @@ export async function sendAutoReply(input: {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
       body: JSON.stringify({
-        sender: { name: 'Relia', email: 'no-reply@relia-app.vercel.app' },
+        sender: { name: 'Relia', email: 'contact@evenementscles.com' },
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: 'Votre demande a bien été reçue',
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>
