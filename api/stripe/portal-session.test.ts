@@ -1,10 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { createPortalSessionMock, getUserMock, singleMock } = vi.hoisted(() => ({
+const { createPortalSessionMock, getUserMock, singleMock, rpcMock } = vi.hoisted(() => ({
   createPortalSessionMock: vi.fn(),
   getUserMock: vi.fn(),
   singleMock: vi.fn(),
+  rpcMock: vi.fn(),
 }))
 
 vi.mock('stripe', () => ({
@@ -17,6 +18,7 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     auth: { getUser: getUserMock },
     from: () => ({ select: () => ({ eq: () => ({ maybeSingle: singleMock }) }) }),
+    rpc: rpcMock,
   }),
 }))
 
@@ -44,6 +46,18 @@ function mockReq(overrides: Partial<VercelRequest> = {}): VercelRequest {
 }
 
 describe('POST /api/stripe/portal-session', () => {
+  beforeEach(() => {
+    rpcMock.mockReset().mockResolvedValue({ data: true, error: null })
+  })
+
+  it('refuse au-delà de la limite de requêtes (rate limit)', async () => {
+    rpcMock.mockReset().mockResolvedValue({ data: false, error: null })
+    const res = mockRes()
+    await handler(mockReq({ headers: { authorization: 'Bearer bon-jeton' } }), res)
+    expect(res.statusCode).toBe(429)
+    expect(getUserMock).not.toHaveBeenCalled()
+  })
+
   it('refuse les méthodes autres que POST', async () => {
     const res = mockRes()
     await handler(mockReq({ method: 'GET' }), res)

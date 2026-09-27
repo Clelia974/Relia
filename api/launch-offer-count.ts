@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import { requireEnv } from './_lib/requireEnv.js'
+import { checkRateLimit, getClientIp } from './_lib/rateLimit.js'
 
 const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
 
@@ -17,6 +18,15 @@ const LAUNCH_OFFER_LIMIT = 100
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Méthode non autorisée.' })
+    return
+  }
+
+  const allowed = await checkRateLimit(supabaseAdmin, `launch-offer-count:${getClientIp(req)}`, {
+    maxRequests: 30,
+    windowSeconds: 60,
+  })
+  if (!allowed) {
+    res.status(429).json({ error: 'Trop de requêtes — réessayez dans une minute.' })
     return
   }
 

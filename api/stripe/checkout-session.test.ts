@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { createSessionMock, maybeSingleMock, getUserMock } = vi.hoisted(() => ({
+const { createSessionMock, maybeSingleMock, getUserMock, rpcMock } = vi.hoisted(() => ({
   createSessionMock: vi.fn(),
   maybeSingleMock: vi.fn(),
   getUserMock: vi.fn(),
+  rpcMock: vi.fn(),
 }))
 vi.mock('stripe', () => ({
   default: class {
@@ -15,6 +16,7 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     auth: { getUser: getUserMock },
     from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }),
+    rpc: rpcMock,
   }),
 }))
 
@@ -30,6 +32,8 @@ process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL = 'price_launch_annual_987'
 maybeSingleMock.mockResolvedValue({ data: { redeemed_count: 0 }, error: null })
 // Par défaut, jeton valide pour "sophie@example.com" (u1) — les tests qui veulent un jeton invalide le remplacent explicitement.
 getUserMock.mockResolvedValue({ data: { user: { id: 'u1', email: 'sophie@example.com' } }, error: null })
+// Par défaut, sous la limite de requêtes — le test dédié au rate limit le remplace explicitement.
+rpcMock.mockResolvedValue({ data: true, error: null })
 
 const { default: handler } = await import('./checkout-session.js')
 
@@ -60,6 +64,16 @@ function mockReq(overrides: Partial<VercelRequest> = {}): VercelRequest {
  * du handler. Contournement : reset explicite en début de chaque test.
  */
 describe('POST /api/stripe/checkout-session', () => {
+  it('refuse au-delà de la limite de requêtes (rate limit)', async () => {
+    createSessionMock.mockReset()
+    rpcMock.mockReset().mockResolvedValue({ data: false, error: null })
+    const res = mockRes()
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
+    expect(res.statusCode).toBe(429)
+    expect(getUserMock).not.toHaveBeenCalled()
+    rpcMock.mockReset().mockResolvedValue({ data: true, error: null })
+  })
+
   it('refuse les méthodes autres que POST', async () => {
     createSessionMock.mockReset()
     const res = mockRes()

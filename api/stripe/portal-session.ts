@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { requireEnv } from '../_lib/requireEnv.js'
+import { checkRateLimit, getClientIp } from '../_lib/rateLimit.js'
 
 const stripe = new Stripe(requireEnv('STRIPE_SECRET_KEY'))
 
@@ -34,6 +35,15 @@ async function getVerifiedUserId(req: VercelRequest): Promise<string | null> {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Méthode non autorisée.' })
+    return
+  }
+
+  const allowed = await checkRateLimit(supabaseAdmin, `portal-session:${getClientIp(req)}`, {
+    maxRequests: 10,
+    windowSeconds: 60,
+  })
+  if (!allowed) {
+    res.status(429).json({ error: 'Trop de tentatives — réessayez dans une minute.' })
     return
   }
 
