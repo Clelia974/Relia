@@ -78,6 +78,7 @@ type NewTaskInput = Pick<Task, 'title'> &
       | 'description'
       | 'weddingId'
       | 'vendorId'
+      | 'leadId'
       | 'dueDate'
       | 'startDate'
       | 'endDate'
@@ -495,6 +496,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           priority: input.priority ?? 'normale',
           weddingId: input.weddingId,
           vendorId: input.vendorId,
+          leadId: input.leadId,
           dueDate: input.dueDate,
           startDate: input.startDate,
           endDate: input.endDate,

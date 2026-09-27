@@ -212,6 +212,8 @@ export const TaskSchema = z.object({
   priority: TaskPrioritySchema.default('normale'),
   weddingId: id.optional(),
   vendorId: id.optional(),
+  /** Renvoie vers une demande (leads, côté Supabase) plutôt qu'un mariage — cas des relances de devis, créées avant toute signature. */
+  leadId: z.string().optional(),
   dueDate: isoDate.optional(),
   startDate: isoDate.optional(),
   endDate: isoDate.optional(),

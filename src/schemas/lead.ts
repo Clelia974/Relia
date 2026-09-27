@@ -36,7 +36,26 @@ export const LEAD_SOURCE_LABELS: Record<z.infer<typeof LeadSourceSchema>, string
   autre: 'Autre',
 }
 
-export const LeadStatusSchema = z.enum(['nouveau', 'importe', 'ignore'])
+/**
+ * Une demande reste "leads" pendant toute la négociation (nouveau →
+ * devis_envoye) — jamais transformée en mariage avant la signature.
+ * 'importe' : devis signé, mariage créé (nom conservé pour ne pas casser
+ * les demandes déjà marquées ainsi avant ce changement). 'ignore' :
+ * écartée, à tout stade.
+ */
+export const LeadStatusSchema = z.enum(['nouveau', 'repondu', 'en_attente_reponse', 'devis_envoye', 'importe', 'ignore'])
+
+export const LEAD_STATUS_LABELS: Record<z.infer<typeof LeadStatusSchema>, string> = {
+  nouveau: 'Nouveau',
+  repondu: 'Répondu',
+  en_attente_reponse: 'En attente de réponse',
+  devis_envoye: 'Devis envoyé',
+  importe: 'Signé',
+  ignore: 'Écartée',
+}
+
+/** Toujours visibles dans la boîte de demandes — une fois signée ou écartée, une demande en sort. */
+export const ACTIVE_LEAD_STATUSES = ['nouveau', 'repondu', 'en_attente_reponse', 'devis_envoye'] as const
 
 export const LeadSchema = z.object({
   id: z.string(),

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchNewLeads } from '@/features/leads/leadsApi'
+import { fetchActiveLeads } from '@/features/leads/leadsApi'
 import { useAuth } from '@/hooks/useAuth'
 import type { Lead } from '@/schemas/lead'
 
@@ -10,7 +10,7 @@ interface UseLeadsInboxResult {
   refresh: () => void
 }
 
-/** Charge les nouvelles demandes de l'utilisatrice connectée — RLS restreint déjà aux siennes. */
+/** Charge les demandes actives (pas encore signées ni écartées) de l'utilisatrice connectée — RLS restreint déjà aux siennes. */
 export function useLeadsInbox(): UseLeadsInboxResult {
   const { isAuthenticated } = useAuth()
   const [leads, setLeads] = useState<Lead[]>([])
@@ -25,7 +25,7 @@ export function useLeadsInbox(): UseLeadsInboxResult {
     let cancelled = false
     setIsLoading(true)
     setError(null)
-    fetchNewLeads()
+    fetchActiveLeads()
       .then((result) => {
         if (!cancelled) setLeads(result)
       })
