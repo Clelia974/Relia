@@ -58,6 +58,7 @@ export function WeddingOverviewTab() {
       venue: values.venue.trim(),
       clientAddress: values.clientAddress.trim() || undefined,
       clientPhone: values.clientPhone.trim() || undefined,
+      clientEmail: values.clientEmail.trim() || undefined,
       guestCount: values.guestCount === '' ? undefined : Number(values.guestCount),
       soldAmount: values.soldAmount === '' ? 0 : Number(values.soldAmount),
       clientBudget: values.clientBudget === '' ? 0 : Number(values.clientBudget),

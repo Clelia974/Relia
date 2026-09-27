@@ -7,7 +7,7 @@ import { useWorkspaceStore } from '@/store/workspaceStore'
 const useSubscriptionCheckMock = vi.hoisted(() => vi.fn())
 vi.mock('@/features/payment/useSubscriptionCheck', () => ({ useSubscriptionCheck: useSubscriptionCheckMock }))
 
-function seedWeddings(count: number) {
+function seedWeddings(count: number, status: 'signe' | 'prospect' = 'signe') {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
   for (let i = 0; i < count; i += 1) {
     useWorkspaceStore.getState().createWedding({
@@ -16,7 +16,7 @@ function seedWeddings(count: number) {
       venue: '',
       soldAmount: 0,
       clientBudget: 0,
-      status: 'signe',
+      status,
     })
   }
 }
@@ -63,5 +63,16 @@ describe('useWeddingLimit', () => {
     const { result } = renderHook(() => useWeddingLimit())
 
     expect(result.current.canCreate).toBe(true)
+  })
+
+  it("Gratuit (expired) : des prospects ne comptent pas dans la limite, même au-delà de 3", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'expired' })
+    seedWeddings(5, 'prospect')
+
+    const { result } = renderHook(() => useWeddingLimit())
+
+    expect(result.current.weddingCount).toBe(0)
+    expect(result.current.canCreate).toBe(true)
+    expect(result.current.limitReached).toBe(false)
   })
 })

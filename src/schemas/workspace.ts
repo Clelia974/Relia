@@ -35,6 +35,8 @@ export const DayPhaseSchema = z.enum(['installation', 'ceremonie', 'reception', 
 
 export const WeddingStatusSchema = z.enum([
   'prospect',
+  'repondu',
+  'en_attente_reponse',
   'devis_envoye',
   'signe',
   'en_preparation',
@@ -131,6 +133,8 @@ export const WeddingSchema = z.object({
   /** Coordonnées du client — reprises par défaut sur les devis et factures (mentions attendues sur ces documents). */
   clientAddress: z.string().optional(),
   clientPhone: z.string().optional(),
+  /** Nécessaire pour l'envoi d'un devis depuis Relia (lien de consultation par email) — pas seulement une coordonnée de courtoisie. */
+  clientEmail: z.string().email('Adresse email invalide.').optional().or(z.literal('')),
   /** Facultatif — utile pour le traiteur/la logistique, jamais requis à la création. */
   guestCount: z.number().int().nonnegative('Le nombre d’invités ne peut pas être négatif.').optional(),
   contract: ContractSchema.optional(),

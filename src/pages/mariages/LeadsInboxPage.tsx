@@ -46,7 +46,6 @@ export function LeadsInboxPage() {
     try {
       const weddingDate = lead.event_date ? new Date(lead.event_date).toISOString() : new Date().toISOString()
       const notesParts = [
-        lead.client_email ? `Email : ${lead.client_email}` : null,
         `Source : ${LEAD_SOURCE_LABELS[lead.source]}`,
         lead.message ? `Message : ${lead.message}` : null,
       ].filter(Boolean)
@@ -61,6 +60,7 @@ export function LeadsInboxPage() {
         clientBudget: lead.budget_estimate ?? 0,
         status: 'prospect',
         clientPhone: lead.client_phone ?? undefined,
+        clientEmail: lead.client_email ?? undefined,
         guestCount: lead.guest_count ?? undefined,
         notes: notesParts.join('\n'),
       })

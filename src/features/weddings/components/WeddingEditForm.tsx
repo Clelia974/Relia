@@ -152,6 +152,16 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
               />
             </Field>
 
+            <Field label="Email du client" htmlFor="w-clientEmail" error={errors.clientEmail} optional>
+              <Input
+                id="w-clientEmail"
+                type="email"
+                value={values.clientEmail}
+                onChange={(e) => setField('clientEmail', e.target.value)}
+                aria-invalid={Boolean(errors.clientEmail)}
+              />
+            </Field>
+
             <Field label="Nombre d’invités" htmlFor="w-guestCount" error={errors.guestCount} optional>
               <Input
                 id="w-guestCount"

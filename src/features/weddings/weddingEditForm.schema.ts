@@ -12,6 +12,9 @@ export const WeddingEditFormSchema = WeddingFormSchema.extend({
   archived: z.boolean(),
   clientAddress: z.string().trim(),
   clientPhone: z.string().trim(),
+  clientEmail: z.string().trim().refine((v) => v === '' || z.string().email().safeParse(v).success, {
+    message: 'Adresse email invalide.',
+  }),
   guestCount: optionalPositiveAmount('Nombre d’invités invalide.'),
 })
 
@@ -24,6 +27,7 @@ export function weddingToEditFormValues(wedding: Wedding): WeddingEditFormValues
     venue: wedding.venue,
     clientAddress: wedding.clientAddress ?? '',
     clientPhone: wedding.clientPhone ?? '',
+    clientEmail: wedding.clientEmail ?? '',
     guestCount: wedding.guestCount === undefined ? '' : String(wedding.guestCount),
     soldAmount: String(wedding.soldAmount),
     clientBudget: String(wedding.clientBudget),
