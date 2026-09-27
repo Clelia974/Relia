@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
+import { LeadFormPage } from '@/pages/LeadFormPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
@@ -28,6 +29,9 @@ const CalendrierGlobalPage = lazy(() =>
 // du chunk initial sans risque de rendu synchrone dupliqué.
 const MariagesListPage = lazy(() =>
   import('@/pages/mariages/MariagesListPage').then((m) => ({ default: m.MariagesListPage })),
+)
+const LeadsInboxPage = lazy(() =>
+  import('@/pages/mariages/LeadsInboxPage').then((m) => ({ default: m.LeadsInboxPage })),
 )
 const WeddingTasksTab = lazy(() =>
   import('@/pages/mariages/WeddingTasksTab').then((m) => ({ default: m.WeddingTasksTab })),
@@ -102,6 +106,7 @@ export function AppRouter() {
       <Route path="/conditions" element={<TermsPage />} />
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
+      <Route path="/lead/new/:userId" element={<LeadFormPage />} />
 
       <Route
         element={
@@ -115,6 +120,7 @@ export function AppRouter() {
         <Route path="mariages">
           <Route index element={<MariagesListPage />} />
           <Route path="nouveau" element={<NewWeddingPage />} />
+          <Route path="demandes" element={<LeadsInboxPage />} />
           <Route path=":weddingId" element={<WeddingLayout />}>
             <Route index element={<WeddingOverviewTab />} />
             <Route path="planning" element={<WeddingPlanningTab />} />

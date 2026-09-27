@@ -100,12 +100,17 @@ export function MariagesListPage() {
             même endroit.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/mariages/nouveau">
-            <Plus className="size-4" aria-hidden="true" />
-            Créer mon premier mariage
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/mariages/demandes">Demandes reçues</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/mariages/nouveau">
+              <Plus className="size-4" aria-hidden="true" />
+              Créer mon premier mariage
+            </Link>
+          </Button>
+        </div>
       </div>
     )
   }
@@ -121,10 +126,15 @@ export function MariagesListPage() {
             </p>
           )}
         </div>
-        <Button onClick={handleCreateClick}>
-          <Plus className="size-4" aria-hidden="true" />
-          Créer un mariage
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/mariages/demandes">Demandes reçues</Link>
+          </Button>
+          <Button onClick={handleCreateClick}>
+            <Plus className="size-4" aria-hidden="true" />
+            Créer un mariage
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
