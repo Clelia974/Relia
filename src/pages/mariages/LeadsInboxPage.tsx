@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Copy } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
@@ -11,6 +12,14 @@ import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
 import { useAuth } from '@/hooks/useAuth'
 import { LEAD_EVENT_TYPE_LABELS, LEAD_SOURCE_LABELS, type Lead } from '@/schemas/lead'
 import { useWorkspaceStore } from '@/store/workspaceStore'
+
+const RELANCE_AFTER_DAYS = 5
+
+/** Pas de cron/email pour la V2 : un simple repère visuel suffit tant que le volume reste faible — cf. audit. */
+function isDueForRelance(lead: Lead): boolean {
+  const ageMs = Date.now() - new Date(lead.created_at).getTime()
+  return ageMs > RELANCE_AFTER_DAYS * 24 * 60 * 60 * 1000
+}
 
 /**
  * Boîte de réception des demandes reçues via le formulaire public
@@ -114,7 +123,14 @@ export function LeadsInboxPage() {
           <Card key={lead.id}>
             <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="font-medium text-foreground">{lead.client_name}</p>
+                <p className="flex items-center gap-2 font-medium text-foreground">
+                  {lead.client_name}
+                  {isDueForRelance(lead) && (
+                    <Badge variant="outline" className="border-warning/40 text-warning">
+                      ⏰ À relancer
+                    </Badge>
+                  )}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {LEAD_EVENT_TYPE_LABELS[lead.event_type]}
                   {lead.event_date ? ` · ${new Date(lead.event_date).toLocaleDateString('fr-FR')}` : ''} ·{' '}
