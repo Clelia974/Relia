@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const { rpcMock, maybeSingleMock, insertMock } = vi.hoisted(() => ({
+const { rpcMock, maybeSingleMock, insertMock, fetchMock } = vi.hoisted(() => ({
   rpcMock: vi.fn(),
   maybeSingleMock: vi.fn(),
   insertMock: vi.fn(),
+  fetchMock: vi.fn(),
 }))
 
 vi.mock('@supabase/supabase-js', () => ({
@@ -16,6 +17,8 @@ vi.mock('@supabase/supabase-js', () => ({
     },
   }),
 }))
+
+vi.stubGlobal('fetch', fetchMock)
 
 process.env.VITE_SUPABASE_URL = 'https://example.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-fake'
@@ -56,6 +59,8 @@ describe('POST /api/leads', () => {
     rpcMock.mockReset().mockResolvedValue({ data: true, error: null })
     maybeSingleMock.mockReset().mockResolvedValue({ data: { id: 'decoratrice-1' }, error: null })
     insertMock.mockReset().mockResolvedValue({ error: null })
+    fetchMock.mockReset().mockResolvedValue({ ok: true, text: async () => '' })
+    process.env.BREVO_API_KEY = 'brevo-fake-key'
   })
 
   it('refuse les méthodes autres que POST', async () => {
@@ -108,5 +113,30 @@ describe('POST /api/leads', () => {
     await handler(mockReq(), res)
     expect(res.statusCode).toBe(500)
     expect(res.body).toEqual({ error: 'Erreur interne.' })
+  })
+
+  it('envoie une auto-réponse Brevo quand un email est fourni', async () => {
+    const res = mockRes()
+    await handler(mockReq(), res)
+    expect(res.statusCode).toBe(200)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.brevo.com/v3/smtp/email',
+      expect.objectContaining({ headers: expect.objectContaining({ 'api-key': 'brevo-fake-key' }) }),
+    )
+  })
+
+  it("n'envoie aucune auto-réponse quand la demande n'a pas laissé d'email", async () => {
+    const res = mockRes()
+    await handler(mockReq({ body: { ...validBody, clientEmail: undefined } }), res)
+    expect(res.statusCode).toBe(200)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it("la demande réussit même si l'auto-réponse échoue (best-effort, jamais bloquant)", async () => {
+    fetchMock.mockReset().mockRejectedValue(new Error('Brevo indisponible'))
+    const res = mockRes()
+    await handler(mockReq(), res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({ ok: true })
   })
 })

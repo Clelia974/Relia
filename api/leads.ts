@@ -3,6 +3,17 @@ import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { requireEnv } from './_lib/requireEnv.js'
 import { checkRateLimit, getClientIp } from './_lib/rateLimit.js'
+import { sendAutoReply } from './_lib/sendAutoReply.js'
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  mariage: 'Mariage',
+  bapteme: 'Baptême',
+  communion: 'Communion',
+  confirmation: 'Confirmation',
+  anniversaire: 'Anniversaire',
+  entreprise: 'Événement d’entreprise',
+  autre: 'Événement',
+}
 
 const supabaseAdmin = createClient(requireEnv('VITE_SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'))
 
@@ -84,6 +95,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('Erreur création de la demande :', insertError.message)
     res.status(500).json({ error: 'Erreur interne.' })
     return
+  }
+
+  // Best-effort : la demande est déjà enregistrée à ce stade, un échec d'envoi ne doit jamais faire échouer la requête.
+  if (input.clientEmail) {
+    await sendAutoReply({
+      clientEmail: input.clientEmail,
+      clientName: input.clientName,
+      eventTypeLabel: EVENT_TYPE_LABELS[input.eventType] ?? 'Événement',
+      eventDate: input.eventDate,
+    })
   }
 
   res.status(200).json({ ok: true })
