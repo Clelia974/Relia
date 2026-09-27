@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
 import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
+import { LeadStatusBadge } from '@/features/leads/components/LeadStatusBadge'
 import { markLeadStatus } from '@/features/leads/leadsApi'
 import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
 import { useAuth } from '@/hooks/useAuth'
@@ -26,12 +27,11 @@ const RELANCE_DEVIS_DAYS = 5
 /** Étapes suivantes proposées selon le statut courant — "Devis envoyé" est à part (cf. handleSign) : c'est la signature qui crée le mariage, pas un simple changement de statut. */
 const LEAD_QUICK_ACTIONS: Partial<Record<LeadStatus, { label: string; next: LeadStatus }[]>> = {
   nouveau: [{ label: 'Marquer comme répondu', next: 'repondu' }],
-  repondu: [
-    { label: 'En attente de réponse', next: 'en_attente_reponse' },
-    { label: 'Devis envoyé', next: 'devis_envoye' },
-  ],
-  en_attente_reponse: [{ label: 'Devis envoyé', next: 'devis_envoye' }],
+  repondu: [{ label: 'En attente de réponse', next: 'en_attente_reponse' }],
 }
+
+/** "Créer un devis" court-circuite les étapes intermédiaires : pas besoin d'être passée par "Répondu" pour envoyer directement un devis. */
+const CAN_CREATE_DEVIS_STATUSES = new Set<LeadStatus>(['nouveau', 'repondu', 'en_attente_reponse'])
 
 /**
  * Boîte de réception des demandes reçues via le formulaire public
@@ -123,6 +123,19 @@ export function LeadsInboxPage() {
     }
   }
 
+  /** Relance manuelle : repousse l'échéance de la tâche de relance de 5 jours à partir d'aujourd'hui. */
+  const handleRelance = (lead: Lead) => {
+    clearRelanceTask(lead.id)
+    const dueDate = new Date(Date.now() + RELANCE_DEVIS_DAYS * 24 * 60 * 60 * 1000).toISOString()
+    addTask({
+      title: `Relancer le devis — ${lead.client_name}`,
+      dueDate,
+      source: 'automatic',
+      leadId: lead.id,
+    })
+    toast.success('Relance notée — prochain rappel dans 5 jours.')
+  }
+
   const handleIgnore = async (lead: Lead) => {
     setPendingId(lead.id)
     try {
@@ -172,8 +185,9 @@ export function LeadsInboxPage() {
           <Card key={lead.id}>
             <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="font-medium text-foreground">
-                  {lead.client_name} <span className="font-normal text-muted-foreground">· {LEAD_STATUS_LABELS[lead.status]}</span>
+                <p className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                  {lead.client_name}
+                  <LeadStatusBadge status={lead.status} />
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {LEAD_EVENT_TYPE_LABELS[lead.event_type]}
@@ -195,10 +209,25 @@ export function LeadsInboxPage() {
                     {action.label}
                   </Button>
                 ))}
-                {lead.status === 'devis_envoye' && (
-                  <Button size="sm" disabled={pendingId === lead.id} onClick={() => handleSign(lead)}>
-                    Marquer comme signé
+                {CAN_CREATE_DEVIS_STATUSES.has(lead.status) && (
+                  <Button
+                    size="sm"
+                    variant={lead.status === 'nouveau' ? 'outline' : 'default'}
+                    disabled={pendingId === lead.id}
+                    onClick={() => handleStatusChange(lead, 'devis_envoye')}
+                  >
+                    Créer un devis
                   </Button>
+                )}
+                {lead.status === 'devis_envoye' && (
+                  <>
+                    <Button variant="outline" size="sm" disabled={pendingId === lead.id} onClick={() => handleRelance(lead)}>
+                      Relancer
+                    </Button>
+                    <Button size="sm" disabled={pendingId === lead.id} onClick={() => handleSign(lead)}>
+                      Marquer comme signé
+                    </Button>
+                  </>
                 )}
                 <Button variant="outline" size="sm" disabled={pendingId === lead.id} onClick={() => handleIgnore(lead)}>
                   Ignorer

@@ -52,19 +52,20 @@ beforeEach(() => {
 })
 
 describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', () => {
-  it('un lead "nouveau" ne propose que "Marquer comme répondu" (et Ignorer)', async () => {
+  it('un lead "nouveau" propose "Marquer comme répondu" ou directement "Créer un devis" (et Ignorer)', async () => {
     renderPage([makeLead({ status: 'nouveau' })])
 
+    expect(screen.getByRole('button', { name: 'Créer un devis' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Marquer comme répondu' }))
 
     await waitFor(() => expect(markLeadStatusMock).toHaveBeenCalledWith('lead-1', 'repondu'))
     expect(screen.queryByRole('button', { name: 'Marquer comme signé' })).toBeNull()
   })
 
-  it('passer en "Devis envoyé" crée une tâche de relance à 5 jours, sans créer de mariage', async () => {
+  it('"Créer un devis" depuis "Répondu" crée une tâche de relance à 5 jours, sans créer de mariage', async () => {
     renderPage([makeLead({ status: 'repondu' })])
 
-    fireEvent.click(screen.getByRole('button', { name: 'Devis envoyé' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Créer un devis' }))
 
     await waitFor(() => expect(markLeadStatusMock).toHaveBeenCalledWith('lead-1', 'devis_envoye'))
     const state = useWorkspaceStore.getState().workspace
@@ -72,6 +73,17 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
     const relance = state.tasks.find((t) => t.leadId === 'lead-1')
     expect(relance?.title).toBe('Relancer le devis — Sophie')
     expect(relance?.dueDate).toBeTruthy()
+  })
+
+  it('"Relancer" sur un devis envoyé remplace la tâche de relance existante par une nouvelle échéance', async () => {
+    useWorkspaceStore.getState().addTask({ title: 'Relancer le devis — Sophie', leadId: 'lead-1' })
+    renderPage([makeLead({ status: 'devis_envoye' })])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Relancer' }))
+
+    const tasks = useWorkspaceStore.getState().workspace.tasks.filter((t) => t.leadId === 'lead-1')
+    expect(tasks).toHaveLength(1)
+    expect(tasks[0].dueDate).toBeTruthy()
   })
 
   it('"Marquer comme signé" crée le mariage avec la checklist, et retire la tâche de relance', async () => {
