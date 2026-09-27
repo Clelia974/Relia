@@ -23,6 +23,8 @@ function makeLead(overrides: Partial<Lead> = {}): Lead {
     client_email: null,
     event_type: 'mariage',
     event_date: '2027-06-12',
+    venue: null,
+    guest_count: null,
     budget_estimate: null,
     message: null,
     source: 'instagram',

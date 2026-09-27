@@ -36,22 +36,6 @@ export const LEAD_SOURCE_LABELS: Record<z.infer<typeof LeadSourceSchema>, string
   autre: 'Autre',
 }
 
-export const LeadSubmissionSchema = z.object({
-  userId: z.string().min(1, 'Lien invalide.'),
-  clientName: z.string().min(1, 'Le nom est obligatoire.').max(200),
-  clientPhone: z.string().max(30).optional(),
-  clientEmail: z.string().email('Adresse email invalide.').optional().or(z.literal('')),
-  eventType: LeadEventTypeSchema,
-  eventDate: z
-    .string()
-    .refine((value) => !Number.isNaN(Date.parse(value)), { message: 'Date invalide.' }),
-  budgetEstimate: z.number().nonnegative().optional(),
-  message: z.string().max(2000).optional(),
-  source: LeadSourceSchema,
-})
-
-export type LeadSubmission = z.infer<typeof LeadSubmissionSchema>
-
 export const LeadStatusSchema = z.enum(['nouveau', 'importe', 'ignore'])
 
 export const LeadSchema = z.object({
@@ -62,6 +46,8 @@ export const LeadSchema = z.object({
   client_email: z.string().nullable(),
   event_type: LeadEventTypeSchema,
   event_date: z.string().nullable(),
+  venue: z.string().nullable(),
+  guest_count: z.number().nullable(),
   budget_estimate: z.number().nullable(),
   message: z.string().nullable(),
   source: LeadSourceSchema,

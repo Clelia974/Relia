@@ -58,6 +58,7 @@ export function WeddingOverviewTab() {
       venue: values.venue.trim(),
       clientAddress: values.clientAddress.trim() || undefined,
       clientPhone: values.clientPhone.trim() || undefined,
+      guestCount: values.guestCount === '' ? undefined : Number(values.guestCount),
       soldAmount: values.soldAmount === '' ? 0 : Number(values.soldAmount),
       clientBudget: values.clientBudget === '' ? 0 : Number(values.clientBudget),
       status: values.status,
@@ -118,6 +119,7 @@ export function WeddingOverviewTab() {
           <dl className="grid gap-x-6 gap-y-4 grid-cols-1 sm:grid-cols-2">
             <Field label="Date du mariage" value={format(new Date(wedding.date), 'd MMMM yyyy', { locale: fr })} />
             <Field label="Lieu du mariage" value={wedding.venue || '—'} />
+            <Field label="Nombre d’invités" value={wedding.guestCount !== undefined ? String(wedding.guestCount) : '—'} />
             <Field label="Montant du contrat" value={currency.format(wedding.soldAmount)} />
             <Field label="Budget client" value={currency.format(wedding.clientBudget)} />
             <Field label="Statut du mariage" value={WEDDING_STATUS_LABELS[wedding.status]} />

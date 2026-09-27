@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
-import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { markLeadStatus } from '@/features/leads/leadsApi'
 import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
 import { useAuth } from '@/hooks/useAuth'
@@ -32,8 +31,6 @@ export function LeadsInboxPage() {
   const { user } = useAuth()
   const { leads, isLoading, error, refresh } = useLeadsInbox()
   const createWedding = useWorkspaceStore((s) => s.createWedding)
-  const addTask = useWorkspaceStore((s) => s.addTask)
-  const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
   const [pendingId, setPendingId] = useState<string | null>(null)
 
   const formLink = user ? `${window.location.origin}/lead/new/${user.id}` : ''
@@ -53,18 +50,20 @@ export function LeadsInboxPage() {
         `Source : ${LEAD_SOURCE_LABELS[lead.source]}`,
         lead.message ? `Message : ${lead.message}` : null,
       ].filter(Boolean)
+      // Pas de checklist de démarrage générée ici : elle n'a de sens qu'une fois le devis/contrat
+      // signé, pas dès le stade prospect — sinon, des tâches pour un mariage qui ne se concrétisera
+      // peut-être jamais (cf. retour utilisatrice).
       const id = createWedding({
         coupleName: lead.client_name,
         date: weddingDate,
-        venue: '',
+        venue: lead.venue ?? '',
         soldAmount: 0,
         clientBudget: lead.budget_estimate ?? 0,
         status: 'prospect',
         clientPhone: lead.client_phone ?? undefined,
+        guestCount: lead.guest_count ?? undefined,
         notes: notesParts.join('\n'),
       })
-      const template = taskTemplate.length > 0 ? taskTemplate : createDefaultTaskTemplate()
-      for (const task of buildDefaultTasksForWedding(id, weddingDate, template)) addTask(task)
       await markLeadStatus(lead.id, 'importe')
       toast.success('Mariage créé à partir de la demande.')
       navigate(`/mariages/${id}`)
@@ -133,7 +132,9 @@ export function LeadsInboxPage() {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {LEAD_EVENT_TYPE_LABELS[lead.event_type]}
-                  {lead.event_date ? ` · ${new Date(lead.event_date).toLocaleDateString('fr-FR')}` : ''} ·{' '}
+                  {lead.event_date ? ` · ${new Date(lead.event_date).toLocaleDateString('fr-FR')}` : ''}
+                  {lead.venue ? ` · ${lead.venue}` : ''}
+                  {lead.guest_count !== null ? ` · ${lead.guest_count} invités` : ''} ·{' '}
                   {LEAD_SOURCE_LABELS[lead.source]}
                 </p>
                 {lead.message && <p className="mt-1 text-sm text-muted-foreground">{lead.message}</p>}

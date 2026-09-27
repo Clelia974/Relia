@@ -131,6 +131,21 @@ export function LeadFormPage() {
                     </Field>
                   </div>
 
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+                    <Field label="Lieu envisagé" htmlFor="venue" optional>
+                      <Input id="venue" value={values.venue} onChange={(e) => setField('venue', e.target.value)} />
+                    </Field>
+                    <Field label="Nombre d’invités" htmlFor="guestCount" error={errors.guestCount} optional>
+                      <Input
+                        id="guestCount"
+                        inputMode="numeric"
+                        value={values.guestCount}
+                        onChange={(e) => setField('guestCount', e.target.value)}
+                        aria-invalid={Boolean(errors.guestCount)}
+                      />
+                    </Field>
+                  </div>
+
                   <Field label="Budget estimé" htmlFor="budgetEstimate" error={errors.budgetEstimate} optional>
                     <Input
                       id="budgetEstimate"

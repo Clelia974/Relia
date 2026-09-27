@@ -30,6 +30,8 @@ export function useSubmitLead(): UseSubmitLeadResult {
           clientEmail: values.clientEmail || undefined,
           eventType: values.eventType,
           eventDate: new Date(values.eventDate).toISOString(),
+          venue: values.venue || undefined,
+          guestCount: values.guestCount === '' ? undefined : Number(values.guestCount),
           budgetEstimate: values.budgetEstimate === '' ? undefined : Number(values.budgetEstimate),
           message: values.message || undefined,
           source: values.source,

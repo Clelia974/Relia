@@ -152,6 +152,16 @@ export function WeddingEditForm({ open, onOpenChange, wedding, hasTimelineEvents
               />
             </Field>
 
+            <Field label="Nombre d’invités" htmlFor="w-guestCount" error={errors.guestCount} optional>
+              <Input
+                id="w-guestCount"
+                inputMode="numeric"
+                value={values.guestCount}
+                onChange={(e) => setField('guestCount', e.target.value)}
+                aria-invalid={Boolean(errors.guestCount)}
+              />
+            </Field>
+
             <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
               <Field label="Montant du contrat" htmlFor="w-soldAmount" error={errors.soldAmount} optional>
                 <Input

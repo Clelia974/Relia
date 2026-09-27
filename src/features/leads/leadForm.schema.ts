@@ -18,6 +18,8 @@ export const LeadFormSchema = z.object({
     .string()
     .min(1, 'Veuillez indiquer la date de l’événement.')
     .refine((v) => !Number.isNaN(Date.parse(v)), { message: 'Date invalide.' }),
+  venue: z.string().trim(),
+  guestCount: optionalPositiveAmount('Nombre d’invités invalide.'),
   budgetEstimate: optionalPositiveAmount('Veuillez saisir un montant valide.'),
   message: z.string().trim(),
   source: LeadSourceSchema,
@@ -32,6 +34,8 @@ export function emptyLeadFormValues(): LeadFormValues {
     clientEmail: '',
     eventType: 'mariage',
     eventDate: '',
+    venue: '',
+    guestCount: '',
     budgetEstimate: '',
     message: '',
     source: 'instagram',

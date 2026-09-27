@@ -131,6 +131,8 @@ export const WeddingSchema = z.object({
   /** Coordonnées du client — reprises par défaut sur les devis et factures (mentions attendues sur ces documents). */
   clientAddress: z.string().optional(),
   clientPhone: z.string().optional(),
+  /** Facultatif — utile pour le traiteur/la logistique, jamais requis à la création. */
+  guestCount: z.number().int().nonnegative('Le nombre d’invités ne peut pas être négatif.').optional(),
   contract: ContractSchema.optional(),
   soldAmount: z.number().nonnegative('Le montant du contrat ne peut pas être négatif.'),
   clientBudget: z.number().nonnegative('Le budget client ne peut pas être négatif.'),
