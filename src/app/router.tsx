@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
+import { ContratPartagePage } from '@/pages/ContratPartagePage'
 import { DevisPartagePage } from '@/pages/DevisPartagePage'
 import { FacturePartageePage } from '@/pages/FacturePartageePage'
 import { LeadFormPage } from '@/pages/LeadFormPage'
@@ -114,6 +115,7 @@ export function AppRouter() {
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
       <Route path="/devis/:shareId" element={<DevisPartagePage />} />
       <Route path="/facture/:shareId" element={<FacturePartageePage />} />
+      <Route path="/contrat/:shareId" element={<ContratPartagePage />} />
 
       <Route
         element={

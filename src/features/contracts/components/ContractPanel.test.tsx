@@ -1,13 +1,39 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ContractPanel } from '@/features/contracts/components/ContractPanel'
-import type { Contract } from '@/types/entities'
+import type { BusinessConfig, Contract } from '@/types/entities'
 
 afterEach(cleanup)
 
-function setup(contract?: Contract) {
+const useAuthMock = vi.hoisted(() => vi.fn())
+vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
+
+const uploadContractMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/contracts/useUploadContract', () => ({
+  useUploadContract: () => ({ uploadContract: uploadContractMock, isLoading: false, error: null }),
+}))
+
+const shareContratMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/contracts/useShareContrat', () => ({
+  useShareContrat: () => ({ shareContrat: shareContratMock, isLoading: false, error: null }),
+}))
+
+const businessConfig: BusinessConfig = {
+  id: 'b1',
+  companyName: 'Atelier Fleur de Lien',
+  vatStatus: 'franchise_en_base',
+  currency: 'EUR',
+}
+
+beforeEach(() => {
+  useAuthMock.mockReturnValue({ user: { id: 'u1', email: 'u1@example.com' } })
+  uploadContractMock.mockReset().mockResolvedValue({ storagePath: 'u1/uuid-contrat.pdf', fileName: 'contrat.pdf' })
+  shareContratMock.mockReset().mockResolvedValue('share-abc')
+})
+
+function setup(contract?: Contract, clientEmail?: string) {
   const onChange = vi.fn()
-  render(<ContractPanel contract={contract} onChange={onChange} />)
+  render(<ContractPanel contract={contract} onChange={onChange} businessConfig={businessConfig} clientName="Sophie Martin" clientEmail={clientEmail} />)
   return onChange
 }
 
@@ -49,8 +75,43 @@ describe('ContractPanel', () => {
     expect(onChange).toHaveBeenCalledWith({ status: 'a_rediger', notes: 'Clause acompte à revoir' })
   })
 
-  it('précise que le dépôt du PDF viendra plus tard', () => {
+  it("propose d'uploader un PDF, jamais généré par Relia elle-même", () => {
     setup()
-    expect(screen.getByText(/dépôt du contrat signé/i)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Uploader un PDF/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Marquer comme envoyé/ })).not.toBeInTheDocument()
+  })
+
+  it('uploader un fichier enregistre son chemin et son nom, sans encore générer de lien', async () => {
+    const onChange = setup()
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const file = new File(['%PDF-1.4'], 'contrat.pdf', { type: 'application/pdf' })
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await waitFor(() => expect(uploadContractMock).toHaveBeenCalledWith('u1', file))
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ storagePath: 'u1/uuid-contrat.pdf', fileName: 'contrat.pdf', shareId: undefined }),
+      ),
+    )
+  })
+
+  it('une fois un fichier présent, "Marquer comme envoyé" génère le lien même sans email client', async () => {
+    const onChange = setup({ status: 'a_rediger', storagePath: 'u1/uuid-contrat.pdf', fileName: 'contrat.pdf' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyé' }))
+
+    await waitFor(() => expect(shareContratMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: undefined })))
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ shareId: 'share-abc' })))
+    await waitFor(() => expect(screen.getByText(/\/contrat\/share-abc$/)).toBeInTheDocument())
+  })
+
+  it('transmet l’email client au partage quand il est renseigné', async () => {
+    setup({ status: 'a_rediger', storagePath: 'u1/uuid-contrat.pdf', fileName: 'contrat.pdf' }, 'sophie@example.com')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyé' }))
+
+    await waitFor(() =>
+      expect(shareContratMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: 'sophie@example.com' })),
+    )
   })
 })

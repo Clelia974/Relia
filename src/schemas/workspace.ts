@@ -115,7 +115,7 @@ export const UserProfileSchema = z.object({
 
 export const ContractStatusSchema = z.enum(['a_rediger', 'envoye', 'signe'])
 
-/** Suivi léger du contrat d'un mariage (statut et dates) — sans pièce jointe : le dépôt du PDF signé viendra avec un vrai stockage de fichiers. */
+/** Suivi léger du contrat d'un mariage (statut, dates, fichier optionnel). */
 export const ContractSchema = z.object({
   status: ContractStatusSchema,
   /** Renseignée quand le contrat a été envoyé au client. */
@@ -123,6 +123,11 @@ export const ContractSchema = z.object({
   /** Renseignée uniquement quand le contrat est signé. */
   signedAt: isoDate.optional(),
   notes: z.string().optional(),
+  /** Chemin du fichier dans le bucket Supabase "contrats" (uploadé par la décoratrice elle-même — un PDF rédigé/signé ailleurs, jamais généré par Relia). */
+  storagePath: z.string().optional(),
+  fileName: z.string().optional(),
+  /** Id du contrats_partages Supabase créé au dernier partage (cf. api/contrats/share.ts) — même principe que Proposal.shareId. */
+  shareId: z.string().optional(),
 })
 
 export const WeddingSchema = z.object({

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
-import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -179,10 +178,10 @@ export function WeddingDocumentsTab() {
           <ContractPanel
             key={wedding.id}
             contract={wedding.contract}
-            onChange={(contract) => {
-              updateWedding(wedding.id, { contract })
-              toast.success('Contrat mis à jour.')
-            }}
+            businessConfig={businessConfig}
+            clientName={wedding.coupleName}
+            clientEmail={wedding.clientEmail}
+            onChange={(contract) => updateWedding(wedding.id, { contract })}
           />
         </TabsContent>
       </Tabs>
