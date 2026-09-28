@@ -399,6 +399,8 @@ export const ProposalSchema = z.object({
   /** Renseigné uniquement quand status passe à "approuvee". */
   approvedAt: isoDate.optional(),
   notes: z.string().optional(),
+  /** Id du devis_partages Supabase créé au dernier "Marquer comme envoyé" (cf. api/devis/share.ts) — permet de réafficher le lien public même après avoir quitté la page, pour un partage manuel (WhatsApp/SMS) si l'email échoue. */
+  shareId: z.string().optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 })

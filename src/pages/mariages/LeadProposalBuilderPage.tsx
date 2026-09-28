@@ -26,6 +26,7 @@ export function LeadProposalBuilderPage() {
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const proposalTemplates = useWorkspaceStore((s) => s.workspace.proposalTemplates)
   const createProposal = useWorkspaceStore((s) => s.createProposal)
+  const setProposalShareId = useWorkspaceStore((s) => s.setProposalShareId)
   const addTask = useWorkspaceStore((s) => s.addTask)
   const allProposals = useWorkspaceStore((s) => s.workspace.proposals)
   const proposal = allProposals.find((p) => p.id === proposalId)
@@ -70,21 +71,30 @@ export function LeadProposalBuilderPage() {
 
   /**
    * L'enregistrement local (statut de la demande + tâche de relance) se
-   * fait toujours, même si l'envoi de l'email échoue : le devis est de
+   * fait toujours, même si le lien de partage échoue : le devis est de
    * toute façon déjà "envoyé" du point de vue de la décoratrice, qui vient
    * de cliquer le bouton après relecture — cf. useShareDevis, best-effort.
+   *
+   * Le lien est généré même sans email client (facultatif sur le
+   * formulaire de demande) : la décoratrice peut toujours le copier et
+   * l'envoyer elle-même (WhatsApp, SMS…) — l'email Brevo n'est qu'un
+   * envoi automatique en plus quand une adresse est renseignée.
    */
   const handleMarkSent = (snapshot: DevisSnapshot) => {
     scheduleDevisRelance(addTask, lead)
     markLeadStatus(lead.id, 'devis_envoye').catch((err) => {
       toast.error(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la demande.')
     })
-    if (lead.client_email) {
-      shareDevis({ snapshot, clientEmail: lead.client_email, clientName: lead.client_name }).then((shareId) => {
-        if (shareId) toast.success('Devis envoyé par email à la cliente.')
-        else toast.error("Le lien du devis n'a pas pu être envoyé par email — le statut a bien été mis à jour.")
-      })
-    }
+    shareDevis({ snapshot, clientEmail: lead.client_email ?? undefined, clientName: lead.client_name }).then((shareId) => {
+      if (!shareId) {
+        toast.error("Le lien du devis n'a pas pu être généré — le statut a bien été mis à jour.")
+        return
+      }
+      setProposalShareId(proposal.id, shareId)
+      toast.success(
+        lead.client_email ? 'Devis envoyé par email à la cliente.' : 'Lien du devis généré — copiez-le pour l’envoyer vous-même.',
+      )
+    })
   }
 
   return <ProposalBuilderInner proposalId={proposal.id} subject={subject} onMarkSent={handleMarkSent} />

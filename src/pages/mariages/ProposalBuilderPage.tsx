@@ -288,6 +288,13 @@ export function ProposalBuilderInner({
     toast[ok ? 'success' : 'error'](ok ? 'Contenu copié dans le presse-papiers.' : 'Impossible de copier automatiquement.')
   }
 
+  const shareUrl = proposal.shareId ? `${window.location.origin}/devis/${proposal.shareId}` : undefined
+  const handleCopyShareLink = async () => {
+    if (!shareUrl) return
+    const ok = await copyTextToClipboard(shareUrl)
+    toast[ok ? 'success' : 'error'](ok ? 'Lien copié.' : 'Impossible de copier automatiquement.')
+  }
+
   const handleExportJson = () => {
     downloadJson(`proposition-${proposal.id}.json`, { ...proposal, title, clientName, lineItems: numericLines, ...totals })
     toast.success('Proposition exportée en JSON.')
@@ -346,6 +353,24 @@ export function ProposalBuilderInner({
           </Button>
         </div>
       </div>
+
+      {shareUrl && (
+        <Card className="no-print">
+          <CardContent className="flex flex-col gap-2 py-4">
+            <p className="text-xs font-medium text-muted-foreground">
+              Lien à partager avec la cliente — utile en attendant le mail, ou pour l'envoyer vous-même (WhatsApp, SMS…)
+            </p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 truncate rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+                {shareUrl}
+              </code>
+              <Button variant="outline" size="icon" onClick={handleCopyShareLink} aria-label="Copier le lien du devis">
+                <Copy className="size-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {statusLocked && (
         <Alert className="no-print border-warning/40 bg-warning-bg">

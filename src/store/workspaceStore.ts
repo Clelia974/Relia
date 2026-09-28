@@ -194,6 +194,8 @@ interface WorkspaceStoreState {
   createProposal: (input: NewProposalInput) => string
   updateProposal: (id: string, patch: Partial<Omit<Proposal, 'id' | 'weddingId' | 'leadId' | 'createdAt'>>) => void
   updateProposalStatus: (id: string, status: ProposalStatus) => void
+  /** Métadonnée pure (lien de partage public) — jamais bloquée par isProposalEditable, contrairement à updateProposal : elle doit pouvoir s'écrire juste après "Marquer comme envoyé", qui vient de faire passer le devis hors de l'état éditable. */
+  setProposalShareId: (id: string, shareId: string) => void
   duplicateProposal: (id: string) => string | null
   deleteProposal: (id: string) => void
 
@@ -757,6 +759,15 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
                 ? { ...p, status, approvedAt: status === 'approuvee' ? nowIso() : p.approvedAt, updatedAt: nowIso() }
                 : p,
             ),
+          },
+        }))
+      },
+
+      setProposalShareId: (id, shareId) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            proposals: state.workspace.proposals.map((p) => (p.id === id ? { ...p, shareId, updatedAt: nowIso() } : p)),
           },
         }))
       },
