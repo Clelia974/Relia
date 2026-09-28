@@ -276,18 +276,6 @@ p { text-wrap: pretty; }
   animation: fade-in-page 220ms ease-out both;
 }
 
-/* Landing OUI — barre de progression du stepper "Une demande arrive"
-   (OuiHowItWorks.tsx) : durée pilotée en JS (AUTOPLAY_MS) via `animation`
-   inline, cette règle ne fixe que la trajectoire. */
-@keyframes oui-step-progress {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 /* Relia — retour visuel des cartes-résumé du tableau de bord : elles pointent
    vers une section souvent déjà visible à l'écran (pas de scroll), donc le
    survol seul ne suffit pas à prouver qu'un clic a eu un effet. Cette classe

@@ -123,7 +123,7 @@ export function OuiHowItWorks() {
               onClick={() => setActive(i)}
               aria-pressed={active === i}
               className={cn(
-                'relative flex w-full items-start gap-3.5 overflow-hidden rounded-xl border p-4 text-left transition-colors',
+                'flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition-colors',
                 active === i ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40',
               )}
             >
@@ -139,14 +139,6 @@ export function OuiHowItWorks() {
                 <span className="block text-sm font-medium text-foreground">{s.title}</span>
                 <span className="mt-0.5 block text-xs text-muted-foreground">{s.caption}</span>
               </span>
-              {active === i && (
-                <span
-                  key={paused ? 'paused' : active}
-                  className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-primary"
-                  style={{ animation: paused ? 'none' : `oui-step-progress ${AUTOPLAY_MS}ms linear forwards` }}
-                  aria-hidden="true"
-                />
-              )}
             </button>
           </li>
         ))}
