@@ -32,9 +32,9 @@ create table if not exists public.devis_partages (
 alter table public.devis_partages enable row level security;
 
 -- Lecture publique par id exact uniquement — jamais de liste, l'id (uuid aléatoire) est le seul secret,
--- même principe qu'un lien "toute personne qui a le lien peut consulter".
-drop policy if exists "devis_partages_select_public" on public.devis_partages;
-create policy "devis_partages_select_public"
+-- même principe qu'un lien du type « toute personne qui a le lien peut consulter ».
+drop policy if exists devis_partages_select_public on public.devis_partages;
+create policy devis_partages_select_public
   on public.devis_partages for select
   to anon, authenticated
   using (true);

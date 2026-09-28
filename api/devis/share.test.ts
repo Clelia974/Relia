@@ -39,7 +39,11 @@ function mockRes() {
 }
 
 const validBody = {
-  snapshot: { title: 'Devis mariage', clientName: 'Sophie Martin' },
+  snapshot: {
+    title: 'Devis mariage',
+    clientName: 'Sophie Martin',
+    businessConfig: { companyName: 'Atelier Fleur de Lien', email: 'contact@atelierfleurdelien.fr' },
+  },
   clientEmail: 'sophie@example.com',
   clientName: 'Sophie Martin',
 }
@@ -130,6 +134,28 @@ describe('POST /api/devis/share', () => {
       'https://api.brevo.com/v3/smtp/email',
       expect.objectContaining({ headers: expect.objectContaining({ 'api-key': 'brevo-fake-key' }) }),
     )
+  })
+
+  it("personnalise l'email avec le nom de l'entreprise de la décoratrice (jamais \"Relia\") et met sa propre adresse en Reply-To", async () => {
+    resetAll()
+    const res = mockRes()
+    await handler(mockReq(), res)
+    expect(res.statusCode).toBe(200)
+    const [, options] = fetchMock.mock.calls[0]
+    const body = JSON.parse(options.body)
+    expect(body.sender).toEqual({ name: 'Atelier Fleur de Lien', email: 'contact@evenementscles.com' })
+    expect(body.replyTo).toEqual({ email: 'contact@atelierfleurdelien.fr', name: 'Atelier Fleur de Lien' })
+  })
+
+  it("retombe sur le nom \"Relia\" et n'ajoute pas de Reply-To quand businessConfig n'a pas de nom/email exploitable", async () => {
+    resetAll()
+    const res = mockRes()
+    await handler(mockReq({ body: { ...validBody, snapshot: { title: 'Devis mariage' } } }), res)
+    expect(res.statusCode).toBe(200)
+    const [, options] = fetchMock.mock.calls[0]
+    const body = JSON.parse(options.body)
+    expect(body.sender).toEqual({ name: 'Relia', email: 'contact@evenementscles.com' })
+    expect(body.replyTo).toBeUndefined()
   })
 
   it('renvoie 500 avec un message générique si l’insertion échoue', async () => {

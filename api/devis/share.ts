@@ -76,7 +76,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Best-effort : le devis est déjà enregistré et consultable via son lien à ce stade, un échec d'envoi ne doit jamais faire échouer la requête.
   if (input.clientEmail) {
-    await sendDevisEmail({ clientEmail: input.clientEmail, clientName: input.clientName, shareId: data.id })
+    const businessConfig = input.snapshot.businessConfig as { companyName?: unknown; email?: unknown } | undefined
+    const companyName = typeof businessConfig?.companyName === 'string' ? businessConfig.companyName : undefined
+    const replyToEmail = typeof businessConfig?.email === 'string' ? businessConfig.email : undefined
+    await sendDevisEmail({ clientEmail: input.clientEmail, clientName: input.clientName, shareId: data.id, companyName, replyToEmail })
   }
 
   res.status(200).json({ ok: true, shareId: data.id })
