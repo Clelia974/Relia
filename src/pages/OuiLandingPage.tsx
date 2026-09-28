@@ -1,5 +1,21 @@
 import { useEffect } from 'react'
-import { ChevronDown } from 'lucide-react'
+import {
+  Brain,
+  Camera,
+  ChevronDown,
+  Eye,
+  Heart,
+  ListChecks,
+  Mail,
+  MessageCircle,
+  Moon,
+  Phone,
+  Power,
+  Repeat,
+  Sparkles,
+  StickyNote,
+  Users,
+} from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { OuiTimeCalculator } from '@/features/oui-landing/OuiTimeCalculator'
@@ -10,15 +26,16 @@ const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
 const SECTION = 'scroll-mt-20 py-14 sm:py-20'
 const H2 = 'font-heading text-2xl font-semibold tracking-tight text-primary sm:text-3xl'
 const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-thread-text'
+const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-thread-text'
 const CONTACT_EMAIL = 'hello@relia.com'
 
 const HEAD_THOUGHTS = [
-  { source: 'Instagram', thought: '« Elle m’avait demandé quoi déjà ? »' },
-  { source: 'WhatsApp', thought: '« Il faut que je lui réponde. »' },
-  { source: 'Email', thought: '« J’avais envoyé le devis ou pas ? »' },
-  { source: 'Téléphone', thought: '« Il faut que je rappelle cette cliente. »' },
-  { source: 'Notes', thought: '« J’avais noté ça quelque part… »' },
-  { source: 'Ta tête', thought: '« Ne surtout pas oublier cette demande. »' },
+  { source: 'Instagram', icon: Camera, thought: '« Elle m’avait demandé quoi déjà ? »' },
+  { source: 'WhatsApp', icon: MessageCircle, thought: '« Il faut que je lui réponde. »' },
+  { source: 'Email', icon: Mail, thought: '« J’avais envoyé le devis ou pas ? »' },
+  { source: 'Téléphone', icon: Phone, thought: '« Il faut que je rappelle cette cliente. »' },
+  { source: 'Notes', icon: StickyNote, thought: '« J’avais noté ça quelque part… »' },
+  { source: 'Ta tête', icon: Brain, thought: '« Ne rien oublier. »' },
 ]
 
 const DAY_TIMELINE = [
@@ -32,10 +49,10 @@ const DAY_TIMELINE = [
 ]
 
 const TIME_RECOVERED = [
-  { emoji: '👨‍👩‍👧', title: 'Ta famille', text: 'Être vraiment là. Sans téléphone posé à côté de toi au cas où une cliente écrive.' },
-  { emoji: '✂️', title: 'Ta créativité', text: 'Créer un moodboard. Chercher une nouvelle idée. Préparer ton prochain projet — ou simplement avoir envie de créer à nouveau.' },
-  { emoji: '❤️', title: 'Ton couple', text: 'Dîner sans dire : « Attends, je dois juste répondre à ce message. »' },
-  { emoji: '🌙', title: 'Toi', text: 'Sortir. Lire. Dormir. Faire du sport. Ne rien faire.' },
+  { icon: Users, title: 'Ta famille', text: 'Être vraiment là, sans téléphone à côté de toi.' },
+  { icon: Sparkles, title: 'Ta créativité', text: 'Créer, chercher une idée, en avoir de nouveau envie.' },
+  { icon: Heart, title: 'Ton couple', text: 'Dîner sans « attends, je réponds vite ».' },
+  { icon: Moon, title: 'Toi', text: 'Sortir, lire, dormir, ne rien faire.' },
 ]
 
 const BEFORE_AFTER = [
@@ -82,27 +99,23 @@ const HOW_IT_WORKS = [
 const FAQ: { q: string; a: string }[] = [
   {
     q: 'OUI est-il déjà disponible ?',
-    a: 'Pas encore. OUI est actuellement en construction. En t’inscrivant, tu seras informée des prochaines étapes et de l’ouverture des premiers tests.',
+    a: 'Pas encore, c’est en construction. En t’inscrivant, tu seras informée des prochaines étapes et de l’ouverture des premiers tests.',
   },
   {
     q: 'Est-ce que OUI va m’apporter plus de clientes ?',
-    a: 'Non. OUI ne remplace pas ton marketing et ne promet pas de générer des demandes. Il s’intéresse à la gestion des demandes que tu reçois déjà.',
+    a: 'Non. OUI ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
   },
   {
     q: 'Est-ce uniquement pour les mariages ?',
-    a: 'Non. OUI est pensé pour les décoratrices événementielles, quel que soit le type d’événement : mariage, baptême, anniversaire, communion, confirmation, événement professionnel…',
+    a: 'Non, pour toute décoratrice événementielle : mariage, baptême, anniversaire, entreprise…',
   },
   {
     q: 'Est-ce que je devrai abandonner WhatsApp ou Instagram ?',
-    a: 'Non. L’objectif n’est pas de te demander où tes clientes doivent t’écrire. L’idée est justement de t’aider à mieux gérer les demandes qui arrivent de différents endroits.',
+    a: 'Non. L’idée est de t’aider à gérer les demandes qui arrivent de différents endroits, pas de choisir un seul canal.',
   },
   {
     q: 'Quand pourrai-je tester OUI ?',
-    a: 'Les premières personnes inscrites seront informées lorsque les premiers tests seront disponibles.',
-  },
-  {
-    q: 'Pourquoi m’inscrire maintenant ?',
-    a: 'Parce que tu peux suivre la construction de OUI dès le début et, si tu le souhaites, participer aux réflexions et aux premiers tests.',
+    a: 'Les premières personnes inscrites seront informées dès l’ouverture des premiers tests.',
   },
 ]
 
@@ -169,11 +182,9 @@ export function OuiLandingPage() {
               <br className="hidden sm:block" /> Tu profites de ta soirée.
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
-              Tu as créé ton activité pour décorer, créer, imaginer de beaux événements. Pas pour répondre à WhatsApp à
-              21h. Pas pour vérifier tes DM le dimanche. Pas pour chercher un devis pendant que ta famille t’attend.
-            </p>
-            <p className="max-w-2xl text-pretty text-base leading-relaxed text-foreground/80">
-              OUI est pensé pour t’aider à mieux gérer tes demandes, pour que ton travail reprenne sa place.
+              Tu as créé ton activité pour décorer, créer, imaginer — pas pour répondre à WhatsApp à 21h ou chercher
+              un devis pendant que ta famille t’attend. OUI t’aide à mieux gérer tes demandes, pour que ton travail
+              reprenne sa place.
             </p>
 
             <div className="mt-2 w-full max-w-md">
@@ -190,16 +201,10 @@ export function OuiLandingPage() {
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
-            <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
-              <p>
-                Tu peux aimer ton métier — aimer créer, imaginer une décoration, voir un événement prendre vie. Et
-                pourtant ne pas avoir envie de passer ta soirée à répondre à des messages, parce qu’être à son
-                compte, ce n’est pas être disponible tout le temps.
-              </p>
-              <p className="font-medium text-foreground">
-                Ton activité mérite ton attention. Ta famille aussi. Tes soirées aussi. Tes dimanches aussi.
-              </p>
-            </div>
+            <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Tu peux aimer créer, imaginer, voir un événement prendre vie — et ne pas avoir envie de répondre à des
+              messages tous les soirs. Être à son compte, ce n’est pas être disponible tout le temps.
+            </p>
           </div>
         </section>
 
@@ -210,15 +215,17 @@ export function OuiLandingPage() {
               <p className={KICKER}>Le problème</p>
               <h2 className={cn(H2, 'mt-2')}>Tes demandes peuvent être partout</h2>
               <p className="mt-3 text-muted-foreground">
-                Le problème, ce n’est pas forcément que tu as trop de travail — c’est que tes demandes peuvent être
-                partout (Instagram, WhatsApp, mail, appel, note quelque part). Et au milieu de tout ça… ta tête
-                essaie de se souvenir de tout.
+                Pas forcément trop de travail — plutôt des demandes éparpillées partout, et ta tête qui essaie de se
+                souvenir de tout.
               </p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {HEAD_THOUGHTS.map((item) => (
                 <div key={item.source} className="rounded-xl border border-border bg-card p-5">
-                  <p className={KICKER}>{item.source}</p>
+                  <p className={CARD_KICKER}>
+                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
+                    {item.source}
+                  </p>
                   <p className="mt-2 text-foreground">{item.thought}</p>
                 </div>
               ))}
@@ -241,8 +248,7 @@ export function OuiLandingPage() {
               ))}
             </ol>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Et demain, il faudra se souvenir de tout ce qui reste. Tu travailles peut-être depuis chez toi. Mais
-              est-ce que ton travail sait vraiment s’arrêter ?
+              Et demain, il faudra se souvenir de tout ce qui reste. Est-ce que ton travail sait vraiment s’arrêter ?
             </p>
           </div>
         </section>
@@ -252,13 +258,10 @@ export function OuiLandingPage() {
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Imagine.</h2>
             <div className="mt-6 flex flex-col gap-3 text-lg leading-relaxed text-foreground/80">
-              <p>18h00. Tu fermes ton ordinateur. 18h05, tu poses ton téléphone.</p>
               <p>
-                Tu sais ce qui est traité, ce qui est en attente, ce que tu retrouveras demain. Alors tu arrêtes — pas
-                parce que tu t’en fiches de tes clientes, mais parce que tu sais que tu peux reprendre demain sans
-                avoir peur d’avoir oublié quelque chose.
+                18h05, tu poses ton téléphone. Tu sais ce qui est traité, en attente, ce que tu retrouveras demain —
+                alors tu arrêtes, sans peur d’avoir oublié quelque chose.
               </p>
-              <p>Tu manges avec ta famille. Tu crées quelque chose. Tu sors. Ou tu ne fais rien.</p>
               <p className="font-medium text-foreground">Et le dimanche… tu ne regardes pas tes demandes.</p>
             </div>
           </div>
@@ -273,14 +276,16 @@ export function OuiLandingPage() {
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {TIME_RECOVERED.map((item) => (
                 <div key={item.title} className="rounded-xl border border-border bg-background p-6">
-                  <p className="text-2xl" aria-hidden="true">{item.emoji}</p>
-                  <p className="mt-2 font-heading text-lg font-semibold text-foreground">{item.title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
+                  <p className={CARD_KICKER}>
+                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
+                    {item.title}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground">{item.text}</p>
                 </div>
               ))}
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              OUI ne veut pas remplir le temps que tu récupères. Il veut te permettre de choisir ce que tu en fais.
+              OUI ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
             </p>
           </div>
         </section>
@@ -291,27 +296,26 @@ export function OuiLandingPage() {
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
               <h2 className={cn(H2, 'mt-2')}>OUI, c’est quoi ?</h2>
-              <p className="mt-3 text-muted-foreground">
-                OUI est pensé autour d’une idée simple : une demande devrait avoir un endroit où aller.
-              </p>
+              <p className="mt-3 text-muted-foreground">Une idée simple : une demande devrait avoir un endroit où aller.</p>
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {[
-                { n: '01', title: 'Voir', text: 'Retrouver tes demandes au même endroit — au lieu de chercher dans plusieurs conversations, applications ou notes.' },
-                { n: '02', title: 'Savoir', text: 'Voir ce qui est à traiter, ce qui est en attente, ce qui est confirmé, ce qui peut attendre demain.' },
-                { n: '03', title: 'Suivre', text: 'Ne plus avoir à compter uniquement sur ta mémoire pour savoir qui doit être relancé ou quel devis doit être traité.' },
-                { n: '04', title: 'Décrocher', text: 'Fermer ton ordinateur en sachant où tu en es.' },
+                { icon: Eye, title: 'Voir', text: 'Toutes tes demandes au même endroit.' },
+                { icon: ListChecks, title: 'Savoir', text: 'Ce qui est à traiter, en attente, confirmé.' },
+                { icon: Repeat, title: 'Suivre', text: 'Qui relancer, sans compter sur ta mémoire.' },
+                { icon: Power, title: 'Décrocher', text: 'Fermer l’ordinateur en sachant où tu en es.' },
               ].map((item) => (
-                <div key={item.n} className="rounded-xl border border-border bg-background p-6">
-                  <p className="font-heading text-sm font-semibold text-thread-text">{item.n}</p>
-                  <p className="mt-1 font-heading text-lg font-semibold text-foreground">{item.title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
+                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
+                  <p className={CARD_KICKER}>
+                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
+                    {item.title}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground">{item.text}</p>
                 </div>
               ))}
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Pas une usine à gaz. Pas une application de plus à alimenter toute la journée. Une organisation pensée
-              autour de la réalité d’une décoratrice événementielle.
+              Pas une usine à gaz. Une organisation pensée pour la réalité d’une décoratrice événementielle.
             </p>
           </div>
         </section>
@@ -374,10 +378,9 @@ export function OuiLandingPage() {
               ))}
             </ul>
             <p className="mt-6 text-muted-foreground">
-              Ce n’est pas son rôle. OUI s’intéresse à ce qui arrive après qu’une demande soit arrivée : comment la
-              suivre, comment savoir où tu en es, sans tout garder dans ta tête.
+              Ce n’est pas son rôle. OUI s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
+              garder dans ta tête.
             </p>
-            <p className="mt-3 font-medium text-foreground">Et peut-être, simplement… pouvoir fermer ton ordinateur sans culpabiliser.</p>
           </div>
         </section>
 
@@ -385,11 +388,9 @@ export function OuiLandingPage() {
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>OUI est encore en construction.</h2>
-            <p className="mt-4 text-muted-foreground">Et on ne va pas te raconter que tout est déjà réglé.</p>
             <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
             <p className="mt-4 text-muted-foreground">
-              Le but n’est pas de créer une application de plus, mais quelque chose que les décoratrices auront
-              réellement envie d’utiliser — et pour ça, j’ai besoin de comprendre ce dont elles ont vraiment besoin.
+              Le but : quelque chose que les décoratrices auront réellement envie d’utiliser.
             </p>
           </div>
         </section>
@@ -453,23 +454,14 @@ export function OuiLandingPage() {
             <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé OUI parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
               <p>
-                J’ai été décoratrice. Avant ça, comptable — le côté « faire tous les jours la même chose » m’avait
-                lassée. Puis j’ai eu mon fils, et j’ai eu envie d’être davantage présente pour lui : je me suis
-                tournée vers la décoration événementielle pour créer quelque chose qui me ressemblait davantage.
-              </p>
-              <p>
-                Mais mon activité n’a pas fonctionné comme je l’espérais — pas assez de demandes pour en vivre comme
-                je le voulais.
+                J’ai été décoratrice, avant comptable — et mon activité n’a pas fonctionné comme je l’espérais, pas
+                assez de demandes pour en vivre.
               </p>
               <p>
                 En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
-                périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard, de demandes
-                difficiles à suivre. Moi, je n’avais pas encore ce volume. Mais je me suis demandé : « Si un jour j’en
-                arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a amenée à réfléchir à OUI.
-              </p>
-              <p>
-                Aujourd’hui, je cherche une façon de rester proche de cet univers, tout en travaillant depuis chez moi
-                et en laissant de la place à ma vie de famille.
+                périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
+                demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
+                amenée à réfléchir à OUI.
               </p>
               <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où OUI ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
@@ -502,8 +494,7 @@ export function OuiLandingPage() {
               Ton travail a une place. Ta vie aussi.
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-primary-foreground/85">
-              OUI est en construction. Et cette fois, j’ai envie de construire quelque chose avec les décoratrices
-              concernées par ce problème.
+              OUI est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
               <OuiWaitlistForm inverted submitLabel="Je découvre OUI" />
