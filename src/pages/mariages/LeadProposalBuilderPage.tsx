@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { buildProposalInputFromTemplate } from '@/features/proposals/buildProposalInput'
 import { TemplatePickerDialog } from '@/features/proposals/components/TemplatePickerDialog'
 import type { ProposalSubject } from '@/features/proposals/proposalSubject'
+import type { DevisSnapshot } from '@/features/proposals/devisSnapshot'
+import { useShareDevis } from '@/features/proposals/useShareDevis'
 import { useLead } from '@/features/leads/useLead'
 import { markLeadStatus } from '@/features/leads/leadsApi'
 import { scheduleDevisRelance } from '@/features/leads/relanceTask'
@@ -20,6 +22,7 @@ export function LeadProposalBuilderPage() {
   const { leadId, proposalId } = useParams<{ leadId: string; proposalId: string }>()
   const navigate = useNavigate()
   const { lead, isLoading, error } = useLead(leadId)
+  const { shareDevis } = useShareDevis()
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const proposalTemplates = useWorkspaceStore((s) => s.workspace.proposalTemplates)
   const createProposal = useWorkspaceStore((s) => s.createProposal)
@@ -65,11 +68,23 @@ export function LeadProposalBuilderPage() {
     return <TemplatePickerDialog open onOpenChange={() => navigate('/mariages/demandes')} onPick={handlePickTemplate} />
   }
 
-  const handleMarkSent = () => {
+  /**
+   * L'enregistrement local (statut de la demande + tâche de relance) se
+   * fait toujours, même si l'envoi de l'email échoue : le devis est de
+   * toute façon déjà "envoyé" du point de vue de la décoratrice, qui vient
+   * de cliquer le bouton après relecture — cf. useShareDevis, best-effort.
+   */
+  const handleMarkSent = (snapshot: DevisSnapshot) => {
     scheduleDevisRelance(addTask, lead)
     markLeadStatus(lead.id, 'devis_envoye').catch((err) => {
       toast.error(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la demande.')
     })
+    if (lead.client_email) {
+      shareDevis({ snapshot, clientEmail: lead.client_email, clientName: lead.client_name }).then((shareId) => {
+        if (shareId) toast.success('Devis envoyé par email à la cliente.')
+        else toast.error("Le lien du devis n'a pas pu être envoyé par email — le statut a bien été mis à jour.")
+      })
+    }
   }
 
   return <ProposalBuilderInner proposalId={proposal.id} subject={subject} onMarkSent={handleMarkSent} />

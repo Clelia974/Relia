@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
+import { DevisPartagePage } from '@/pages/DevisPartagePage'
 import { LeadFormPage } from '@/pages/LeadFormPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
@@ -110,6 +111,7 @@ export function AppRouter() {
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
+      <Route path="/devis/:shareId" element={<DevisPartagePage />} />
 
       <Route
         element={

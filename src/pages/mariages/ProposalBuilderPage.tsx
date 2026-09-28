@@ -30,6 +30,7 @@ import {
   type ProposalLineItemFormValues,
 } from '@/features/proposals/proposalForm.schema'
 import type { ProposalSubject } from '@/features/proposals/proposalSubject'
+import type { DevisSnapshot } from '@/features/proposals/devisSnapshot'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
@@ -76,8 +77,8 @@ export function ProposalBuilderInner({
 }: {
   proposalId: string
   subject: ProposalSubject
-  /** Fourni uniquement pour un devis rattaché à une demande pas encore signée — marque la demande "Devis envoyé" (et programme la relance) en plus du statut du devis lui-même. */
-  onMarkSent?: () => void
+  /** Fourni uniquement pour un devis rattaché à une demande pas encore signée — reçoit un instantané figé du devis (pour l'envoi à la cliente) et marque la demande "Devis envoyé" (et programme la relance) en plus du statut du devis lui-même. */
+  onMarkSent?: (snapshot: DevisSnapshot) => void
 }) {
   const navigate = useNavigate()
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
@@ -172,7 +173,23 @@ export function ProposalBuilderInner({
    */
   const handleMarkSent = () => {
     updateProposalStatus(proposal.id, 'envoyee')
-    onMarkSent?.()
+    onMarkSent?.({
+      businessConfig,
+      wedding: { coupleName: subject.coupleName, date: subject.date, venue: subject.venue },
+      title,
+      proposalNumber: proposal.proposalNumber,
+      templateLabel: documentTemplateLabel,
+      clientName: clientName || subject.coupleName,
+      clientAddress: clientAddress.trim() || undefined,
+      clientPhone: clientPhone.trim() || undefined,
+      validUntil: validUntil ? new Date(validUntil).toISOString() : undefined,
+      lineItems: numericLines,
+      totals,
+      vatMode: businessConfig.vatStatus,
+      vatRate: businessConfig.vatRate,
+      depositPercentage: depositPercentage === '' ? undefined : Number(depositPercentage),
+      notes: notes.trim() || undefined,
+    })
     toast.success('Devis marqué comme envoyé.')
   }
 
