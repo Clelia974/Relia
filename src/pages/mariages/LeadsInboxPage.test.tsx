@@ -107,6 +107,8 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
       vatMode: 'franchise_en_base',
       taxAmount: 0,
       total: 0,
+      depositAmount: 0,
+      balanceAmount: 0,
       status: 'envoyee',
     })
     const proposalId = useWorkspaceStore.getState().workspace.proposals[0].id
