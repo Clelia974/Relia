@@ -17,6 +17,9 @@ vi.mock('@/hooks/useAuth', () => ({ useAuth: useAuthMock }))
 const markLeadStatusMock = vi.hoisted(() => vi.fn())
 vi.mock('@/features/leads/leadsApi', () => ({ markLeadStatus: markLeadStatusMock }))
 
+const relanceDevisMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/proposals/useRelanceDevis', () => ({ useRelanceDevis: () => ({ relanceDevis: relanceDevisMock, isLoading: false }) }))
+
 function makeLead(overrides: Partial<Lead> = {}): Lead {
   return {
     id: 'lead-1',
@@ -55,6 +58,7 @@ beforeEach(() => {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
   useAuthMock.mockReturnValue({ user: { id: 'u1', email: 'u1@example.com' } })
   markLeadStatusMock.mockReset().mockResolvedValue(undefined)
+  relanceDevisMock.mockReset().mockResolvedValue(true)
 })
 
 describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', () => {
@@ -80,13 +84,42 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
 
   it('"Relancer" sur un devis envoyé remplace la tâche de relance existante par une nouvelle échéance', async () => {
     useWorkspaceStore.getState().addTask({ title: 'Relancer le devis — Sophie', leadId: 'lead-1' })
-    renderPage([makeLead({ status: 'devis_envoye' })])
+    renderPage([makeLead({ status: 'devis_envoye', client_email: null })])
 
     fireEvent.click(screen.getByRole('button', { name: 'Relancer' }))
 
-    const tasks = useWorkspaceStore.getState().workspace.tasks.filter((t) => t.leadId === 'lead-1')
-    expect(tasks).toHaveLength(1)
-    expect(tasks[0].dueDate).toBeTruthy()
+    await waitFor(() => {
+      const tasks = useWorkspaceStore.getState().workspace.tasks.filter((t) => t.leadId === 'lead-1')
+      expect(tasks).toHaveLength(1)
+      expect(tasks[0].dueDate).toBeTruthy()
+    })
+    // Pas d'email client sur ce lead : uniquement la note interne, jamais d'appel à l'envoi.
+    expect(relanceDevisMock).not.toHaveBeenCalled()
+  })
+
+  it('"Relancer" envoie aussi un email de rappel quand le devis a déjà un lien de partage et que le lead a un email', async () => {
+    useWorkspaceStore.getState().createProposal({
+      leadId: 'lead-1',
+      template: 'silver',
+      title: 'Devis Sophie',
+      lineItems: [],
+      subtotal: 0,
+      vatMode: 'franchise_en_base',
+      taxAmount: 0,
+      total: 0,
+      status: 'envoyee',
+    })
+    const proposalId = useWorkspaceStore.getState().workspace.proposals[0].id
+    useWorkspaceStore.getState().setProposalShareId(proposalId, 'share-abc')
+    renderPage([makeLead({ status: 'devis_envoye', client_email: 'sophie@example.com' })])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Relancer' }))
+
+    await waitFor(() =>
+      expect(relanceDevisMock).toHaveBeenCalledWith(
+        expect.objectContaining({ shareId: 'share-abc', clientEmail: 'sophie@example.com' }),
+      ),
+    )
   })
 
   it('"Marquer comme signé" crée le mariage avec la checklist, et retire la tâche de relance', async () => {
@@ -115,6 +148,27 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
     fireEvent.click(screen.getByRole('button', { name: 'Ignorer' }))
 
     await waitFor(() => expect(markLeadStatusMock).toHaveBeenCalledWith('lead-1', 'ignore'))
+  })
+})
+
+describe('LeadsInboxPage — coordonnées consultables au clic', () => {
+  it('cliquer sur le nom du lead ouvre ses coordonnées (téléphone, email)', async () => {
+    renderPage([makeLead({ client_phone: '0692000000', client_email: 'sophie@example.com' })])
+
+    fireEvent.click(screen.getByRole('button', { name: /Voir les coordonnées de Sophie/ }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /0692000000/ })).toHaveAttribute('href', 'tel:0692000000')
+      expect(screen.getByRole('link', { name: /sophie@example.com/ })).toHaveAttribute('href', 'mailto:sophie@example.com')
+    })
+  })
+
+  it('affiche un message si la demande ne laisse aucune coordonnée', async () => {
+    renderPage([makeLead({ client_phone: null, client_email: null })])
+
+    fireEvent.click(screen.getByRole('button', { name: /Voir les coordonnées de Sophie/ }))
+
+    await waitFor(() => expect(screen.getByText('Aucune coordonnée laissée par la cliente.')).toBeInTheDocument())
   })
 })
 

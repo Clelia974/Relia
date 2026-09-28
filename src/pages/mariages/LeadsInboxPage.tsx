@@ -1,15 +1,24 @@
 import { useState } from 'react'
-import { Copy } from 'lucide-react'
+import { Copy, Mail, Phone } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { EmptyState } from '@/components/EmptyState'
 import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { LeadStatusBadge } from '@/features/leads/components/LeadStatusBadge'
 import { markLeadStatus } from '@/features/leads/leadsApi'
 import { clearLeadRelance, scheduleDevisRelance } from '@/features/leads/relanceTask'
 import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
+import { useRelanceDevis } from '@/features/proposals/useRelanceDevis'
+import { copyTextToClipboard } from '@/lib/clipboard'
 import { useAuth } from '@/hooks/useAuth'
 import {
   LEAD_EVENT_TYPE_LABELS,
@@ -47,8 +56,12 @@ export function LeadsInboxPage() {
   const addTask = useWorkspaceStore((s) => s.addTask)
   const deleteTask = useWorkspaceStore((s) => s.deleteTask)
   const allTasks = useWorkspaceStore((s) => s.workspace.tasks)
+  const allProposals = useWorkspaceStore((s) => s.workspace.proposals)
+  const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
+  const { relanceDevis } = useRelanceDevis()
   const [pendingId, setPendingId] = useState<string | null>(null)
+  const [detailLead, setDetailLead] = useState<Lead | null>(null)
 
   const formLink = user ? `${window.location.origin}/lead/new/${user.id}` : ''
   const embedCode = user
@@ -115,11 +128,32 @@ export function LeadsInboxPage() {
     }
   }
 
-  /** Relance manuelle : repousse l'échéance de la tâche de relance de 5 jours à partir d'aujourd'hui. */
-  const handleRelance = (lead: Lead) => {
+  /**
+   * Relance manuelle : repousse l'échéance de la tâche de relance de 5 jours
+   * à partir d'aujourd'hui, ET envoie un email de rappel à la cliente si son
+   * devis a bien un lien de partage (cf. Proposal.shareId) et qu'elle a
+   * laissé une adresse — sinon la relance reste purement une note interne,
+   * comme avant. Jamais de recréation du partage, seulement un nouvel email
+   * pointant vers le lien déjà existant.
+   */
+  const handleRelance = async (lead: Lead) => {
     clearLeadRelance(allTasks, deleteTask, lead.id)
     scheduleDevisRelance(addTask, lead)
-    toast.success('Relance notée — prochain rappel dans 5 jours.')
+    const proposal = allProposals
+      .filter((p) => p.leadId === lead.id && p.shareId)
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+    if (lead.client_email && proposal?.shareId) {
+      const sent = await relanceDevis({
+        shareId: proposal.shareId,
+        clientEmail: lead.client_email,
+        clientName: lead.client_name,
+        companyName: businessConfig.companyName,
+        replyToEmail: businessConfig.email,
+      })
+      toast.success(sent ? 'Relance notée — email de rappel envoyé à la cliente.' : "Relance notée — l'email de rappel n'a pas pu être envoyé.")
+    } else {
+      toast.success('Relance notée — prochain rappel dans 5 jours.')
+    }
   }
 
   const handleIgnore = async (lead: Lead) => {
@@ -183,7 +217,12 @@ export function LeadsInboxPage() {
         {leads.map((lead) => (
           <Card key={lead.id}>
             <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
+              <button
+                type="button"
+                className="flex-1 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => setDetailLead(lead)}
+                aria-label={`Voir les coordonnées de ${lead.client_name}`}
+              >
                 <p className="flex flex-wrap items-center gap-2 font-medium text-foreground">
                   {lead.client_name}
                   <LeadStatusBadge status={lead.status} />
@@ -196,7 +235,7 @@ export function LeadsInboxPage() {
                   {LEAD_SOURCE_LABELS[lead.source]}
                 </p>
                 {lead.message && <p className="mt-1 text-sm text-muted-foreground">{lead.message}</p>}
-              </div>
+              </button>
               <div className="flex flex-wrap gap-2">
                 {LEAD_QUICK_ACTIONS[lead.status]?.map((action) => (
                   <Button
@@ -235,6 +274,95 @@ export function LeadsInboxPage() {
           </Card>
         ))}
       </div>
+
+      <Dialog open={detailLead !== null} onOpenChange={(open) => !open && setDetailLead(null)}>
+        <DialogContent>
+          {detailLead && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  {detailLead.client_name}
+                  <LeadStatusBadge status={detailLead.status} />
+                </DialogTitle>
+                <DialogDescription>
+                  {LEAD_EVENT_TYPE_LABELS[detailLead.event_type]}
+                  {detailLead.event_date ? ` · ${new Date(detailLead.event_date).toLocaleDateString('fr-FR')}` : ''}
+                  {' · '}
+                  {LEAD_SOURCE_LABELS[detailLead.source]}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-3 text-sm">
+                {detailLead.client_phone && (
+                  <div className="flex items-center justify-between gap-2">
+                    <a href={`tel:${detailLead.client_phone}`} className="flex items-center gap-2 text-foreground hover:underline">
+                      <Phone className="size-4 text-muted-foreground" aria-hidden="true" />
+                      {detailLead.client_phone}
+                    </a>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="Copier le téléphone"
+                      onClick={async () => {
+                        const ok = await copyTextToClipboard(detailLead.client_phone!)
+                        toast[ok ? 'success' : 'error'](ok ? 'Téléphone copié.' : 'Impossible de copier.')
+                      }}
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
+                )}
+                {detailLead.client_email && (
+                  <div className="flex items-center justify-between gap-2">
+                    <a href={`mailto:${detailLead.client_email}`} className="flex items-center gap-2 truncate text-foreground hover:underline">
+                      <Mail className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      <span className="truncate">{detailLead.client_email}</span>
+                    </a>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0"
+                      aria-label="Copier l'email"
+                      onClick={async () => {
+                        const ok = await copyTextToClipboard(detailLead.client_email!)
+                        toast[ok ? 'success' : 'error'](ok ? 'Email copié.' : 'Impossible de copier.')
+                      }}
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
+                )}
+                {!detailLead.client_phone && !detailLead.client_email && (
+                  <p className="text-muted-foreground">Aucune coordonnée laissée par la cliente.</p>
+                )}
+                {detailLead.venue && (
+                  <p>
+                    <span className="text-muted-foreground">Lieu envisagé : </span>
+                    {detailLead.venue}
+                  </p>
+                )}
+                {detailLead.guest_count !== null && (
+                  <p>
+                    <span className="text-muted-foreground">Invités : </span>
+                    {detailLead.guest_count}
+                  </p>
+                )}
+                {detailLead.budget_estimate !== null && (
+                  <p>
+                    <span className="text-muted-foreground">Budget estimé : </span>
+                    {detailLead.budget_estimate.toLocaleString('fr-FR')} €
+                  </p>
+                )}
+                {detailLead.message && (
+                  <div>
+                    <p className="text-muted-foreground">Message :</p>
+                    <p className="whitespace-pre-line">{detailLead.message}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
