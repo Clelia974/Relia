@@ -51,11 +51,20 @@ export function LeadsInboxPage() {
   const [pendingId, setPendingId] = useState<string | null>(null)
 
   const formLink = user ? `${window.location.origin}/lead/new/${user.id}` : ''
+  const embedCode = user
+    ? `<iframe src="${window.location.origin}/lead/new/${user.id}?embed=1" style="width:100%;max-width:480px;height:900px;border:0;"></iframe>`
+    : ''
 
   const copyLink = async () => {
     if (!formLink) return
     await navigator.clipboard.writeText(formLink)
     toast.success('Lien copié.')
+  }
+
+  const copyEmbedCode = async () => {
+    if (!embedCode) return
+    await navigator.clipboard.writeText(embedCode)
+    toast.success('Code d’intégration copié.')
   }
 
   const handleStatusChange = async (lead: Lead, next: LeadStatus) => {
@@ -141,13 +150,26 @@ export function LeadsInboxPage() {
         <CardHeader>
           <CardTitle className="text-base">Votre lien de contact</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center gap-2">
-          <code className="flex-1 truncate rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-            {formLink}
-          </code>
-          <Button variant="outline" size="icon" onClick={copyLink} aria-label="Copier le lien">
-            <Copy className="size-4" />
-          </Button>
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <code className="flex-1 truncate rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+              {formLink}
+            </code>
+            <Button variant="outline" size="icon" onClick={copyLink} aria-label="Copier le lien">
+              <Copy className="size-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-muted-foreground">Pour l'intégrer directement sur votre site</p>
+              <code className="mt-1 block truncate rounded-md border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+                {embedCode}
+              </code>
+            </div>
+            <Button variant="outline" size="icon" onClick={copyEmbedCode} aria-label="Copier le code d’intégration">
+              <Copy className="size-4" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

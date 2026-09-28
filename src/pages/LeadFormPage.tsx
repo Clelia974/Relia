@@ -1,7 +1,8 @@
 import { type FormEvent, type ReactNode, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -14,9 +15,19 @@ import {
 import { LEAD_EVENT_TYPE_LABELS, LEAD_SOURCE_LABELS, LeadEventTypeSchema, LeadSourceSchema } from '@/schemas/lead'
 import { useSubmitLead } from '@/features/leads/useSubmitLead'
 
-/** Formulaire public (jamais authentifié) : une prospect n'a pas de compte Relia — lien propre à chaque décoratrice (/lead/new/:userId), à partager elle-même (bio Instagram, réponse WhatsApp…). */
+/**
+ * Formulaire public (jamais authentifié) : une prospect n'a pas de compte
+ * Relia — lien propre à chaque décoratrice (/lead/new/:userId), à
+ * partager elle-même (bio Instagram, réponse WhatsApp…) ou à intégrer
+ * directement sur son propre site (lien classique ou iframe).
+ *
+ * `?embed=1` : sans en-tête Relia ni fond de page — pensé pour un
+ * <iframe> encastré dans une autre page, qui a déjà son propre habillage.
+ */
 export function LeadFormPage() {
   const { userId } = useParams<{ userId: string }>()
+  const [searchParams] = useSearchParams()
+  const embed = searchParams.get('embed') === '1'
   const { submitLead, isLoading, error } = useSubmitLead()
   const [values, setValues] = useState<LeadFormValues>(emptyLeadFormValues())
   const [errors, setErrors] = useState<Partial<Record<keyof LeadFormValues, string>>>({})
@@ -48,18 +59,20 @@ export function LeadFormPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background text-foreground">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
-          <Link to="/" className="flex items-center gap-2" aria-label="Relia — retour à l'accueil">
-            <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
-          </Link>
-        </div>
-      </header>
+    <div className={cn('flex min-h-dvh flex-col text-foreground', embed ? 'bg-transparent' : 'bg-background')}>
+      {!embed && (
+        <header className="border-b border-border/60">
+          <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
+            <Link to="/" className="flex items-center gap-2" aria-label="Relia — retour à l'accueil">
+              <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
+              <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
+            </Link>
+          </div>
+        </header>
+      )}
 
-      <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
-        <Card className="w-full max-w-lg">
+      <main className={cn('flex flex-1 items-center justify-center', embed ? 'p-4' : 'px-4 py-10 sm:px-6')}>
+        <Card className={cn('w-full max-w-lg', embed && 'border-none shadow-none')}>
           {sent ? (
             <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
               <CardTitle className="font-heading text-xl">Merci pour votre demande !</CardTitle>
