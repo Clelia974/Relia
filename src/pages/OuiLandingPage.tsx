@@ -159,7 +159,7 @@ export function OuiLandingPage() {
       <main id="contenu" className="flex flex-col">
         {/* 2 — HERO */}
         <section id="haut" className="overflow-hidden pb-14 pt-14 sm:pb-20 sm:pt-20">
-          <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
+          <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-thread-text">
               <span className="size-1.5 rounded-full bg-thread" aria-hidden="true" />
               OUI — en construction

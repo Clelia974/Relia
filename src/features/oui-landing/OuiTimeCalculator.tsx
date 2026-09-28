@@ -12,81 +12,110 @@ function estimateHours(count: number, avgMinutes: number, repeats: number): numb
   return Math.round((totalMinutes / 60) * 10) / 10
 }
 
-export function OuiTimeCalculator() {
-  const [count, setCount] = useState(50)
-  const [avgMinutes, setAvgMinutes] = useState(15)
-  const [repeats, setRepeats] = useState(2)
-  const [choice, setChoice] = useState<(typeof CHOICES)[number]>(CHOICES[0])
+const FIELD_INPUT_CLASSES = 'h-12 bg-card text-base text-foreground'
 
-  const hours = useMemo(() => estimateHours(count, avgMinutes, repeats), [count, avgMinutes, repeats])
+export function OuiTimeCalculator() {
+  // Champs vides par défaut (pas de valeurs pré-remplies) : le résultat n'apparaît
+  // qu'une fois que la décoratrice a saisi ses propres chiffres — effet de révélation
+  // plutôt qu'un calcul déjà affiché avant toute interaction.
+  const [count, setCount] = useState('')
+  const [avgMinutes, setAvgMinutes] = useState('')
+  const [repeats, setRepeats] = useState('')
+  const [choice, setChoice] = useState<(typeof CHOICES)[number] | null>(null)
+
+  const hours = useMemo(
+    () => estimateHours(Number(count) || 0, Number(avgMinutes) || 0, Number(repeats) || 0),
+    [count, avgMinutes, repeats],
+  )
+  const hasResult = hours > 0
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+    <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-(--shadow-raised) sm:p-8">
       <div className="grid gap-5 sm:grid-cols-3">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="oui-calc-count">Demandes reçues pendant une grosse période</Label>
+          <Label htmlFor="oui-calc-count" className="text-primary-foreground/90">
+            Demandes reçues pendant une grosse période
+          </Label>
           <Input
             id="oui-calc-count"
             type="number"
             inputMode="numeric"
             min={0}
+            placeholder="ex. 50"
             value={count}
-            onChange={(e) => setCount(Number(e.target.value) || 0)}
+            onChange={(e) => setCount(e.target.value)}
+            className={FIELD_INPUT_CLASSES}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="oui-calc-minutes">Temps moyen par demande (min)</Label>
+          <Label htmlFor="oui-calc-minutes" className="text-primary-foreground/90">
+            Temps moyen par demande (min)
+          </Label>
           <Input
             id="oui-calc-minutes"
             type="number"
             inputMode="numeric"
             min={0}
+            placeholder="ex. 15"
             value={avgMinutes}
-            onChange={(e) => setAvgMinutes(Number(e.target.value) || 0)}
+            onChange={(e) => setAvgMinutes(e.target.value)}
+            className={FIELD_INPUT_CLASSES}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="oui-calc-repeats">Recherches / relances par demande</Label>
+          <Label htmlFor="oui-calc-repeats" className="text-primary-foreground/90">
+            Recherches / relances par demande
+          </Label>
           <Input
             id="oui-calc-repeats"
             type="number"
             inputMode="numeric"
             min={0}
+            placeholder="ex. 2"
             value={repeats}
-            onChange={(e) => setRepeats(Number(e.target.value) || 0)}
+            onChange={(e) => setRepeats(e.target.value)}
+            className={FIELD_INPUT_CLASSES}
           />
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col items-center gap-1 border-t border-border pt-8 text-center">
-        <p className="font-heading text-4xl font-semibold tracking-tight text-primary sm:text-5xl">≈ {hours} h</p>
-        <p className="text-sm text-muted-foreground">par mois consacrées à ces tâches de suivi.</p>
-      </div>
+      {hasResult ? (
+        <div key={hours} className="animate-notice-in">
+          <div className="mt-8 flex flex-col items-center gap-1 border-t border-primary-foreground/20 pt-8 text-center">
+            <p className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">≈ {hours} h</p>
+            <p className="text-sm text-primary-foreground/80">par mois consacrées à ces tâches de suivi.</p>
+          </div>
 
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        Cette estimation est indicative et dépend uniquement des informations que tu renseignes — elle ne mesure pas
-        réellement ton activité.
-      </p>
+          <p className="mt-4 text-center text-xs text-primary-foreground/70">
+            Cette estimation est indicative et dépend uniquement des informations que tu renseignes — elle ne mesure
+            pas réellement ton activité.
+          </p>
 
-      <div className="mt-6 flex flex-col items-center gap-3 border-t border-border pt-6 sm:flex-row sm:justify-center">
-        <p className="text-sm text-muted-foreground">Et ce temps, tu en ferais quoi ?</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {CHOICES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setChoice(c)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                choice === c
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-card text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+          <div className="mt-6 flex flex-col items-center gap-3 border-t border-primary-foreground/20 pt-6 sm:flex-row sm:justify-center">
+            <p className="text-sm text-primary-foreground/80">Et ce temps, tu en ferais quoi ?</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {CHOICES.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setChoice(c)}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                    choice === c
+                      ? 'border-card bg-card text-primary'
+                      : 'border-primary-foreground/30 text-primary-foreground/80 hover:border-primary-foreground/60 hover:text-primary-foreground'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="mt-8 border-t border-primary-foreground/20 pt-8 text-center text-sm text-primary-foreground/70">
+          Renseigne tes chiffres pour voir ton estimation.
+        </p>
+      )}
     </div>
   )
 }
