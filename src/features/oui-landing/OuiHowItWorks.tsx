@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Camera, Mail, MessageCircle, Phone } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+const AUTOPLAY_MS = 3500
 
 type Tone = 'new' | 'pending' | 'progress' | 'done' | 'muted'
 
@@ -92,10 +94,27 @@ const STEPS: Step[] = [
  */
 export function OuiHowItWorks() {
   const [active, setActive] = useState(0)
+  const [paused, setPaused] = useState(false)
   const step = STEPS[active]
 
+  // Défile automatiquement d'étape en étape ; le délai se réarme à chaque
+  // changement (auto ou clic manuel), donc chaque étape reste affichée le
+  // même temps peu importe comment on y est arrivé. En pause au survol/focus
+  // pour laisser le temps de lire (et respecter WCAG 2.2.2 sur le contenu qui bouge seul).
+  useEffect(() => {
+    if (paused) return
+    const id = setTimeout(() => setActive((a) => (a + 1) % STEPS.length), AUTOPLAY_MS)
+    return () => clearTimeout(id)
+  }, [active, paused])
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 sm:items-start">
+    <div
+      className="grid gap-6 sm:grid-cols-2 sm:items-start"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
       <ol className="flex flex-col gap-2">
         {STEPS.map((s, i) => (
           <li key={s.title}>
@@ -104,7 +123,7 @@ export function OuiHowItWorks() {
               onClick={() => setActive(i)}
               aria-pressed={active === i}
               className={cn(
-                'flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition-colors',
+                'relative flex w-full items-start gap-3.5 overflow-hidden rounded-xl border p-4 text-left transition-colors',
                 active === i ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40',
               )}
             >
@@ -120,6 +139,14 @@ export function OuiHowItWorks() {
                 <span className="block text-sm font-medium text-foreground">{s.title}</span>
                 <span className="mt-0.5 block text-xs text-muted-foreground">{s.caption}</span>
               </span>
+              {active === i && (
+                <span
+                  key={paused ? 'paused' : active}
+                  className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-primary"
+                  style={{ animation: paused ? 'none' : `oui-step-progress ${AUTOPLAY_MS}ms linear forwards` }}
+                  aria-hidden="true"
+                />
+              )}
             </button>
           </li>
         ))}
