@@ -191,10 +191,11 @@ export function OuiLandingPage() {
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
-              <p>Tu peux aimer ton métier.</p>
-              <p>Aimer créer. Aimer imaginer une décoration. Aimer voir un événement prendre vie.</p>
-              <p>Et malgré tout, ne pas avoir envie de passer ta soirée à répondre à des messages.</p>
-              <p>Parce qu’être à son compte, ce n’est pas être disponible tout le temps.</p>
+              <p>
+                Tu peux aimer ton métier — aimer créer, imaginer une décoration, voir un événement prendre vie. Et
+                pourtant ne pas avoir envie de passer ta soirée à répondre à des messages, parce qu’être à son
+                compte, ce n’est pas être disponible tout le temps.
+              </p>
               <p className="font-medium text-foreground">
                 Ton activité mérite ton attention. Ta famille aussi. Tes soirées aussi. Tes dimanches aussi.
               </p>
@@ -209,11 +210,10 @@ export function OuiLandingPage() {
               <p className={KICKER}>Le problème</p>
               <h2 className={cn(H2, 'mt-2')}>Tes demandes peuvent être partout</h2>
               <p className="mt-3 text-muted-foreground">
-                Le problème, ce n’est pas forcément que tu as trop de travail. C’est que tes demandes peuvent être
-                partout — une sur Instagram, une autre sur WhatsApp, un mail pour un devis, un appel auquel tu dois
-                penser à répondre, une note quelque part pour ne pas oublier une information.
+                Le problème, ce n’est pas forcément que tu as trop de travail — c’est que tes demandes peuvent être
+                partout (Instagram, WhatsApp, mail, appel, note quelque part). Et au milieu de tout ça… ta tête
+                essaie de se souvenir de tout.
               </p>
-              <p className="mt-3 text-muted-foreground">Et au milieu de tout ça… ta tête essaie de se souvenir de tout.</p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {HEAD_THOUGHTS.map((item) => (
@@ -252,12 +252,13 @@ export function OuiLandingPage() {
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Imagine.</h2>
             <div className="mt-6 flex flex-col gap-3 text-lg leading-relaxed text-foreground/80">
-              <p>18h00. Tu fermes ton ordinateur.</p>
-              <p>18h05. Tu poses ton téléphone.</p>
-              <p>Tu sais ce qui est traité. Tu sais ce qui est en attente. Tu sais ce que tu retrouveras demain.</p>
-              <p>Alors tu arrêtes.</p>
-              <p>Pas parce que tu t’en fiches de tes clientes. Parce que tu sais que tu peux reprendre demain sans avoir peur d’avoir oublié quelque chose.</p>
-              <p>Tu manges avec ta famille. Tu joues avec ton enfant. Tu regardes une série. Tu crées quelque chose. Tu lis. Tu sors. Ou tu ne fais rien.</p>
+              <p>18h00. Tu fermes ton ordinateur. 18h05, tu poses ton téléphone.</p>
+              <p>
+                Tu sais ce qui est traité, ce qui est en attente, ce que tu retrouveras demain. Alors tu arrêtes — pas
+                parce que tu t’en fiches de tes clientes, mais parce que tu sais que tu peux reprendre demain sans
+                avoir peur d’avoir oublié quelque chose.
+              </p>
+              <p>Tu manges avec ta famille. Tu crées quelque chose. Tu sors. Ou tu ne fais rien.</p>
               <p className="font-medium text-foreground">Et le dimanche… tu ne regardes pas tes demandes.</p>
             </div>
           </div>
@@ -281,29 +282,6 @@ export function OuiLandingPage() {
             <p className="mt-8 max-w-2xl text-muted-foreground">
               OUI ne veut pas remplir le temps que tu récupères. Il veut te permettre de choisir ce que tu en fais.
             </p>
-          </div>
-        </section>
-
-        {/* 8 — LE CONSTAT QUI A DONNÉ NAISSANCE À OUI */}
-        <section className={SECTION}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <p className={KICKER}>D’où vient OUI</p>
-            <h2 className={cn(H2, 'mt-2')}>Pourquoi j’ai commencé à réfléchir à OUI</h2>
-            <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
-              <p>Quand j’étais décoratrice, je regardais beaucoup ce que faisaient les autres décoratrices.</p>
-              <p>
-                Et pendant les grosses périodes, je voyais régulièrement passer des messages sur les retards de
-                traitement des demandes, des devis qui prenaient du temps, des messages auxquels elles n’avaient pas
-                encore répondu…
-              </p>
-              <p>Moi, je n’avais pas beaucoup de demandes à ce moment-là, donc je ne vivais pas encore ce problème.</p>
-              <p>Mais ça m’a interpellée. Je me suis demandé : « Si un jour j’ai beaucoup plus de demandes, comment je vais gérer tout ça ? »</p>
-              <p>
-                Et surtout : « Est-ce qu’il n’y aurait pas une façon plus simple de suivre les demandes, les devis et
-                les échanges, sans devoir tout chercher partout ? »
-              </p>
-              <p className="font-medium text-foreground">C’est là que j’ai commencé à réfléchir à OUI.</p>
-            </div>
           </div>
         </section>
 
@@ -395,12 +373,11 @@ export function OuiLandingPage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-6 text-muted-foreground">Ce n’est pas son rôle.</p>
-            <div className="mt-4 flex flex-col gap-2 text-foreground/80">
-              <p>OUI s’intéresse à ce qui arrive après qu’une demande soit arrivée.</p>
-              <p>Comment la suivre. Comment savoir où tu en es. Comment éviter de devoir tout garder dans ta tête.</p>
-              <p className="font-medium text-foreground">Et peut-être, simplement… pouvoir fermer ton ordinateur sans culpabiliser.</p>
-            </div>
+            <p className="mt-6 text-muted-foreground">
+              Ce n’est pas son rôle. OUI s’intéresse à ce qui arrive après qu’une demande soit arrivée : comment la
+              suivre, comment savoir où tu en es, sans tout garder dans ta tête.
+            </p>
+            <p className="mt-3 font-medium text-foreground">Et peut-être, simplement… pouvoir fermer ton ordinateur sans culpabiliser.</p>
           </div>
         </section>
 
@@ -409,12 +386,11 @@ export function OuiLandingPage() {
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>OUI est encore en construction.</h2>
             <p className="mt-4 text-muted-foreground">Et on ne va pas te raconter que tout est déjà réglé.</p>
-            <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On change. On recommence.</p>
+            <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
             <p className="mt-4 text-muted-foreground">
-              Parce que le but n’est pas de créer une application de plus. Le but est de construire quelque chose que
-              les décoratrices auront réellement envie d’utiliser.
+              Le but n’est pas de créer une application de plus, mais quelque chose que les décoratrices auront
+              réellement envie d’utiliser — et pour ça, j’ai besoin de comprendre ce dont elles ont vraiment besoin.
             </p>
-            <p className="mt-2 text-muted-foreground">Et pour ça, j’ai besoin de comprendre ce dont elles ont vraiment besoin.</p>
           </div>
         </section>
 
@@ -476,18 +452,24 @@ export function OuiLandingPage() {
             <p className={KICKER}>Pourquoi OUI</p>
             <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé OUI parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
-              <p>J’ai été décoratrice. Avant ça, j’étais comptable.</p>
-              <p>Le côté « faire tous les jours la même chose » m’avait lassée.</p>
-              <p>Puis j’ai eu mon fils et j’ai eu envie d’être davantage présente pour lui.</p>
-              <p>Je me suis tournée vers la décoration événementielle parce que j’avais envie de créer quelque chose qui me ressemblait davantage.</p>
-              <p>Mais mon activité de décoration n’a pas fonctionné comme je l’espérais. J’ai eu quelques événements, mais pas suffisamment de demandes pour en vivre comme je le voulais.</p>
-              <p>Et en regardant ce qui se passait autour de moi, j’ai commencé à remarquer autre chose.</p>
-              <p>Pendant les grosses périodes, je voyais des décoratrices parler de messages qui s’accumulaient, de devis en retard, de demandes difficiles à suivre.</p>
-              <p>Moi, je n’avais pas encore ce volume. Mais je me suis demandé : « Si un jour j’en arrive là, comment est-ce que je vais gérer tout ça ? »</p>
-              <p>C’est cette question qui m’a amenée à réfléchir à OUI.</p>
               <p>
-                Aujourd’hui, je cherche une autre façon de rester proche de cet univers, tout en travaillant depuis
-                chez moi et en construisant quelque chose qui puisse aussi laisser de la place à ma vie de famille.
+                J’ai été décoratrice. Avant ça, comptable — le côté « faire tous les jours la même chose » m’avait
+                lassée. Puis j’ai eu mon fils, et j’ai eu envie d’être davantage présente pour lui : je me suis
+                tournée vers la décoration événementielle pour créer quelque chose qui me ressemblait davantage.
+              </p>
+              <p>
+                Mais mon activité n’a pas fonctionné comme je l’espérais — pas assez de demandes pour en vivre comme
+                je le voulais.
+              </p>
+              <p>
+                En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
+                périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard, de demandes
+                difficiles à suivre. Moi, je n’avais pas encore ce volume. Mais je me suis demandé : « Si un jour j’en
+                arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a amenée à réfléchir à OUI.
+              </p>
+              <p>
+                Aujourd’hui, je cherche une façon de rester proche de cet univers, tout en travaillant depuis chez moi
+                et en laissant de la place à ma vie de famille.
               </p>
               <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où OUI ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
