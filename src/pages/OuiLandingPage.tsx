@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
+import { OuiHowItWorks } from '@/features/oui-landing/OuiHowItWorks'
 import { OuiTimeCalculator } from '@/features/oui-landing/OuiTimeCalculator'
 import { OuiWaitlistForm } from '@/features/oui-landing/OuiWaitlistForm'
 import { cn } from '@/lib/utils'
@@ -86,14 +87,6 @@ const NOT_FOR_YOU = [
   'Tu reçois très peu de demandes et ton organisation actuelle te convient parfaitement.',
   'Tu n’as pas envie de changer ta façon de suivre tes demandes.',
   'Tu cherches avant tout un outil pour obtenir plus de clientes.',
-]
-
-const HOW_IT_WORKS = [
-  'Tu reçois une demande.',
-  'Elle trouve sa place dans ton suivi.',
-  'Tu sais ce qu’il reste à faire.',
-  'Tu avances sans devoir tout retenir.',
-  'Tu fermes ton ordinateur.',
 ]
 
 const FAQ: { q: string; a: string }[] = [
@@ -327,23 +320,27 @@ export function OuiLandingPage() {
               <p className={KICKER}>La différence</p>
               <h2 className={cn(H2, 'mt-2')}>Pas pour travailler plus vite. Pour avoir moins de choses à retenir.</h2>
             </div>
-            <div className="mt-10 overflow-x-auto rounded-xl border border-border">
-              <table className="w-full min-w-[520px] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-card text-left">
-                    <th className="p-4 font-heading font-semibold text-foreground">Aujourd’hui</th>
-                    <th className="p-4 font-heading font-semibold text-foreground">Avec une organisation claire</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <p className="text-sm font-semibold text-muted-foreground">Aujourd’hui</p>
+                <ul className="mt-4 flex flex-col divide-y divide-border">
                   {BEFORE_AFTER.map((row) => (
-                    <tr key={row.before}>
-                      <td className="p-4 align-top text-muted-foreground">{row.before}</td>
-                      <td className="p-4 align-top text-foreground">{row.after}</td>
-                    </tr>
+                    <li key={row.before} className="py-2.5 text-sm text-muted-foreground first:pt-0 last:pb-0">
+                      {row.before}
+                    </li>
                   ))}
-                </tbody>
-              </table>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
+                <p className="text-sm font-semibold text-primary">Avec une organisation claire</p>
+                <ul className="mt-4 flex flex-col divide-y divide-primary/15">
+                  {BEFORE_AFTER.map((row) => (
+                    <li key={row.after} className="py-2.5 text-sm text-foreground first:pt-0 last:pb-0">
+                      {row.after}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -402,18 +399,21 @@ export function OuiLandingPage() {
               <p className={KICKER}>Pour qui</p>
               <h2 className={cn(H2, 'mt-2')}>OUI est pour toi si…</h2>
             </div>
-            <div className="mt-10 grid gap-8 sm:grid-cols-2">
-              <ul className="flex flex-col gap-2.5">
-                {FOR_YOU.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-foreground/80">
-                    <span className="mt-0.5 text-success">✓</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div>
-                <p className="mb-2.5 text-sm font-medium text-muted-foreground">OUI n’est probablement pas pour toi si…</p>
-                <ul className="flex flex-col gap-2.5">
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
+              <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
+                <p className="text-sm font-semibold text-success">OUI est pour toi si…</p>
+                <ul className="mt-4 flex flex-col gap-2.5">
+                  {FOR_YOU.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-foreground/80">
+                      <span className="mt-0.5 text-success">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <p className="text-sm font-semibold text-muted-foreground">OUI n’est probablement pas pour toi si…</p>
+                <ul className="mt-4 flex flex-col gap-2.5">
                   {NOT_FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-muted-foreground">
                       <span className="mt-0.5">×</span>
@@ -431,19 +431,14 @@ export function OuiLandingPage() {
 
         {/* 15 — COMMENT ÇA POURRAIT FONCTIONNER */}
         <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>Une demande arrive.</h2>
-            <ol className="mt-8 flex flex-col gap-4">
-              {HOW_IT_WORKS.map((step, i) => (
-                <li key={step} className="flex items-center gap-4">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                    {i + 1}
-                  </span>
-                  <span className="text-foreground/80">{step}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-6 font-medium text-foreground">Et tu sais où reprendre demain.</p>
+          <div className={CONTAINER}>
+            <div className="max-w-2xl">
+              <h2 className={H2}>Une demande arrive.</h2>
+              <p className="mt-3 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
+            </div>
+            <div className="mt-8">
+              <OuiHowItWorks />
+            </div>
           </div>
         </section>
 
