@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { fetchLead } from '@/features/leads/leadsApi'
 import type { Lead } from '@/schemas/lead'
 
@@ -6,6 +6,8 @@ interface UseLeadResult {
   lead: Lead | null
   isLoading: boolean
   error: string | null
+  /** Recharge la demande — utile après une action qui change son statut (LeadDetailPage). */
+  refresh: () => void
 }
 
 /** Charge une demande précise (fiche client pour le devis) — RLS restreint déjà à la décoratrice propriétaire. */
@@ -14,7 +16,7 @@ export function useLead(leadId: string | undefined): UseLeadResult {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const load = useCallback(() => {
     if (!leadId) return
     let cancelled = false
     setIsLoading(true)
@@ -34,5 +36,7 @@ export function useLead(leadId: string | undefined): UseLeadResult {
     }
   }, [leadId])
 
-  return { lead, isLoading, error }
+  useEffect(() => load(), [load])
+
+  return { lead, isLoading, error, refresh: load }
 }

@@ -45,6 +45,7 @@ function renderPage(leads: Lead[]) {
   const router = createMemoryRouter(
     [
       { path: '/mariages/demandes', element: <LeadsInboxPage /> },
+      { path: '/mariages/demandes/:leadId', element: <p>Fiche de la demande</p> },
       { path: '/mariages/demandes/:leadId/devis/:proposalId', element: <p>Éditeur de devis</p> },
       { path: '/mariages/:weddingId', element: <p>Fiche mariage</p> },
     ],
@@ -153,24 +154,13 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
   })
 })
 
-describe('LeadsInboxPage — coordonnées consultables au clic', () => {
-  it('cliquer sur le nom du lead ouvre ses coordonnées (téléphone, email)', async () => {
-    renderPage([makeLead({ client_phone: '0692000000', client_email: 'sophie@example.com' })])
+describe('LeadsInboxPage — ouverture de la fiche détaillée', () => {
+  it('cliquer sur le nom du lead ouvre sa fiche détaillée (LeadDetailPage), pour voir toutes ses coordonnées et ses devis', async () => {
+    const router = renderPage([makeLead()])
 
-    fireEvent.click(screen.getByRole('button', { name: /Voir les coordonnées de Sophie/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Voir la fiche de Sophie/ }))
 
-    await waitFor(() => {
-      expect(screen.getByRole('link', { name: /0692000000/ })).toHaveAttribute('href', 'tel:0692000000')
-      expect(screen.getByRole('link', { name: /sophie@example.com/ })).toHaveAttribute('href', 'mailto:sophie@example.com')
-    })
-  })
-
-  it('affiche un message si la demande ne laisse aucune coordonnée', async () => {
-    renderPage([makeLead({ client_phone: null, client_email: null })])
-
-    fireEvent.click(screen.getByRole('button', { name: /Voir les coordonnées de Sophie/ }))
-
-    await waitFor(() => expect(screen.getByText('Aucune coordonnée laissée par la cliente.')).toBeInTheDocument())
+    await waitFor(() => expect(router.state.location.pathname).toBe('/mariages/demandes/lead-1'))
   })
 })
 
