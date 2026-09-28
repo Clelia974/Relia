@@ -14,7 +14,7 @@ describe('OuiTimeCalculator', () => {
   it('affiche l’estimation une fois les deux champs nécessaires renseignés', () => {
     render(<OuiTimeCalculator />)
     fireEvent.change(screen.getByLabelText(/Demandes reçues/), { target: { value: '50' } })
-    fireEvent.change(screen.getByLabelText(/Temps moyen par demande/), { target: { value: '15' } })
+    fireEvent.change(screen.getByLabelText(/Minutes par demande/), { target: { value: '15' } })
     expect(screen.getByText('≈ 12.5 h')).toBeInTheDocument()
     expect(screen.queryByText('Renseigne tes chiffres pour voir ton estimation.')).toBeNull()
   })

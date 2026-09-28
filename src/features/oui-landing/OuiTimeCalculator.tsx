@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Clock, Inbox, RotateCcw } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -10,7 +11,41 @@ function estimateHours(count: number, avgMinutes: number, repeats: number): numb
   return Math.round((totalMinutes / 60) * 10) / 10
 }
 
-const FIELD_INPUT_CLASSES = 'h-12 bg-card text-base text-foreground'
+interface StatFieldProps {
+  id: string
+  icon: typeof Inbox
+  label: string
+  placeholder: string
+  value: string
+  onChange: (value: string) => void
+}
+
+/**
+ * Carte "métrique" (icône + libellé court + grand chiffre éditable) plutôt qu'un
+ * champ de formulaire classique — les 3 cartes ont strictement la même structure
+ * interne, donc s'alignent naturellement sur une même ligne, quelle que soit la
+ * largeur d'écran.
+ */
+function StatField({ id, icon: Icon, label, placeholder, value, onChange }: StatFieldProps) {
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-primary-foreground/15 bg-primary-foreground/5 p-4 sm:p-5">
+      <Label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-primary-foreground/70">
+        <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+        {label}
+      </Label>
+      <Input
+        id={id}
+        type="number"
+        inputMode="numeric"
+        min={0}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-auto rounded-none border-0 border-b-2 border-primary-foreground/20 bg-transparent px-0 py-1 font-heading text-3xl font-semibold text-primary-foreground placeholder:text-primary-foreground/30 focus-visible:border-primary-foreground focus-visible:ring-0"
+      />
+    </div>
+  )
+}
 
 export function OuiTimeCalculator() {
   // Champs vides par défaut (pas de valeurs pré-remplies) : le résultat n'apparaît
@@ -28,50 +63,10 @@ export function OuiTimeCalculator() {
 
   return (
     <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-(--shadow-raised) sm:p-8">
-      {/* Une seule grille à 3 colonnes (labels puis champs, dans cet ordre) plutôt que 3 blocs
-          indépendants : les lignes de la grille s'alignent automatiquement sur la ligne la plus
-          haute, même quand un label passe sur plus de lignes qu'un autre. */}
-      <div className="grid grid-cols-1 items-start gap-x-5 gap-y-2 sm:grid-cols-3">
-        <Label htmlFor="oui-calc-count" className="text-primary-foreground/90">
-          Demandes reçues pendant une grosse période
-        </Label>
-        <Label htmlFor="oui-calc-minutes" className="text-primary-foreground/90">
-          Temps moyen par demande (min)
-        </Label>
-        <Label htmlFor="oui-calc-repeats" className="text-primary-foreground/90">
-          Recherches / relances par demande
-        </Label>
-
-        <Input
-          id="oui-calc-count"
-          type="number"
-          inputMode="numeric"
-          min={0}
-          placeholder="ex. 50"
-          value={count}
-          onChange={(e) => setCount(e.target.value)}
-          className={FIELD_INPUT_CLASSES}
-        />
-        <Input
-          id="oui-calc-minutes"
-          type="number"
-          inputMode="numeric"
-          min={0}
-          placeholder="ex. 15"
-          value={avgMinutes}
-          onChange={(e) => setAvgMinutes(e.target.value)}
-          className={FIELD_INPUT_CLASSES}
-        />
-        <Input
-          id="oui-calc-repeats"
-          type="number"
-          inputMode="numeric"
-          min={0}
-          placeholder="ex. 2"
-          value={repeats}
-          onChange={(e) => setRepeats(e.target.value)}
-          className={FIELD_INPUT_CLASSES}
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatField id="oui-calc-count" icon={Inbox} label="Demandes reçues" placeholder="50" value={count} onChange={setCount} />
+        <StatField id="oui-calc-minutes" icon={Clock} label="Minutes par demande" placeholder="15" value={avgMinutes} onChange={setAvgMinutes} />
+        <StatField id="oui-calc-repeats" icon={RotateCcw} label="Relances par demande" placeholder="2" value={repeats} onChange={setRepeats} />
       </div>
 
       {hasResult ? (
