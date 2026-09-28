@@ -33,6 +33,9 @@ const MariagesListPage = lazy(() =>
 const LeadsInboxPage = lazy(() =>
   import('@/pages/mariages/LeadsInboxPage').then((m) => ({ default: m.LeadsInboxPage })),
 )
+const LeadProposalBuilderPage = lazy(() =>
+  import('@/pages/mariages/LeadProposalBuilderPage').then((m) => ({ default: m.LeadProposalBuilderPage })),
+)
 const WeddingTasksTab = lazy(() =>
   import('@/pages/mariages/WeddingTasksTab').then((m) => ({ default: m.WeddingTasksTab })),
 )
@@ -121,6 +124,7 @@ export function AppRouter() {
           <Route index element={<MariagesListPage />} />
           <Route path="nouveau" element={<NewWeddingPage />} />
           <Route path="demandes" element={<LeadsInboxPage />} />
+          <Route path="demandes/:leadId/devis/:proposalId" element={<LeadProposalBuilderPage />} />
           <Route path=":weddingId" element={<WeddingLayout />}>
             <Route index element={<WeddingOverviewTab />} />
             <Route path="planning" element={<WeddingPlanningTab />} />

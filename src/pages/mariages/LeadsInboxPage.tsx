@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { buildDefaultTasksForWedding, createDefaultTaskTemplate } from '@/features/tasks/defaultTaskTemplate'
 import { LeadStatusBadge } from '@/features/leads/components/LeadStatusBadge'
 import { markLeadStatus } from '@/features/leads/leadsApi'
+import { clearLeadRelance, scheduleDevisRelance } from '@/features/leads/relanceTask'
 import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -22,15 +23,13 @@ import type { z } from 'zod'
 
 type LeadStatus = z.infer<typeof LeadStatusSchema>
 
-const RELANCE_DEVIS_DAYS = 5
-
-/** Étapes suivantes proposées selon le statut courant — "Devis envoyé" est à part (cf. handleSign) : c'est la signature qui crée le mariage, pas un simple changement de statut. */
+/** Étapes suivantes proposées selon le statut courant — "Devis envoyé" est à part : on ne l'atteint jamais par un simple changement de statut, seulement en envoyant réellement le devis depuis son éditeur (cf. "Créer un devis"). */
 const LEAD_QUICK_ACTIONS: Partial<Record<LeadStatus, { label: string; next: LeadStatus }[]>> = {
   nouveau: [{ label: 'Marquer comme répondu', next: 'repondu' }],
   repondu: [{ label: 'En attente de réponse', next: 'en_attente_reponse' }],
 }
 
-/** "Créer un devis" court-circuite les étapes intermédiaires : pas besoin d'être passée par "Répondu" pour envoyer directement un devis. */
+/** "Créer un devis" court-circuite les étapes intermédiaires : pas besoin d'être passée par "Répondu" pour ouvrir directement l'éditeur de devis. */
 const CAN_CREATE_DEVIS_STATUSES = new Set<LeadStatus>(['nouveau', 'repondu', 'en_attente_reponse'])
 
 /**
@@ -59,26 +58,10 @@ export function LeadsInboxPage() {
     toast.success('Lien copié.')
   }
 
-  /** Retire la relance devis en cours pour cette demande — plus utile une fois signée ou écartée. */
-  const clearRelanceTask = (leadId: string) => {
-    for (const task of allTasks) {
-      if (task.leadId === leadId && task.status !== 'terminee') deleteTask(task.id)
-    }
-  }
-
   const handleStatusChange = async (lead: Lead, next: LeadStatus) => {
     setPendingId(lead.id)
     try {
       await markLeadStatus(lead.id, next)
-      if (next === 'devis_envoye') {
-        const dueDate = new Date(Date.now() + RELANCE_DEVIS_DAYS * 24 * 60 * 60 * 1000).toISOString()
-        addTask({
-          title: `Relancer le devis — ${lead.client_name}`,
-          dueDate,
-          source: 'automatic',
-          leadId: lead.id,
-        })
-      }
       toast.success(`Statut mis à jour : ${LEAD_STATUS_LABELS[next]}.`)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.')
@@ -111,7 +94,7 @@ export function LeadsInboxPage() {
       })
       const template = taskTemplate.length > 0 ? taskTemplate : createDefaultTaskTemplate()
       for (const task of buildDefaultTasksForWedding(id, weddingDate, template)) addTask(task)
-      clearRelanceTask(lead.id)
+      clearLeadRelance(allTasks, deleteTask, lead.id)
       await markLeadStatus(lead.id, 'importe')
       toast.success('Devis signé — mariage créé avec sa checklist de démarrage.')
       navigate(`/mariages/${id}`)
@@ -125,21 +108,15 @@ export function LeadsInboxPage() {
 
   /** Relance manuelle : repousse l'échéance de la tâche de relance de 5 jours à partir d'aujourd'hui. */
   const handleRelance = (lead: Lead) => {
-    clearRelanceTask(lead.id)
-    const dueDate = new Date(Date.now() + RELANCE_DEVIS_DAYS * 24 * 60 * 60 * 1000).toISOString()
-    addTask({
-      title: `Relancer le devis — ${lead.client_name}`,
-      dueDate,
-      source: 'automatic',
-      leadId: lead.id,
-    })
+    clearLeadRelance(allTasks, deleteTask, lead.id)
+    scheduleDevisRelance(addTask, lead)
     toast.success('Relance notée — prochain rappel dans 5 jours.')
   }
 
   const handleIgnore = async (lead: Lead) => {
     setPendingId(lead.id)
     try {
-      clearRelanceTask(lead.id)
+      clearLeadRelance(allTasks, deleteTask, lead.id)
       await markLeadStatus(lead.id, 'ignore')
       toast.success('Demande écartée.')
     } catch (err) {
@@ -213,8 +190,7 @@ export function LeadsInboxPage() {
                   <Button
                     size="sm"
                     variant={lead.status === 'nouveau' ? 'outline' : 'default'}
-                    disabled={pendingId === lead.id}
-                    onClick={() => handleStatusChange(lead, 'devis_envoye')}
+                    onClick={() => navigate(`/mariages/demandes/${lead.id}/devis/nouveau`)}
                   >
                     Créer un devis
                   </Button>

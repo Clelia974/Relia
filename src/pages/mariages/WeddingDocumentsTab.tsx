@@ -17,8 +17,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EmptyState } from '@/components/EmptyState'
 import { ContractPanel } from '@/features/contracts/components/ContractPanel'
 import { ContractStatusBadge } from '@/features/contracts/components/ContractStatusBadge'
-import { computeProposalTotals } from '@/features/proposals/calculations'
+import { buildProposalInputFromTemplate } from '@/features/proposals/buildProposalInput'
 import { ProposalStatusBadge } from '@/features/proposals/components/ProposalStatusBadge'
+import { TemplatePickerDialog } from '@/features/proposals/components/TemplatePickerDialog'
 import { currency } from '@/lib/currency'
 import { formatShortDate } from '@/lib/dateFormat'
 import { generateId } from '@/lib/id'
@@ -48,32 +49,14 @@ export function WeddingDocumentsTab() {
   const handlePickTemplate = (tier: ProposalTier) => {
     const template = proposalTemplates.find((t) => t.tier === tier)
     if (!template) return
-    const lineItems = template.lines.map((line) => ({
-      id: generateId(),
-      description: line.description,
-      category: line.category,
-      quantity: line.quantity,
-      unitPrice: line.unitPrice,
-      total: line.quantity * line.unitPrice,
-      included: line.included,
-      optional: line.optional,
-    }))
-    const totals = computeProposalTotals(lineItems, businessConfig.vatStatus, businessConfig.vatRate, undefined)
     const id = createProposal({
       weddingId: wedding.id,
-      template: tier,
-      title: template.showOnDocuments === false ? `Proposition — ${wedding.coupleName}` : `Proposition ${template.label} — ${wedding.coupleName}`,
-      clientName: wedding.coupleName,
-      clientAddress: wedding.clientAddress,
-      clientPhone: wedding.clientPhone,
-      lineItems,
-      subtotal: totals.subtotal,
-      vatMode: businessConfig.vatStatus,
-      vatRate: businessConfig.vatRate,
-      taxAmount: totals.taxAmount,
-      total: totals.total,
-      depositAmount: totals.depositAmount,
-      balanceAmount: totals.balanceAmount,
+      ...buildProposalInputFromTemplate(
+        template,
+        wedding.coupleName,
+        { clientAddress: wedding.clientAddress, clientPhone: wedding.clientPhone },
+        businessConfig,
+      ),
     })
     setTemplatePickerOpen(false)
     navigate(`/mariages/${wedding.id}/documents/propositions/${id}`)
@@ -204,37 +187,7 @@ export function WeddingDocumentsTab() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={templatePickerOpen} onOpenChange={setTemplatePickerOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Choisir une formule</DialogTitle>
-            <DialogDescription>Chaque formule est entièrement personnalisable une fois créée.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
-            {proposalTemplates.map((template) => {
-              const totals = computeProposalTotals(
-                template.lines.map((l) => ({ id: l.id, description: l.description, category: l.category, quantity: l.quantity, unitPrice: l.unitPrice, total: l.quantity * l.unitPrice, included: l.included, optional: l.optional })),
-                businessConfig.vatStatus,
-                businessConfig.vatRate,
-                undefined,
-              )
-              return (
-                <button
-                  key={template.tier}
-                  type="button"
-                  onClick={() => handlePickTemplate(template.tier)}
-                  className="flex flex-col gap-2 rounded-lg border border-border p-4 text-left transition-colors hover:border-thread hover:bg-accent"
-                >
-                  <p className="font-heading text-lg font-semibold text-foreground">{template.label}</p>
-                  <p className="text-sm text-muted-foreground">{template.tagline}</p>
-                  <p className="mt-2 font-heading text-xl font-semibold tabular-nums text-foreground">{currency.format(totals.subtotal)}</p>
-                  <p className="text-xs text-muted-foreground">{template.lines.length} ligne{template.lines.length !== 1 ? 's' : ''} préconfigurée{template.lines.length !== 1 ? 's' : ''}</p>
-                </button>
-              )
-            })}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TemplatePickerDialog open={templatePickerOpen} onOpenChange={setTemplatePickerOpen} onPick={handlePickTemplate} />
 
       <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
         <DialogContent>

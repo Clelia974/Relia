@@ -29,6 +29,7 @@ import {
   emptyLineItemFormValues,
   type ProposalLineItemFormValues,
 } from '@/features/proposals/proposalForm.schema'
+import type { ProposalSubject } from '@/features/proposals/proposalSubject'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
@@ -51,13 +52,33 @@ function toNumericLines(lines: ProposalLineItemFormValues[]) {
   }))
 }
 
+/** Route mariage (`/mariages/:weddingId/documents/propositions/:proposalId`) — construit le sujet à partir du mariage. */
 export function ProposalBuilderPage() {
   const { proposalId } = useParams<{ proposalId: string }>()
-  return <ProposalBuilderInner key={proposalId} proposalId={proposalId ?? ''} />
+  const { wedding } = useOutletContext<WeddingOutletContext>()
+  const subject: ProposalSubject = {
+    coupleName: wedding.coupleName,
+    date: wedding.date,
+    venue: wedding.venue,
+    clientAddress: wedding.clientAddress,
+    clientPhone: wedding.clientPhone,
+    backHref: `/mariages/${wedding.id}/documents`,
+    backLabel: '← Documents',
+    proposalHref: (id) => `/mariages/${wedding.id}/documents/propositions/${id}`,
+  }
+  return <ProposalBuilderInner key={proposalId} proposalId={proposalId ?? ''} subject={subject} />
 }
 
-function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
-  const { wedding } = useOutletContext<WeddingOutletContext>()
+export function ProposalBuilderInner({
+  proposalId,
+  subject,
+  onMarkSent,
+}: {
+  proposalId: string
+  subject: ProposalSubject
+  /** Fourni uniquement pour un devis rattaché à une demande pas encore signée — marque la demande "Devis envoyé" (et programme la relance) en plus du statut du devis lui-même. */
+  onMarkSent?: () => void
+}) {
   const navigate = useNavigate()
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const proposalTemplates = useWorkspaceStore((s) => s.workspace.proposalTemplates)
@@ -69,8 +90,8 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
 
   const [title, setTitle] = useState(proposal?.title ?? '')
   const [clientName, setClientName] = useState(proposal?.clientName ?? '')
-  const [clientAddress, setClientAddress] = useState(proposal?.clientAddress ?? wedding.clientAddress ?? '')
-  const [clientPhone, setClientPhone] = useState(proposal?.clientPhone ?? wedding.clientPhone ?? '')
+  const [clientAddress, setClientAddress] = useState(proposal?.clientAddress ?? subject.clientAddress ?? '')
+  const [clientPhone, setClientPhone] = useState(proposal?.clientPhone ?? subject.clientPhone ?? '')
   const [validUntil, setValidUntil] = useState(proposal?.validUntil?.slice(0, 10) ?? '')
   const [depositPercentage, setDepositPercentage] = useState(proposal?.depositPercentage !== undefined ? String(proposal.depositPercentage) : '')
   const [notes, setNotes] = useState(proposal?.notes ?? '')
@@ -99,7 +120,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
       <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed border-border px-6 py-16">
         <h1 className="font-heading text-xl font-semibold text-foreground">Proposition introuvable</h1>
         <Button asChild variant="outline">
-          <Link to={`/mariages/${wedding.id}/documents`}>Retour aux documents</Link>
+          <Link to={subject.backHref}>{subject.backLabel}</Link>
         </Button>
       </div>
     )
@@ -141,6 +162,18 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
     const nextStatus = value as ProposalStatus
     updateProposalStatus(proposal.id, nextStatus)
     toast.success(`Statut mis à jour : ${PROPOSAL_STATUS_LABELS[nextStatus]}.`)
+  }
+
+  /**
+   * Uniquement pour un devis rattaché à une demande (onMarkSent fourni) :
+   * passe le devis en "Envoyée" ET la demande en "Devis envoyé" (+ programme
+   * la relance) en une seule action — la décoratrice a relu le devis avant
+   * de cliquer, jamais un envoi automatique à son insu.
+   */
+  const handleMarkSent = () => {
+    updateProposalStatus(proposal.id, 'envoyee')
+    onMarkSent?.()
+    toast.success('Devis marqué comme envoyé.')
   }
 
   const handleSave = () => {
@@ -218,7 +251,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
 
   const buildTextSummary = () => {
     const lines2 = [
-      `${title} — ${wedding.coupleName}`,
+      `${title} — ${subject.coupleName}`,
       ...(documentTemplateLabel ? [`Formule : ${documentTemplateLabel}`] : []),
       '',
       'Services inclus :',
@@ -247,22 +280,22 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
     const newId = duplicateProposal(proposal.id)
     if (newId) {
       toast.success('Proposition dupliquée.')
-      navigate(`/mariages/${wedding.id}/documents/propositions/${newId}`)
+      navigate(subject.proposalHref(newId))
     }
   }
 
   const confirmDelete = () => {
     deleteProposal(proposal.id)
     toast.success('Proposition supprimée.')
-    navigate(`/mariages/${wedding.id}/documents`)
+    navigate(subject.backHref)
   }
 
   return (
     <div className="flex flex-col gap-6">
       <div className="no-print flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Link to={`/mariages/${wedding.id}/documents`} className="text-sm text-muted-foreground hover:underline">
-            ← Documents
+          <Link to={subject.backHref} className="text-sm text-muted-foreground hover:underline">
+            {subject.backLabel}
           </Link>
           <p className="mt-1 text-xs font-medium uppercase tracking-wide tabular-nums text-thread-text">N° {proposal.proposalNumber}</p>
           <h1 className="font-heading text-2xl font-semibold text-foreground">{title || 'Proposition'}</h1>
@@ -272,6 +305,9 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {onMarkSent && (proposal.status === 'brouillon' || proposal.status === 'a_envoyer') && (
+            <Button onClick={handleMarkSent}>Marquer comme envoyé</Button>
+          )}
           <Select value={proposal.status} onValueChange={handleStatusChange} disabled={statusLocked}>
             <SelectTrigger className="w-48" aria-label={statusLocked ? 'Statut verrouillé' : 'Statut de la proposition'}>
               <SelectValue />
@@ -353,7 +389,7 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
                     />
                   </Field>
                   <Field label="Nom du client" htmlFor="pb-client" optional>
-                    <Input id="pb-client" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder={wedding.coupleName} />
+                    <Input id="pb-client" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder={subject.coupleName} />
                   </Field>
                 </div>
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -438,11 +474,11 @@ function ProposalBuilderInner({ proposalId }: { proposalId: string }) {
         <div className="print-area">
           <ProposalDocumentPreview
             businessConfig={businessConfig}
-            wedding={wedding}
+            wedding={subject}
             title={title}
             proposalNumber={proposal.proposalNumber}
             templateLabel={documentTemplateLabel}
-            clientName={clientName || wedding.coupleName}
+            clientName={clientName || subject.coupleName}
             clientAddress={clientAddress.trim() || undefined}
             clientPhone={clientPhone.trim() || undefined}
             validUntil={validUntil ? new Date(validUntil).toISOString() : undefined}

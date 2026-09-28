@@ -370,7 +370,10 @@ export const ProposalStatusSchema = z.enum([
 
 export const ProposalSchema = z.object({
   id,
-  weddingId: id,
+  /** Facultatif : un devis peut exister pour une demande pas encore signée (pas de mariage). Toujours l'un des deux (weddingId ou leadId), jamais les deux. */
+  weddingId: id.optional(),
+  /** Renvoie vers une demande (leads, côté Supabase) tant qu'aucun mariage n'existe encore. */
+  leadId: z.string().optional(),
   /** Numéro attribué automatiquement à la création (DEV-AAAA-NNNN) — jamais modifiable, jamais réutilisé. */
   proposalNumber: z.string().min(1),
   /** Formule d'origine — les templates par défaut restent séparés des propositions réellement créées (cf. src/features/proposals/templates.ts). */

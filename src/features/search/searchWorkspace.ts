@@ -57,13 +57,16 @@ function buildCandidates(ws: SearchableWorkspace): Candidate[] {
     })
   }
   for (const p of ws.proposals) {
+    const linkedWeddingName = p.weddingId ? weddingName.get(p.weddingId) : undefined
     candidates.push({
       id: p.id,
       kind: 'devis',
       title: `${p.proposalNumber} — ${p.title}`,
-      subtitle: weddingName.get(p.weddingId),
-      href: `/mariages/${p.weddingId}/documents/propositions/${p.id}`,
-      haystack: `${p.proposalNumber} ${p.title} ${p.clientName} ${weddingName.get(p.weddingId) ?? ''}`,
+      subtitle: linkedWeddingName ?? (p.leadId ? p.clientName : undefined),
+      href: p.weddingId
+        ? `/mariages/${p.weddingId}/documents/propositions/${p.id}`
+        : `/mariages/demandes/${p.leadId}/devis/${p.id}`,
+      haystack: `${p.proposalNumber} ${p.title} ${p.clientName} ${linkedWeddingName ?? ''}`,
     })
   }
   for (const i of ws.invoices) {

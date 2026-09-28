@@ -7,7 +7,8 @@ import type { BusinessConfig, ProposalLineItem, VatStatus, Wedding } from '@/typ
 
 interface ProposalDocumentPreviewProps {
   businessConfig: BusinessConfig
-  wedding: Wedding
+  /** Un mariage entier convient, mais seuls ces 3 champs sont lus — permet aussi un devis rattaché à une demande, sans mariage. */
+  wedding: Pick<Wedding, 'coupleName' | 'date' | 'venue'>
   title: string
   proposalNumber: string
   templateLabel?: string

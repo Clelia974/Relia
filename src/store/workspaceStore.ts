@@ -118,8 +118,10 @@ type NewExpenseInput = Pick<Expense, 'weddingId' | 'description' | 'category' | 
 type NewScopeChangeInput = Pick<ScopeChange, 'weddingId' | 'description' | 'date' | 'vendorCost' | 'clientPrice'> &
   Partial<Pick<ScopeChange, 'status' | 'notes'>>
 
-type NewProposalInput = Pick<Proposal, 'weddingId' | 'template' | 'title' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total' | 'depositAmount' | 'balanceAmount'> &
-  Partial<Pick<Proposal, 'clientName' | 'clientAddress' | 'clientPhone' | 'validUntil' | 'vatRate' | 'depositPercentage' | 'status' | 'notes'>>
+type NewProposalInput = Pick<Proposal, 'template' | 'title' | 'lineItems' | 'subtotal' | 'vatMode' | 'taxAmount' | 'total' | 'depositAmount' | 'balanceAmount'> &
+  Partial<
+    Pick<Proposal, 'weddingId' | 'leadId' | 'clientName' | 'clientAddress' | 'clientPhone' | 'validUntil' | 'vatRate' | 'depositPercentage' | 'status' | 'notes'>
+  >
 
 type NewSoldServiceInput = Pick<SoldService, 'weddingId' | 'proposalId' | 'title' | 'soldPrice'> &
   Partial<Pick<SoldService, 'description' | 'quantity' | 'status' | 'notes'>>
@@ -190,7 +192,7 @@ interface WorkspaceStoreState {
   deleteScopeChange: (id: string) => void
 
   createProposal: (input: NewProposalInput) => string
-  updateProposal: (id: string, patch: Partial<Omit<Proposal, 'id' | 'weddingId' | 'createdAt'>>) => void
+  updateProposal: (id: string, patch: Partial<Omit<Proposal, 'id' | 'weddingId' | 'leadId' | 'createdAt'>>) => void
   updateProposalStatus: (id: string, status: ProposalStatus) => void
   duplicateProposal: (id: string) => string | null
   deleteProposal: (id: string) => void
@@ -703,6 +705,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           const proposal: Proposal = {
             id,
             weddingId: input.weddingId,
+            leadId: input.leadId,
             proposalNumber: allocated.number,
             template: input.template,
             title: input.title,
@@ -800,16 +803,18 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       generateSoldServicesFromProposal: (proposalId) => {
         const state = get()
         const proposal = state.workspace.proposals.find((p) => p.id === proposalId)
-        if (!proposal || proposal.status !== 'approuvee') return []
+        // Un devis pas encore lié à un mariage (demande pas encore signée) n'a rien à préparer.
+        if (!proposal || proposal.status !== 'approuvee' || !proposal.weddingId) return []
         const alreadyGenerated = state.workspace.soldServices.some((s) => s.proposalId === proposalId)
         if (alreadyGenerated) return []
 
+        const weddingId = proposal.weddingId
         const timestamp = nowIso()
         const created: SoldService[] = proposal.lineItems
           .filter((line) => line.included)
           .map((line) => ({
             id: generateId(),
-            weddingId: proposal.weddingId,
+            weddingId,
             proposalId: proposal.id,
             title: line.description,
             quantity: line.quantity,

@@ -39,10 +39,16 @@ function makeLead(overrides: Partial<Lead> = {}): Lead {
 
 function renderPage(leads: Lead[]) {
   useLeadsInboxMock.mockReturnValue({ leads, isLoading: false, error: null, refresh: vi.fn() })
-  const router = createMemoryRouter([{ path: '/mariages/demandes', element: <LeadsInboxPage /> }], {
-    initialEntries: ['/mariages/demandes'],
-  })
-  return render(<RouterProvider router={router} />)
+  const router = createMemoryRouter(
+    [
+      { path: '/mariages/demandes', element: <LeadsInboxPage /> },
+      { path: '/mariages/demandes/:leadId/devis/:proposalId', element: <p>Éditeur de devis</p> },
+      { path: '/mariages/:weddingId', element: <p>Fiche mariage</p> },
+    ],
+    { initialEntries: ['/mariages/demandes'] },
+  )
+  render(<RouterProvider router={router} />)
+  return router
 }
 
 beforeEach(() => {
@@ -62,17 +68,14 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
     expect(screen.queryByRole('button', { name: 'Marquer comme signé' })).toBeNull()
   })
 
-  it('"Créer un devis" depuis "Répondu" crée une tâche de relance à 5 jours, sans créer de mariage', async () => {
-    renderPage([makeLead({ status: 'repondu' })])
+  it('"Créer un devis" ouvre l’éditeur de devis de la demande, sans changer son statut ni créer de mariage', async () => {
+    const router = renderPage([makeLead({ status: 'repondu' })])
 
     fireEvent.click(screen.getByRole('button', { name: 'Créer un devis' }))
 
-    await waitFor(() => expect(markLeadStatusMock).toHaveBeenCalledWith('lead-1', 'devis_envoye'))
-    const state = useWorkspaceStore.getState().workspace
-    expect(state.weddings).toHaveLength(0)
-    const relance = state.tasks.find((t) => t.leadId === 'lead-1')
-    expect(relance?.title).toBe('Relancer le devis — Sophie')
-    expect(relance?.dueDate).toBeTruthy()
+    await waitFor(() => expect(router.state.location.pathname).toBe('/mariages/demandes/lead-1/devis/nouveau'))
+    expect(markLeadStatusMock).not.toHaveBeenCalled()
+    expect(useWorkspaceStore.getState().workspace.weddings).toHaveLength(0)
   })
 
   it('"Relancer" sur un devis envoyé remplace la tâche de relance existante par une nouvelle échéance', async () => {

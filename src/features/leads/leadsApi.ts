@@ -13,6 +13,13 @@ export async function fetchActiveLeads(): Promise<Lead[]> {
   return (data ?? []).map((row) => LeadSchema.parse(row))
 }
 
+/** Une demande précise (fiche client pour construire un devis) — RLS restreint déjà au propriétaire. */
+export async function fetchLead(leadId: string): Promise<Lead | null> {
+  const { data, error } = await supabase.from('leads').select('*').eq('id', leadId).maybeSingle()
+  if (error) throw error
+  return data ? LeadSchema.parse(data) : null
+}
+
 export async function markLeadStatus(leadId: string, status: z.infer<typeof LeadStatusSchema>): Promise<void> {
   const { error } = await supabase.from('leads').update({ status }).eq('id', leadId)
   if (error) throw error

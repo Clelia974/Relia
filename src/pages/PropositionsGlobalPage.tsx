@@ -34,7 +34,7 @@ export function PropositionsGlobalPage() {
   const rows = useMemo(() => {
     return proposals
       .filter((p) => (filter === 'toutes' ? true : p.status === filter))
-      .map((p) => ({ proposal: p, wedding: weddingById.get(p.weddingId) }))
+      .map((p) => ({ proposal: p, wedding: p.weddingId ? weddingById.get(p.weddingId) : undefined }))
       .sort((a, b) => b.proposal.updatedAt.localeCompare(a.proposal.updatedAt))
   }, [proposals, weddingById, filter])
 
@@ -54,14 +54,22 @@ export function PropositionsGlobalPage() {
           {rows.map(({ proposal, wedding }) => (
             <Link
               key={proposal.id}
-              to={wedding ? `/mariages/${wedding.id}/documents/propositions/${proposal.id}` : '#'}
+              to={
+                wedding
+                  ? `/mariages/${wedding.id}/documents/propositions/${proposal.id}`
+                  : proposal.leadId
+                    ? `/mariages/demandes/${proposal.leadId}/devis/${proposal.id}`
+                    : '#'
+              }
               className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-border bg-card px-4 py-3 text-sm transition-colors hover:border-thread/50"
             >
               <div className="min-w-40 flex-1">
                 <p className="font-medium text-foreground">{proposal.title}</p>
                 <p className="text-xs uppercase tracking-wide text-thread-text">{proposal.proposalNumber} · {templateLabelByTier.get(proposal.template) ?? proposal.template}</p>
               </div>
-              <span className="text-muted-foreground">{wedding ? wedding.coupleName : 'Mariage supprimé'}</span>
+              <span className="text-muted-foreground">
+                {wedding ? wedding.coupleName : proposal.leadId ? `${proposal.clientName} (demande)` : 'Mariage supprimé'}
+              </span>
               <ProposalStatusBadge status={proposal.status} />
               <span className="font-medium tabular-nums text-foreground">{currency.format(proposal.total)}</span>
               <span className="text-xs text-muted-foreground">Mis à jour le {formatShortDate(proposal.updatedAt)}</span>
