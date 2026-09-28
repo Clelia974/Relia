@@ -8,6 +8,7 @@ interface UseRelanceDevisResult {
     clientName: string
     companyName?: string
     replyToEmail?: string
+    customMessage?: string
   }) => Promise<boolean>
   isLoading: boolean
 }
@@ -27,6 +28,7 @@ export function useRelanceDevis(): UseRelanceDevisResult {
     clientName: string
     companyName?: string
     replyToEmail?: string
+    customMessage?: string
   }): Promise<boolean> => {
     setIsLoading(true)
     try {

@@ -15,7 +15,9 @@ const markLeadStatusMock = vi.hoisted(() => vi.fn())
 vi.mock('@/features/leads/leadsApi', () => ({ markLeadStatus: markLeadStatusMock }))
 
 const shareDevisMock = vi.hoisted(() => vi.fn())
-vi.mock('@/features/proposals/useShareDevis', () => ({ useShareDevis: () => ({ shareDevis: shareDevisMock }) }))
+vi.mock('@/features/proposals/useShareDevis', () => ({
+  useShareDevis: () => ({ shareDevis: shareDevisMock, isLoading: false }),
+}))
 
 function makeLead(overrides: Partial<Lead> = {}): Lead {
   return {
@@ -98,6 +100,11 @@ describe('LeadProposalBuilderPage — lien de partage (avec ou sans email client
     renderPage(proposalId)
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyé' }))
+
+    // Une adresse client existe : un aperçu de l'email s'ouvre d'abord, jamais un envoi direct au clic.
+    const confirmButton = await screen.findByRole('button', { name: 'Envoyer' })
+    expect(shareDevisMock).not.toHaveBeenCalled()
+    fireEvent.click(confirmButton)
 
     await waitFor(() =>
       expect(shareDevisMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: 'sophie@example.com' })),

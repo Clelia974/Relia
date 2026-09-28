@@ -3,7 +3,12 @@ import { supabase } from '@/lib/supabase'
 import type { FactureSnapshot } from '@/features/invoices/factureSnapshot'
 
 interface UseShareFactureResult {
-  shareFacture: (input: { snapshot: FactureSnapshot; clientEmail?: string; clientName: string }) => Promise<string | null>
+  shareFacture: (input: {
+    snapshot: FactureSnapshot
+    clientEmail?: string
+    clientName: string
+    customMessage?: string
+  }) => Promise<string | null>
   isLoading: boolean
   error: string | null
 }
@@ -17,7 +22,12 @@ export function useShareFacture(): UseShareFactureResult {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const shareFacture = async (input: { snapshot: FactureSnapshot; clientEmail?: string; clientName: string }): Promise<string | null> => {
+  const shareFacture = async (input: {
+    snapshot: FactureSnapshot
+    clientEmail?: string
+    clientName: string
+    customMessage?: string
+  }): Promise<string | null> => {
     setIsLoading(true)
     setError(null)
     try {

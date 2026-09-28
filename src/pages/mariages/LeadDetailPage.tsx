@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { EmailPreviewDialog } from '@/features/email/EmailPreviewDialog'
 import { LeadStatusBadge } from '@/features/leads/components/LeadStatusBadge'
 import { useLead } from '@/features/leads/useLead'
 import { useLeadActions } from '@/features/leads/useLeadActions'
@@ -33,7 +34,18 @@ export function LeadDetailPage() {
   const navigate = useNavigate()
   const { lead, isLoading, error, refresh } = useLead(leadId)
   const allProposals = useWorkspaceStore((s) => s.workspace.proposals)
-  const { pendingId, handleStatusChange, handleSign, handleRelance, handleIgnore } = useLeadActions(refresh)
+  const {
+    pendingId,
+    handleStatusChange,
+    handleSign,
+    handleRelance,
+    handleIgnore,
+    senderName,
+    relanceTarget,
+    confirmRelance,
+    closeRelanceDialog,
+    isRelanceSending,
+  } = useLeadActions(refresh)
 
   if (isLoading) return null
   if (error || !lead) {
@@ -66,12 +78,6 @@ export function LeadDetailPage() {
           <h1 className="font-heading text-2xl font-semibold text-foreground">{lead.client_name}</h1>
           <LeadStatusBadge status={lead.status} />
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {LEAD_EVENT_TYPE_LABELS[lead.event_type]}
-          {lead.event_date ? ` · ${new Date(lead.event_date).toLocaleDateString('fr-FR')}` : ''}
-          {' · '}
-          {LEAD_SOURCE_LABELS[lead.source]}
-        </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -106,7 +112,25 @@ export function LeadDetailPage() {
 
       <Card>
         <CardContent className="flex flex-col gap-3 text-sm">
-          <p className="text-xs font-medium text-muted-foreground">Coordonnées</p>
+          <p className="text-xs font-medium text-muted-foreground">Informations de la demande</p>
+          <p>
+            <span className="text-muted-foreground">Type d'événement : </span>
+            {LEAD_EVENT_TYPE_LABELS[lead.event_type]}
+          </p>
+          {lead.event_date && (
+            <p>
+              <span className="text-muted-foreground">Date de l'événement : </span>
+              {new Date(lead.event_date).toLocaleDateString('fr-FR')}
+            </p>
+          )}
+          <p>
+            <span className="text-muted-foreground">Trouvée via : </span>
+            {LEAD_SOURCE_LABELS[lead.source]}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Demande reçue le : </span>
+            {new Date(lead.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
           {lead.client_phone && (
             <div className="flex items-center justify-between gap-2">
               <a href={`tel:${lead.client_phone}`} className="flex items-center gap-2 text-foreground hover:underline">
@@ -228,6 +252,18 @@ export function LeadDetailPage() {
           ))
         )}
       </div>
+
+      <EmailPreviewDialog
+        open={relanceTarget !== null}
+        onOpenChange={(open) => !open && closeRelanceDialog()}
+        clientName={relanceTarget?.client_name ?? ''}
+        senderName={senderName}
+        subject={`Votre devis vous attend toujours — ${senderName}`}
+        introText="vous envoie un petit rappel — votre devis est toujours disponible en ligne, n'hésitez pas à y jeter un œil quand vous aurez un moment :"
+        isSending={isRelanceSending}
+        onConfirm={confirmRelance}
+        confirmLabel="Relancer"
+      />
     </div>
   )
 }

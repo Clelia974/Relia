@@ -9,6 +9,7 @@ interface UseShareContratResult {
     clientName: string
     companyName?: string
     replyToEmail?: string
+    customMessage?: string
   }) => Promise<string | null>
   isLoading: boolean
   error: string | null
@@ -30,6 +31,7 @@ export function useShareContrat(): UseShareContratResult {
     clientName: string
     companyName?: string
     replyToEmail?: string
+    customMessage?: string
   }): Promise<string | null> => {
     setIsLoading(true)
     setError(null)

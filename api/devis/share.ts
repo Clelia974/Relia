@@ -33,6 +33,8 @@ const ShareDevisSchema = z.object({
   snapshot: z.record(z.string(), z.unknown()),
   clientEmail: z.string().email().optional().or(z.literal('')),
   clientName: z.string().min(1),
+  /** Relu par la décoratrice dans l'aperçu avant envoi (cf. EmailPreviewDialog) — jamais d'envoi à l'aveugle. */
+  customMessage: z.string().max(2000).optional(),
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -79,7 +81,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const businessConfig = input.snapshot.businessConfig as { companyName?: unknown; email?: unknown } | undefined
     const companyName = typeof businessConfig?.companyName === 'string' ? businessConfig.companyName : undefined
     const replyToEmail = typeof businessConfig?.email === 'string' ? businessConfig.email : undefined
-    await sendDevisEmail({ clientEmail: input.clientEmail, clientName: input.clientName, shareId: data.id, companyName, replyToEmail })
+    await sendDevisEmail({
+      clientEmail: input.clientEmail,
+      clientName: input.clientName,
+      shareId: data.id,
+      companyName,
+      replyToEmail,
+      customMessage: input.customMessage,
+    })
   }
 
   res.status(200).json({ ok: true, shareId: data.id })

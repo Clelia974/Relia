@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ContractStatusBadge } from '@/features/contracts/components/ContractStatusBadge'
 import { useUploadContract } from '@/features/contracts/useUploadContract'
 import { useShareContrat } from '@/features/contracts/useShareContrat'
+import { EmailPreviewDialog } from '@/features/email/EmailPreviewDialog'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { applyContractStatus, CONTRACT_STATUS_LABELS, CONTRACT_STATUS_OPTIONS } from '@/lib/contractStatus'
 import { useAuth } from '@/hooks/useAuth'
@@ -42,6 +43,7 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
    * son état par props plutôt que de lire le store directement.
    */
   const [current, setCurrent] = useState<Contract>(contract ?? { status: 'a_rediger' })
+  const [showEmailPreview, setShowEmailPreview] = useState(false)
   const status: ContractStatus = current.status
   const applyChange = (next: Contract) => {
     setCurrent(next)
@@ -67,7 +69,7 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
     applyChange({ ...current, storagePath: result.storagePath, fileName: result.fileName, shareId: undefined })
   }
 
-  const handleShare = async () => {
+  const doShare = async (customMessage?: string) => {
     if (!current.storagePath || !current.fileName) return
     const shareId = await shareContrat({
       storagePath: current.storagePath,
@@ -76,6 +78,7 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
       clientName,
       companyName: businessConfig.companyName,
       replyToEmail: businessConfig.email,
+      customMessage,
     })
     if (!shareId) {
       toast.error("Le lien du contrat n'a pas pu être généré.")
@@ -84,6 +87,14 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
     applyChange({ ...current, shareId })
     toast.success(clientEmail ? 'Contrat envoyé par email à la cliente.' : 'Lien du contrat généré — copiez-le pour l’envoyer vous-même.')
   }
+
+  /** Une adresse client existe : aperçu de l'email d'abord, jamais un envoi à l'aveugle. Sinon, le lien est simplement généré. */
+  const handleShare = () => {
+    if (clientEmail) setShowEmailPreview(true)
+    else doShare()
+  }
+
+  const senderName = businessConfig.companyName?.trim() || 'Relia'
 
   const shareUrl = current.shareId ? `${window.location.origin}/contrat/${current.shareId}` : undefined
   const handleCopyShareLink = async () => {
@@ -186,6 +197,20 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
           <Textarea id="contract-notes" rows={3} value={notesDraft} onChange={(e) => setNotesDraft(e.target.value)} onBlur={saveNotes} />
         </div>
       </CardContent>
+
+      <EmailPreviewDialog
+        open={showEmailPreview}
+        onOpenChange={setShowEmailPreview}
+        clientName={clientName}
+        senderName={senderName}
+        subject={`Votre contrat de la part de ${senderName}`}
+        introText="vous a transmis votre contrat — vous pouvez le consulter directement en ligne :"
+        isSending={isSharing}
+        onConfirm={(customMessage) => {
+          doShare(customMessage)
+          setShowEmailPreview(false)
+        }}
+      />
     </Card>
   )
 }

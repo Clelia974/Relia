@@ -14,6 +14,8 @@ export async function sendFactureEmail(input: {
   shareId: string
   companyName?: string
   replyToEmail?: string
+  /** Mot personnalisé ajouté par la décoratrice, relu dans l'aperçu avant envoi (cf. EmailPreviewDialog). */
+  customMessage?: string
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey) {
@@ -35,7 +37,7 @@ export async function sendFactureEmail(input: {
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: `Votre facture de la part de ${senderName}`,
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>
-<p>${escapeHtml(senderName)} vous a transmis une facture — vous pouvez la consulter directement en ligne :</p>
+${input.customMessage?.trim() ? `<p>${escapeHtml(input.customMessage.trim())}</p>\n` : ''}<p>${escapeHtml(senderName)} vous a transmis une facture — vous pouvez la consulter directement en ligne :</p>
 <p><a href="${factureUrl}">${factureUrl}</a></p>
 <p>N'hésitez pas à revenir vers ${input.replyToEmail ? 'nous' : `${escapeHtml(senderName)}`} pour toute question.</p>
 <p>À très vite !</p>`,

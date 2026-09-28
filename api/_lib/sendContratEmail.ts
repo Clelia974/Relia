@@ -14,6 +14,8 @@ export async function sendContratEmail(input: {
   shareId: string
   companyName?: string
   replyToEmail?: string
+  /** Mot personnalisé ajouté par la décoratrice, relu dans l'aperçu avant envoi (cf. EmailPreviewDialog). */
+  customMessage?: string
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey) {
@@ -35,7 +37,7 @@ export async function sendContratEmail(input: {
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: `Votre contrat de la part de ${senderName}`,
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>
-<p>${escapeHtml(senderName)} vous a transmis votre contrat — vous pouvez le consulter directement en ligne :</p>
+${input.customMessage?.trim() ? `<p>${escapeHtml(input.customMessage.trim())}</p>\n` : ''}<p>${escapeHtml(senderName)} vous a transmis votre contrat — vous pouvez le consulter directement en ligne :</p>
 <p><a href="${contratUrl}">${contratUrl}</a></p>
 <p>N'hésitez pas à revenir vers ${input.replyToEmail ? 'nous' : `${escapeHtml(senderName)}`} pour toute question.</p>
 <p>À très vite !</p>`,

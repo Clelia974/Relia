@@ -156,10 +156,11 @@ export function ProposalDocumentPreview({
         </section>
       )}
 
-      <footer className="border-t border-border pt-4 text-xs text-muted-foreground">
-        <p>Document indicatif généré avec Relia — ne constitue pas un contrat.</p>
-        {businessConfig.legalMentions && <p className="mt-1">{businessConfig.legalMentions}</p>}
-      </footer>
+      {businessConfig.legalMentions && (
+        <footer className="border-t border-border pt-4 text-xs text-muted-foreground">
+          <p>{businessConfig.legalMentions}</p>
+        </footer>
+      )}
     </div>
   )
 }

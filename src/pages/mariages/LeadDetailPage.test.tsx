@@ -70,6 +70,15 @@ describe('LeadDetailPage — toutes les coordonnées', () => {
     expect(screen.getByText('On cherche une déco champêtre.')).toBeInTheDocument()
   })
 
+  it("affiche aussi le type d'événement, sa date, la source et la date de réception — tout le formulaire, pas juste les coordonnées", () => {
+    renderPage(makeLead())
+
+    expect(screen.getByText('Mariage')).toBeInTheDocument()
+    expect(screen.getByText('12/06/2027')).toBeInTheDocument()
+    expect(screen.getByText('Instagram')).toBeInTheDocument()
+    expect(screen.getByText(/Demande reçue le/)).toBeInTheDocument()
+  })
+
   it("affiche un message d'introuvable quand la demande n'existe pas", () => {
     renderPage(null, { error: 'Introuvable' })
 

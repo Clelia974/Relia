@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import type { DevisSnapshot } from '@/features/proposals/devisSnapshot'
 
 interface UseShareDevisResult {
-  shareDevis: (input: { snapshot: DevisSnapshot; clientEmail?: string; clientName: string }) => Promise<string | null>
+  shareDevis: (input: { snapshot: DevisSnapshot; clientEmail?: string; clientName: string; customMessage?: string }) => Promise<string | null>
   isLoading: boolean
   error: string | null
 }
@@ -18,7 +18,12 @@ export function useShareDevis(): UseShareDevisResult {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const shareDevis = async (input: { snapshot: DevisSnapshot; clientEmail?: string; clientName: string }): Promise<string | null> => {
+  const shareDevis = async (input: {
+    snapshot: DevisSnapshot
+    clientEmail?: string
+    clientName: string
+    customMessage?: string
+  }): Promise<string | null> => {
     setIsLoading(true)
     setError(null)
     try {

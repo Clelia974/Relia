@@ -10,7 +10,9 @@ import type { InvoiceStatus, Wedding } from '@/types/entities'
 afterEach(cleanup)
 
 const shareFactureMock = vi.hoisted(() => vi.fn())
-vi.mock('@/features/invoices/useShareFacture', () => ({ useShareFacture: () => ({ shareFacture: shareFactureMock }) }))
+vi.mock('@/features/invoices/useShareFacture', () => ({
+  useShareFacture: () => ({ shareFacture: shareFactureMock, isLoading: false }),
+}))
 
 beforeEach(() => {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
@@ -139,6 +141,11 @@ describe('InvoicePreviewPage — lien de partage', () => {
     renderInvoice(wedding, invoiceId)
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyée' }))
+
+    // Une adresse client existe : un aperçu de l'email s'ouvre d'abord, jamais un envoi direct au clic.
+    const confirmButton = await screen.findByRole('button', { name: 'Envoyer' })
+    expect(shareFactureMock).not.toHaveBeenCalled()
+    fireEvent.click(confirmButton)
 
     await waitFor(() =>
       expect(shareFactureMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: 'sophie@example.com' })),

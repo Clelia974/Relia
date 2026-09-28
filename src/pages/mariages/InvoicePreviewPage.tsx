@@ -25,6 +25,8 @@ import { InvoiceDocumentPreview } from '@/features/invoices/components/InvoiceDo
 import { InvoiceStatusBadge } from '@/features/invoices/components/InvoiceStatusBadge'
 import { InvoicePreviewFormSchema } from '@/features/invoices/invoicePreviewForm.schema'
 import { useShareFacture } from '@/features/invoices/useShareFacture'
+import { EmailPreviewDialog } from '@/features/email/EmailPreviewDialog'
+import type { FactureSnapshot } from '@/features/invoices/factureSnapshot'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
@@ -61,7 +63,8 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const setInvoiceShareId = useWorkspaceStore((s) => s.setInvoiceShareId)
   const duplicateInvoicePreview = useWorkspaceStore((s) => s.duplicateInvoicePreview)
   const deleteInvoicePreview = useWorkspaceStore((s) => s.deleteInvoicePreview)
-  const { shareFacture } = useShareFacture()
+  const { shareFacture, isLoading: isSharing } = useShareFacture()
+  const [pendingSnapshot, setPendingSnapshot] = useState<FactureSnapshot | null>(null)
 
   /** Attribué automatiquement à la création : jamais modifiable. */
   const invoiceNumber = invoice?.invoiceNumber ?? ''
@@ -192,8 +195,21 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
    * (best-effort, cf. useShareFacture) ; le lien reste affiché dans l'app
    * dans tous les cas, pour un envoi manuel (WhatsApp, SMS...).
    */
+  const doShareFacture = async (snapshot: FactureSnapshot, customMessage?: string) => {
+    const shareId = await shareFacture({ snapshot, clientEmail: wedding.clientEmail || undefined, clientName: snapshot.clientName, customMessage })
+    if (!shareId) {
+      toast.error("Le lien de la facture n'a pas pu être généré.")
+      return
+    }
+    setInvoiceShareId(invoice.id, shareId)
+    toast.success(
+      wedding.clientEmail ? 'Facture envoyée par email à la cliente.' : 'Lien de la facture généré — copiez-le pour l’envoyer vous-même.',
+    )
+  }
+
+  /** Une adresse client existe : aperçu de l'email d'abord, jamais un envoi à l'aveugle. Sinon, le lien est simplement généré (pas d'email possible). */
   const handleMarkSent = () => {
-    const snapshot = {
+    const snapshot: FactureSnapshot = {
       businessConfig,
       wedding: { coupleName: wedding.coupleName, date: wedding.date },
       invoiceNumber,
@@ -211,17 +227,11 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
       balanceAmount: invoice.balanceAmount,
       legalMentions: legalMentions || businessConfig.legalMentions,
     }
-    shareFacture({ snapshot, clientEmail: wedding.clientEmail || undefined, clientName: snapshot.clientName }).then((shareId) => {
-      if (!shareId) {
-        toast.error("Le lien de la facture n'a pas pu être généré.")
-        return
-      }
-      setInvoiceShareId(invoice.id, shareId)
-      toast.success(
-        wedding.clientEmail ? 'Facture envoyée par email à la cliente.' : 'Lien de la facture généré — copiez-le pour l’envoyer vous-même.',
-      )
-    })
+    if (wedding.clientEmail) setPendingSnapshot(snapshot)
+    else doShareFacture(snapshot)
   }
+
+  const senderName = businessConfig.companyName?.trim() || 'Relia'
 
   const confirmFinalize = () => {
     updateInvoiceStatus(invoice.id, 'finalisee')
@@ -448,6 +458,20 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EmailPreviewDialog
+        open={pendingSnapshot !== null}
+        onOpenChange={(open) => !open && setPendingSnapshot(null)}
+        clientName={clientName || wedding.coupleName}
+        senderName={senderName}
+        subject={`Votre facture de la part de ${senderName}`}
+        introText="vous a transmis une facture — vous pouvez la consulter directement en ligne :"
+        isSending={isSharing}
+        onConfirm={(customMessage) => {
+          if (pendingSnapshot) doShareFacture(pendingSnapshot, customMessage)
+          setPendingSnapshot(null)
+        }}
+      />
     </div>
   )
 }

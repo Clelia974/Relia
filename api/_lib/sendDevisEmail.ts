@@ -15,6 +15,8 @@ export async function sendDevisEmail(input: {
   companyName?: string
   /** Email pro de la décoratrice (businessConfig.email), si renseigné — mis en Reply-To pour qu'une réponse de la cliente lui arrive directement, jamais à l'adresse générique de Relia. */
   replyToEmail?: string
+  /** Mot personnalisé ajouté par la décoratrice, relu dans l'aperçu avant envoi (cf. EmailPreviewDialog) — inséré tel quel juste après la formule de politesse. */
+  customMessage?: string
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey) {
@@ -36,7 +38,7 @@ export async function sendDevisEmail(input: {
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: `Votre devis de la part de ${senderName}`,
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>
-<p>${escapeHtml(senderName)} vous a préparé un devis — vous pouvez le consulter directement en ligne :</p>
+${input.customMessage?.trim() ? `<p>${escapeHtml(input.customMessage.trim())}</p>\n` : ''}<p>${escapeHtml(senderName)} vous a préparé un devis — vous pouvez le consulter directement en ligne :</p>
 <p><a href="${devisUrl}">${devisUrl}</a></p>
 <p>N'hésitez pas à revenir vers ${input.replyToEmail ? 'nous' : `${escapeHtml(senderName)}`} pour toute question.</p>
 <p>À très vite !</p>`,

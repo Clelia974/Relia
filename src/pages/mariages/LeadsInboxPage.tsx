@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
+import { EmailPreviewDialog } from '@/features/email/EmailPreviewDialog'
 import { LeadStatusBadge } from '@/features/leads/components/LeadStatusBadge'
 import { useLeadActions } from '@/features/leads/useLeadActions'
 import { useLeadsInbox } from '@/features/leads/useLeadsInbox'
@@ -36,7 +37,18 @@ export function LeadsInboxPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { leads, isLoading, error, refresh } = useLeadsInbox()
-  const { pendingId, handleStatusChange, handleSign, handleRelance, handleIgnore } = useLeadActions(refresh)
+  const {
+    pendingId,
+    handleStatusChange,
+    handleSign,
+    handleRelance,
+    handleIgnore,
+    senderName,
+    relanceTarget,
+    confirmRelance,
+    closeRelanceDialog,
+    isRelanceSending,
+  } = useLeadActions(refresh)
 
   const formLink = user ? `${window.location.origin}/lead/new/${user.id}` : ''
   const embedCode = user
@@ -159,6 +171,18 @@ export function LeadsInboxPage() {
           </Card>
         ))}
       </div>
+
+      <EmailPreviewDialog
+        open={relanceTarget !== null}
+        onOpenChange={(open) => !open && closeRelanceDialog()}
+        clientName={relanceTarget?.client_name ?? ''}
+        senderName={senderName}
+        subject={`Votre devis vous attend toujours — ${senderName}`}
+        introText="vous envoie un petit rappel — votre devis est toujours disponible en ligne, n'hésitez pas à y jeter un œil quand vous aurez un moment :"
+        isSending={isRelanceSending}
+        onConfirm={confirmRelance}
+        confirmLabel="Relancer"
+      />
     </div>
   )
 }

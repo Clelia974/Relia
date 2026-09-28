@@ -12,6 +12,8 @@ export async function sendDevisRelanceEmail(input: {
   shareId: string
   companyName?: string
   replyToEmail?: string
+  /** Mot personnalisé ajouté par la décoratrice, relu dans l'aperçu avant envoi (cf. EmailPreviewDialog). */
+  customMessage?: string
 }): Promise<boolean> {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey) {
@@ -33,7 +35,7 @@ export async function sendDevisRelanceEmail(input: {
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: `Votre devis vous attend toujours — ${senderName}`,
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>
-<p>Un petit rappel de la part de ${escapeHtml(senderName)} — votre devis est toujours disponible en ligne, n'hésitez pas à y jeter un œil quand vous aurez un moment :</p>
+${input.customMessage?.trim() ? `<p>${escapeHtml(input.customMessage.trim())}</p>\n` : ''}<p>Un petit rappel de la part de ${escapeHtml(senderName)} — votre devis est toujours disponible en ligne, n'hésitez pas à y jeter un œil quand vous aurez un moment :</p>
 <p><a href="${devisUrl}">${devisUrl}</a></p>
 <p>N'hésitez pas à revenir vers ${input.replyToEmail ? 'nous' : `${escapeHtml(senderName)}`} pour toute question.</p>
 <p>À très vite !</p>`,

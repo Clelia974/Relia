@@ -25,8 +25,12 @@ export function useLeadActions(refresh: () => void) {
   const allProposals = useWorkspaceStore((s) => s.workspace.proposals)
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const taskTemplate = useWorkspaceStore((s) => s.workspace.taskTemplate)
-  const { relanceDevis } = useRelanceDevis()
+  const { relanceDevis, isLoading: isRelanceSending } = useRelanceDevis()
   const [pendingId, setPendingId] = useState<string | null>(null)
+  /** Lead en attente de confirmation dans l'aperçu d'email de relance — null si aucun n'est ouvert. */
+  const [relanceTarget, setRelanceTarget] = useState<Lead | null>(null)
+
+  const senderName = businessConfig.companyName?.trim() || 'Relia'
 
   const handleStatusChange = async (lead: Lead, next: LeadStatus) => {
     setPendingId(lead.id)
@@ -76,20 +80,36 @@ export function useLeadActions(refresh: () => void) {
     }
   }
 
+  const latestSharedProposal = (leadId: string) =>
+    allProposals
+      .filter((p) => p.leadId === leadId && p.shareId)
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+
   /**
-   * Relance manuelle : repousse l'échéance de la tâche de relance de 5 jours
-   * à partir d'aujourd'hui, ET envoie un email de rappel à la cliente si son
-   * devis a bien un lien de partage (cf. Proposal.shareId) et qu'elle a
-   * laissé une adresse — sinon la relance reste purement une note interne.
-   * Jamais de recréation du partage, seulement un nouvel email pointant
-   * vers le lien déjà existant.
+   * Relance manuelle : repousse toujours l'échéance de la tâche de relance
+   * de 5 jours à partir d'aujourd'hui. Si un email de rappel est possible
+   * (devis déjà partagé + adresse cliente connue), ouvre d'abord un aperçu
+   * — jamais d'envoi à l'aveugle — plutôt que d'envoyer directement ;
+   * sinon la relance reste une simple note interne, comme avant.
    */
-  const handleRelance = async (lead: Lead) => {
+  const handleRelance = (lead: Lead) => {
+    const proposal = latestSharedProposal(lead.id)
+    if (lead.client_email && proposal?.shareId) {
+      setRelanceTarget(lead)
+      return
+    }
     clearLeadRelance(allTasks, deleteTask, lead.id)
     scheduleDevisRelance(addTask, lead)
-    const proposal = allProposals
-      .filter((p) => p.leadId === lead.id && p.shareId)
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+    toast.success('Relance notée — prochain rappel dans 5 jours.')
+  }
+
+  /** Confirmation depuis l'aperçu d'email (EmailPreviewDialog) — envoie réellement le rappel. */
+  const confirmRelance = async (customMessage: string) => {
+    const lead = relanceTarget
+    if (!lead) return
+    clearLeadRelance(allTasks, deleteTask, lead.id)
+    scheduleDevisRelance(addTask, lead)
+    const proposal = latestSharedProposal(lead.id)
     if (lead.client_email && proposal?.shareId) {
       const sent = await relanceDevis({
         shareId: proposal.shareId,
@@ -97,11 +117,11 @@ export function useLeadActions(refresh: () => void) {
         clientName: lead.client_name,
         companyName: businessConfig.companyName,
         replyToEmail: businessConfig.email,
+        customMessage,
       })
       toast.success(sent ? 'Relance notée — email de rappel envoyé à la cliente.' : "Relance notée — l'email de rappel n'a pas pu être envoyé.")
-    } else {
-      toast.success('Relance notée — prochain rappel dans 5 jours.')
     }
+    setRelanceTarget(null)
   }
 
   const handleIgnore = async (lead: Lead) => {
@@ -118,5 +138,16 @@ export function useLeadActions(refresh: () => void) {
     }
   }
 
-  return { pendingId, handleStatusChange, handleSign, handleRelance, handleIgnore }
+  return {
+    pendingId,
+    handleStatusChange,
+    handleSign,
+    handleRelance,
+    handleIgnore,
+    senderName,
+    relanceTarget,
+    confirmRelance,
+    closeRelanceDialog: () => setRelanceTarget(null),
+    isRelanceSending,
+  }
 }

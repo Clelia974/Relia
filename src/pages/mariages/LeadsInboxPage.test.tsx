@@ -118,6 +118,11 @@ describe('LeadsInboxPage — pipeline (reste "leads" jusqu’à la signature)', 
 
     fireEvent.click(screen.getByRole('button', { name: 'Relancer' }))
 
+    // Devis déjà partagé + email connu : un aperçu s'ouvre d'abord, jamais un envoi direct au clic.
+    const relanceButtons = await screen.findAllByRole('button', { name: 'Relancer' })
+    expect(relanceDevisMock).not.toHaveBeenCalled()
+    fireEvent.click(relanceButtons[relanceButtons.length - 1])
+
     await waitFor(() =>
       expect(relanceDevisMock).toHaveBeenCalledWith(
         expect.objectContaining({ shareId: 'share-abc', clientEmail: 'sophie@example.com' }),

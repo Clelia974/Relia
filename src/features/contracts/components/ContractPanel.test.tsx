@@ -110,6 +110,11 @@ describe('ContractPanel', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyé' }))
 
+    // Une adresse client existe : un aperçu de l'email s'ouvre d'abord, jamais un envoi direct au clic.
+    const confirmButton = await screen.findByRole('button', { name: 'Envoyer' })
+    expect(shareContratMock).not.toHaveBeenCalled()
+    fireEvent.click(confirmButton)
+
     await waitFor(() =>
       expect(shareContratMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: 'sophie@example.com' })),
     )

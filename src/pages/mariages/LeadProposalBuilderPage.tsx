@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -6,6 +7,7 @@ import { TemplatePickerDialog } from '@/features/proposals/components/TemplatePi
 import type { ProposalSubject } from '@/features/proposals/proposalSubject'
 import type { DevisSnapshot } from '@/features/proposals/devisSnapshot'
 import { useShareDevis } from '@/features/proposals/useShareDevis'
+import { EmailPreviewDialog } from '@/features/email/EmailPreviewDialog'
 import { useLead } from '@/features/leads/useLead'
 import { markLeadStatus } from '@/features/leads/leadsApi'
 import { scheduleDevisRelance } from '@/features/leads/relanceTask'
@@ -22,7 +24,7 @@ export function LeadProposalBuilderPage() {
   const { leadId, proposalId } = useParams<{ leadId: string; proposalId: string }>()
   const navigate = useNavigate()
   const { lead, isLoading, error } = useLead(leadId)
-  const { shareDevis } = useShareDevis()
+  const { shareDevis, isLoading: isSharing } = useShareDevis()
   const businessConfig = useWorkspaceStore((s) => s.workspace.businessConfig)
   const proposalTemplates = useWorkspaceStore((s) => s.workspace.proposalTemplates)
   const createProposal = useWorkspaceStore((s) => s.createProposal)
@@ -30,6 +32,7 @@ export function LeadProposalBuilderPage() {
   const addTask = useWorkspaceStore((s) => s.addTask)
   const allProposals = useWorkspaceStore((s) => s.workspace.proposals)
   const proposal = allProposals.find((p) => p.id === proposalId)
+  const [pendingSnapshot, setPendingSnapshot] = useState<DevisSnapshot | null>(null)
 
   if (isLoading) return null
   if (error || !lead) {
@@ -80,22 +83,46 @@ export function LeadProposalBuilderPage() {
    * l'envoyer elle-même (WhatsApp, SMS…) — l'email Brevo n'est qu'un
    * envoi automatique en plus quand une adresse est renseignée.
    */
-  const handleMarkSent = (snapshot: DevisSnapshot) => {
+  const doShare = async (snapshot: DevisSnapshot, customMessage?: string) => {
     scheduleDevisRelance(addTask, lead)
     markLeadStatus(lead.id, 'devis_envoye').catch((err) => {
       toast.error(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la demande.')
     })
-    shareDevis({ snapshot, clientEmail: lead.client_email ?? undefined, clientName: lead.client_name }).then((shareId) => {
-      if (!shareId) {
-        toast.error("Le lien du devis n'a pas pu être généré — le statut a bien été mis à jour.")
-        return
-      }
-      setProposalShareId(proposal.id, shareId)
-      toast.success(
-        lead.client_email ? 'Devis envoyé par email à la cliente.' : 'Lien du devis généré — copiez-le pour l’envoyer vous-même.',
-      )
-    })
+    const shareId = await shareDevis({ snapshot, clientEmail: lead.client_email ?? undefined, clientName: lead.client_name, customMessage })
+    if (!shareId) {
+      toast.error("Le lien du devis n'a pas pu être généré — le statut a bien été mis à jour.")
+      return
+    }
+    setProposalShareId(proposal.id, shareId)
+    toast.success(
+      lead.client_email ? 'Devis envoyé par email à la cliente.' : 'Lien du devis généré — copiez-le pour l’envoyer vous-même.',
+    )
   }
 
-  return <ProposalBuilderInner proposalId={proposal.id} subject={subject} onMarkSent={handleMarkSent} />
+  /** Une adresse client existe : la décoratrice voit d'abord un aperçu de l'email avant tout envoi (jamais à l'aveugle). Sinon, pas d'email possible — le lien est simplement généré. */
+  const handleMarkSent = (snapshot: DevisSnapshot) => {
+    if (lead.client_email) setPendingSnapshot(snapshot)
+    else doShare(snapshot)
+  }
+
+  const senderName = businessConfig.companyName?.trim() || 'Relia'
+
+  return (
+    <>
+      <ProposalBuilderInner proposalId={proposal.id} subject={subject} onMarkSent={handleMarkSent} />
+      <EmailPreviewDialog
+        open={pendingSnapshot !== null}
+        onOpenChange={(open) => !open && setPendingSnapshot(null)}
+        clientName={lead.client_name}
+        senderName={senderName}
+        subject={`Votre devis de la part de ${senderName}`}
+        introText="vous a préparé un devis — vous pouvez le consulter directement en ligne :"
+        isSending={isSharing}
+        onConfirm={(customMessage) => {
+          if (pendingSnapshot) doShare(pendingSnapshot, customMessage)
+          setPendingSnapshot(null)
+        }}
+      />
+    </>
+  )
 }

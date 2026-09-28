@@ -23,6 +23,7 @@ const RelanceDevisSchema = z.object({
   clientName: z.string().min(1),
   companyName: z.string().optional(),
   replyToEmail: z.string().email().optional().or(z.literal('')),
+  customMessage: z.string().max(2000).optional(),
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -74,6 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     shareId: input.shareId,
     companyName: input.companyName,
     replyToEmail: input.replyToEmail || undefined,
+    customMessage: input.customMessage,
   })
 
   res.status(200).json({ ok })

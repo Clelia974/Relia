@@ -27,6 +27,7 @@ const ShareContratSchema = z.object({
   clientName: z.string().min(1),
   companyName: z.string().optional(),
   replyToEmail: z.string().email().optional().or(z.literal('')),
+  customMessage: z.string().max(2000).optional(),
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -82,6 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       shareId: data.id,
       companyName: input.companyName,
       replyToEmail: input.replyToEmail || undefined,
+      customMessage: input.customMessage,
     })
   }
 
