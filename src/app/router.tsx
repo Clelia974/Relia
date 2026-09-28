@@ -4,6 +4,7 @@ import { AppLayout } from '@/app/layout/AppLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
 import { DevisPartagePage } from '@/pages/DevisPartagePage'
+import { FacturePartageePage } from '@/pages/FacturePartageePage'
 import { LeadFormPage } from '@/pages/LeadFormPage'
 import { NewWeddingPage } from '@/pages/mariages/NewWeddingPage'
 import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
@@ -112,6 +113,7 @@ export function AppRouter() {
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
       <Route path="/devis/:shareId" element={<DevisPartagePage />} />
+      <Route path="/facture/:shareId" element={<FacturePartageePage />} />
 
       <Route
         element={

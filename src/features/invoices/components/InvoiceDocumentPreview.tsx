@@ -6,7 +6,8 @@ import type { BusinessConfig, ProposalLineItem, VatStatus, Wedding } from '@/typ
 
 interface InvoiceDocumentPreviewProps {
   businessConfig: BusinessConfig
-  wedding: Wedding
+  /** Un mariage entier convient, mais seuls ces 2 champs sont lus — permet aussi une facture partagée publiquement (instantané figé, sans mariage attaché). */
+  wedding: Pick<Wedding, 'coupleName' | 'date'>
   invoiceNumber: string
   date: string
   clientName: string

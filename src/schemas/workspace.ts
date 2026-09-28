@@ -510,6 +510,8 @@ export const InvoiceSchema = z.object({
   depositAmount: z.number().optional(),
   balanceAmount: z.number().optional(),
   legalMentions: z.string().optional(),
+  /** Id du factures_partages Supabase créé au dernier "Marquer comme envoyée" (cf. api/factures/share.ts) — même principe que Proposal.shareId. */
+  shareId: z.string().optional(),
   isIndicativePreview: z.literal(true),
   /** Absent sur les factures créées avant la Phase 2b : le default couvre leur relecture (cf. migration v9→v10). */
   status: InvoiceStatusSchema.default('brouillon'),

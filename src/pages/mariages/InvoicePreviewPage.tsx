@@ -24,6 +24,7 @@ import { emptyLineItemFormValues, ProposalLineItemFormSchema, type ProposalLineI
 import { InvoiceDocumentPreview } from '@/features/invoices/components/InvoiceDocumentPreview'
 import { InvoiceStatusBadge } from '@/features/invoices/components/InvoiceStatusBadge'
 import { InvoicePreviewFormSchema } from '@/features/invoices/invoicePreviewForm.schema'
+import { useShareFacture } from '@/features/invoices/useShareFacture'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { currency } from '@/lib/currency'
 import { downloadJson } from '@/lib/downloadFile'
@@ -57,8 +58,10 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
   const invoice = useWorkspaceStore((s) => s.workspace.invoices.find((inv) => inv.id === invoiceId))
   const updateInvoicePreview = useWorkspaceStore((s) => s.updateInvoicePreview)
   const updateInvoiceStatus = useWorkspaceStore((s) => s.updateInvoiceStatus)
+  const setInvoiceShareId = useWorkspaceStore((s) => s.setInvoiceShareId)
   const duplicateInvoicePreview = useWorkspaceStore((s) => s.duplicateInvoicePreview)
   const deleteInvoicePreview = useWorkspaceStore((s) => s.deleteInvoicePreview)
+  const { shareFacture } = useShareFacture()
 
   /** Attribué automatiquement à la création : jamais modifiable. */
   const invoiceNumber = invoice?.invoiceNumber ?? ''
@@ -182,6 +185,44 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
     }
   }
 
+  /**
+   * Génère (ou régénère) le lien de partage public — jamais d'envoi
+   * automatique à l'insu de la décoratrice, elle clique après relecture.
+   * Envoie aussi par email si le mariage a une adresse cliente renseignée
+   * (best-effort, cf. useShareFacture) ; le lien reste affiché dans l'app
+   * dans tous les cas, pour un envoi manuel (WhatsApp, SMS...).
+   */
+  const handleMarkSent = () => {
+    const snapshot = {
+      businessConfig,
+      wedding: { coupleName: wedding.coupleName, date: wedding.date },
+      invoiceNumber,
+      date: date ? new Date(date).toISOString() : invoice.date,
+      clientName: clientName || wedding.coupleName,
+      clientAddress: clientAddress.trim() || undefined,
+      clientPhone: clientPhone.trim() || undefined,
+      lineItems: numericLines,
+      subtotal: totals.subtotal,
+      taxAmount: totals.taxAmount,
+      total: totals.total,
+      vatMode: invoice.vatMode,
+      vatRate: invoice.vatRate,
+      depositAmount: invoice.depositAmount,
+      balanceAmount: invoice.balanceAmount,
+      legalMentions: legalMentions || businessConfig.legalMentions,
+    }
+    shareFacture({ snapshot, clientEmail: wedding.clientEmail || undefined, clientName: snapshot.clientName }).then((shareId) => {
+      if (!shareId) {
+        toast.error("Le lien de la facture n'a pas pu être généré.")
+        return
+      }
+      setInvoiceShareId(invoice.id, shareId)
+      toast.success(
+        wedding.clientEmail ? 'Facture envoyée par email à la cliente.' : 'Lien de la facture généré — copiez-le pour l’envoyer vous-même.',
+      )
+    })
+  }
+
   const confirmFinalize = () => {
     updateInvoiceStatus(invoice.id, 'finalisee')
     toast.success('Facture finalisée — elle est maintenant en lecture seule.')
@@ -208,6 +249,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={handleMarkSent}>{invoice.shareId ? 'Renvoyer' : 'Marquer comme envoyée'}</Button>
           {editable && (
             <Button variant="outline" onClick={() => setPendingFinalize(true)}>
               <Lock className="size-4" aria-hidden="true" />
@@ -223,6 +265,32 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
           </Button>
         </div>
       </div>
+
+      {invoice.shareId && (
+        <Card className="no-print">
+          <CardContent className="flex flex-col gap-2 py-4">
+            <p className="text-xs font-medium text-muted-foreground">
+              Lien à partager avec la cliente — utile en attendant le mail, ou pour l'envoyer vous-même (WhatsApp, SMS…)
+            </p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 truncate rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+                {`${window.location.origin}/facture/${invoice.shareId}`}
+              </code>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={async () => {
+                  const ok = await copyTextToClipboard(`${window.location.origin}/facture/${invoice.shareId}`)
+                  toast[ok ? 'success' : 'error'](ok ? 'Lien copié.' : 'Impossible de copier automatiquement.')
+                }}
+                aria-label="Copier le lien de la facture"
+              >
+                <Copy className="size-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {!editable && (
         <Alert className="no-print border-warning/40 bg-warning-bg">

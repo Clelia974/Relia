@@ -1,5 +1,5 @@
 import { type FormEvent, type ReactNode, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -60,17 +60,6 @@ export function LeadFormPage() {
 
   return (
     <div className={cn('flex min-h-dvh flex-col text-foreground', embed ? 'bg-transparent' : 'bg-background')}>
-      {!embed && (
-        <header className="border-b border-border/60">
-          <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
-            <Link to="/" className="flex items-center gap-2" aria-label="Relia — retour à l'accueil">
-              <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
-              <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
-            </Link>
-          </div>
-        </header>
-      )}
-
       <main className={cn('flex flex-1 items-center justify-center', embed ? 'p-4' : 'px-4 py-10 sm:px-6')}>
         <Card className={cn('w-full max-w-lg', embed && 'border-none shadow-none')}>
           {sent ? (

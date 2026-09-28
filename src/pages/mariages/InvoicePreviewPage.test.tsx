@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { InvoicePreviewPage } from '@/pages/mariages/InvoicePreviewPage'
@@ -9,11 +9,15 @@ import type { InvoiceStatus, Wedding } from '@/types/entities'
 
 afterEach(cleanup)
 
+const shareFactureMock = vi.hoisted(() => vi.fn())
+vi.mock('@/features/invoices/useShareFacture', () => ({ useShareFacture: () => ({ shareFacture: shareFactureMock }) }))
+
 beforeEach(() => {
   useWorkspaceStore.setState({ workspace: createEmptyWorkspace() })
+  shareFactureMock.mockReset().mockResolvedValue('share-abc')
 })
 
-function seedWeddingAndInvoice(status: InvoiceStatus) {
+function seedWeddingAndInvoice(status: InvoiceStatus, weddingOverrides: Partial<{ clientEmail: string }> = {}) {
   const weddingId = useWorkspaceStore.getState().createWedding({
     coupleName: 'Camille & Antoine',
     date: '2026-06-06T00:00:00.000Z',
@@ -21,6 +25,7 @@ function seedWeddingAndInvoice(status: InvoiceStatus) {
     soldAmount: 5000,
     clientBudget: 5000,
     status: 'signe',
+    ...weddingOverrides,
   })
   const wedding = useWorkspaceStore.getState().workspace.weddings.find((w) => w.id === weddingId)!
   const invoiceId = useWorkspaceStore.getState().createInvoicePreview({
@@ -114,5 +119,39 @@ describe('InvoicePreviewPage — verrou brouillon / finalisée (Phase 2b)', () =
     renderInvoice(wedding, invoiceId)
 
     expect(screen.queryByLabelText('Numéro de facture')).not.toBeInTheDocument()
+  })
+})
+
+describe('InvoicePreviewPage — lien de partage', () => {
+  it('génère et affiche le lien même sans email client, pour un envoi manuel (WhatsApp/SMS)', async () => {
+    const { wedding, invoiceId } = seedWeddingAndInvoice('brouillon')
+    renderInvoice(wedding, invoiceId)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyée' }))
+
+    await waitFor(() => expect(shareFactureMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: undefined })))
+    await waitFor(() => expect(screen.getByText(/\/facture\/share-abc$/)).toBeInTheDocument())
+    expect(useWorkspaceStore.getState().workspace.invoices.find((inv) => inv.id === invoiceId)?.shareId).toBe('share-abc')
+  })
+
+  it('transmet l’email client à useShareFacture quand le mariage en a un', async () => {
+    const { wedding, invoiceId } = seedWeddingAndInvoice('brouillon', { clientEmail: 'sophie@example.com' })
+    renderInvoice(wedding, invoiceId)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyée' }))
+
+    await waitFor(() =>
+      expect(shareFactureMock).toHaveBeenCalledWith(expect.objectContaining({ clientEmail: 'sophie@example.com' })),
+    )
+  })
+
+  it('reste possible sur une facture déjà finalisée (le bouton devient "Renvoyer")', async () => {
+    const { wedding, invoiceId } = seedWeddingAndInvoice('finalisee')
+    renderInvoice(wedding, invoiceId)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Marquer comme envoyée' }))
+
+    await waitFor(() => expect(useWorkspaceStore.getState().workspace.invoices.find((inv) => inv.id === invoiceId)?.shareId).toBe('share-abc'))
+    expect(screen.getByRole('button', { name: 'Renvoyer' })).toBeInTheDocument()
   })
 })

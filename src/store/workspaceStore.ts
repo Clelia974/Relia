@@ -222,6 +222,8 @@ interface WorkspaceStoreState {
   createInvoicePreview: (input: NewInvoiceInput) => string
   updateInvoicePreview: (id: string, patch: Partial<Omit<Invoice, 'id' | 'weddingId' | 'createdAt'>>) => void
   updateInvoiceStatus: (id: string, status: InvoiceStatus) => void
+  /** Métadonnée pure (lien de partage public) — jamais bloquée par isInvoiceStatusLocked, même principe que setProposalShareId. */
+  setInvoiceShareId: (id: string, shareId: string) => void
   duplicateInvoicePreview: (id: string) => string | null
   deleteInvoicePreview: (id: string) => void
 
@@ -962,6 +964,15 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
                 ? { ...inv, status, finalizedAt: status === 'finalisee' ? nowIso() : inv.finalizedAt, updatedAt: nowIso() }
                 : inv,
             ),
+          },
+        }))
+      },
+
+      setInvoiceShareId: (id, shareId) => {
+        set((state) => ({
+          workspace: {
+            ...state.workspace,
+            invoices: state.workspace.invoices.map((inv) => (inv.id === id ? { ...inv, shareId, updatedAt: nowIso() } : inv)),
           },
         }))
       },
