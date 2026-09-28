@@ -35,6 +35,7 @@ export function FacturePartageePage() {
             depositAmount={snapshot.depositAmount}
             balanceAmount={snapshot.balanceAmount}
             legalMentions={snapshot.legalMentions}
+            clientFacing
           />
         )}
       </main>

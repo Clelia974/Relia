@@ -22,6 +22,8 @@ interface InvoiceDocumentPreviewProps {
   depositAmount?: number
   balanceAmount?: number
   legalMentions?: string
+  /** true sur la page publique /facture/:shareId — masque la mention réservée à la décoratrice. */
+  clientFacing?: boolean
 }
 
 export function InvoiceDocumentPreview({
@@ -41,6 +43,7 @@ export function InvoiceDocumentPreview({
   depositAmount,
   balanceAmount,
   legalMentions,
+  clientFacing = false,
 }: InvoiceDocumentPreviewProps) {
   const showVat = vatApplies(vatMode)
   const accentStyle = businessConfig.brandColor ? { color: businessConfig.brandColor } : undefined
@@ -133,12 +136,15 @@ export function InvoiceDocumentPreview({
         </section>
       )}
 
-      <footer className="border-t border-border pt-4 text-xs text-muted-foreground">
-        <p>
-          Cette facture est une prévisualisation indicative — elle ne constitue pas un document juridiquement conforme.
-          Vérifiez les mentions applicables à votre situation avant émission.
-        </p>
-      </footer>
+      {!clientFacing && (
+        <footer className="border-t border-border pt-4 text-xs text-muted-foreground">
+          <p>
+            À titre d'information (non visible par votre cliente) : cette facture est une prévisualisation indicative —
+            elle ne constitue pas un document juridiquement conforme. Vérifiez les mentions applicables à votre situation
+            avant émission.
+          </p>
+        </footer>
+      )}
     </div>
   )
 }
