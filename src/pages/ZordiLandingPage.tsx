@@ -456,8 +456,8 @@ export function ZordiLandingPage() {
             <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé Zordi parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
               <p>
-                J’ai été décoratrice, avant comptable — et mon activité n’a pas fonctionné comme je l’espérais, pas
-                assez de demandes pour en vivre.
+                J’ai été comptable, avant décoratrice — et mon activité de décoratrice n’a pas fonctionné comme je
+                l’espérais, pas assez de demandes pour en vivre.
               </p>
               <p>
                 En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
