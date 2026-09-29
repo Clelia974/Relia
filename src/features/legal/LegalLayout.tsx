@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { CookieNotice } from '@/features/legal/CookieNotice'
+import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { LEGAL } from '@/features/landing/landingContent'
 
@@ -14,8 +15,8 @@ export function LegalLayout({ title, intro, sections }: { title: string; intro: 
     <div className="min-h-dvh bg-background text-foreground">
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center justify-between px-5 sm:px-8">
-          <Link to="/" aria-label="Jordu — retour à l'accueil">
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
+          <Link to="/" aria-label="Zordi — retour à l'accueil">
+            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight text-primary" />
           </Link>
           <Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Retour à l'accueil</Link>
         </div>

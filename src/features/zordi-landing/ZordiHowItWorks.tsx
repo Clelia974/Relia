@@ -92,7 +92,7 @@ const STEPS: Step[] = [
  * au vocabulaire déjà en place sur la page (mêmes 4 demandes fictives à travers
  * les 5 étapes plutôt que 5 illustrations différentes).
  */
-export function JorduHowItWorks() {
+export function ZordiHowItWorks() {
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
   const step = STEPS[active]

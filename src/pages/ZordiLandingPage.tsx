@@ -18,12 +18,13 @@ import {
 } from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
-import { JorduHowItWorks } from '@/features/jordu-landing/JorduHowItWorks'
-import { JorduTimeCalculator } from '@/features/jordu-landing/JorduTimeCalculator'
-import { JorduWaitlistForm } from '@/features/jordu-landing/JorduWaitlistForm'
+import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
+import { ZordiHowItWorks } from '@/features/zordi-landing/ZordiHowItWorks'
+import { ZordiTimeCalculator } from '@/features/zordi-landing/ZordiTimeCalculator'
+import { ZordiWaitlistForm } from '@/features/zordi-landing/ZordiWaitlistForm'
 import { cn } from '@/lib/utils'
 
-// Couleurs de marque Jordu, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
+// Couleurs de marque Zordi, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
 // #680808 primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
 // distinctes des tokens --primary/--thread de l'app existante, laissés intacts ailleurs
 // dans le produit tant que le rebrand complet n'est pas décidé.
@@ -72,7 +73,7 @@ const BEFORE_AFTER = [
   { before: '« Je continue après le dîner. »', after: '« Je sais où reprendre demain. »' },
 ]
 
-const WHAT_JORDU_DOES_NOT = [
+const WHAT_ZORDI_DOES_NOT = [
   'faire venir des clientes à ta place ;',
   'remplacer ton Instagram ;',
   'remplacer ton savoir-faire ;',
@@ -98,12 +99,12 @@ const NOT_FOR_YOU = [
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: 'Jordu est-il déjà disponible ?',
+    q: 'Zordi est-il déjà disponible ?',
     a: 'Pas encore, c’est en construction. En t’inscrivant, tu seras informée des prochaines étapes et de l’ouverture des premiers tests.',
   },
   {
-    q: 'Est-ce que Jordu va m’apporter plus de clientes ?',
-    a: 'Non. Jordu ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
+    q: 'Est-ce que Zordi va m’apporter plus de clientes ?',
+    a: 'Non. Zordi ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
   },
   {
     q: 'Est-ce uniquement pour les mariages ?',
@@ -114,17 +115,17 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Non. L’idée est de t’aider à gérer les demandes qui arrivent de différents endroits, pas de choisir un seul canal.',
   },
   {
-    q: 'Quand pourrai-je tester Jordu ?',
+    q: 'Quand pourrai-je tester Zordi ?',
     a: 'Les premières personnes inscrites seront informées dès l’ouverture des premiers tests.',
   },
 ]
 
 /**
- * Landing "bis" — /jordu : uniquement une collecte d'emails en attendant que
- * le MVP Jordu soit prêt, distincte de la vraie landing "lancement" (RootGate /).
+ * Landing "bis" — /zordi : uniquement une collecte d'emails en attendant que
+ * le MVP Zordi soit prêt, distincte de la vraie landing "lancement" (RootGate /).
  * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
  */
-export function JorduLandingPage() {
+export function ZordiLandingPage() {
   useEffect(() => {
     const root = document.documentElement
     const wasDark = root.classList.contains('dark')
@@ -150,13 +151,13 @@ export function JorduLandingPage() {
       {/* 1 — HEADER */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" aria-label="Jordu — haut de page">
-            <span className="font-heading text-2xl font-semibold tracking-tight text-[#680808]">Jordu</span>
+          <a href="#haut" aria-label="Zordi — haut de page">
+            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight text-[#680808]" />
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
             <a href="#comment-ca-marche" className="transition-colors hover:text-foreground">Comment ça marche</a>
-            <a href="#pourquoi-jordu" className="transition-colors hover:text-foreground">Pourquoi Jordu</a>
+            <a href="#pourquoi-zordi" className="transition-colors hover:text-foreground">Pourquoi Zordi</a>
             <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
           </nav>
           <button
@@ -164,7 +165,7 @@ export function JorduLandingPage() {
             onClick={scrollToInscription}
             className="rounded-lg bg-[#680808] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#680808]/90"
           >
-            Je veux rejoindre Jordu
+            Je veux rejoindre Zordi
           </button>
         </div>
       </header>
@@ -175,23 +176,23 @@ export function JorduLandingPage() {
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-[#5F6B4C]">
               <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
-              Jordu — en construction
+              Zordi — en construction
             </span>
             <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#680808] sm:text-5xl">
               Et si tu pouvais vraiment fermer ton ordinateur à 18h ?
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
               Tu as créé ton activité pour décorer, créer, imaginer — pas pour répondre à WhatsApp à 21h ou chercher
-              un devis pendant que ta famille t’attend. Jordu t’aide à mieux gérer tes demandes, pour que ton travail
+              un devis pendant que ta famille t’attend. Zordi t’aide à mieux gérer tes demandes, pour que ton travail
               reprenne sa place.
             </p>
 
             <div className="mt-2 w-full max-w-md">
-              <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre Jordu →</p>
-              <JorduWaitlistForm id="inscription" submitLabel="Je veux rejoindre Jordu" />
+              <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre Zordi →</p>
+              <ZordiWaitlistForm id="inscription" submitLabel="Je veux rejoindre Zordi" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Jordu est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
+              Zordi est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
             </p>
           </div>
         </section>
@@ -284,17 +285,17 @@ export function JorduLandingPage() {
               ))}
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Jordu ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
+              Zordi ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
             </p>
           </div>
         </section>
 
-        {/* 9 — JORDU, C'EST QUOI ? */}
+        {/* 9 — ZORDI, C'EST QUOI ? */}
         <section id="comment-ca-marche" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
-              <h2 className={cn(H2, 'mt-2')}>Jordu, c’est quoi ?</h2>
+              <h2 className={cn(H2, 'mt-2')}>Zordi, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">Une idée simple : une demande devrait avoir un endroit où aller.</p>
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -362,18 +363,18 @@ export function JorduLandingPage() {
               </p>
             </div>
             <div className="mt-10">
-              <JorduTimeCalculator />
+              <ZordiTimeCalculator />
             </div>
           </div>
         </section>
 
-        {/* 12 — CE QUE JORDU NE PROMET PAS */}
+        {/* 12 — CE QUE ZORDI NE PROMET PAS */}
         <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>On ne va pas te raconter que Jordu va régler toute ton activité.</h2>
-            <p className="mt-4 text-muted-foreground">Jordu ne va pas :</p>
+            <h2 className={H2}>On ne va pas te raconter que Zordi va régler toute ton activité.</h2>
+            <p className="mt-4 text-muted-foreground">Zordi ne va pas :</p>
             <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
-              {WHAT_JORDU_DOES_NOT.map((item) => (
+              {WHAT_ZORDI_DOES_NOT.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
                   {item}
@@ -381,7 +382,7 @@ export function JorduLandingPage() {
               ))}
             </ul>
             <p className="mt-6 text-muted-foreground">
-              Ce n’est pas son rôle. Jordu s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
+              Ce n’est pas son rôle. Zordi s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
               garder dans ta tête.
             </p>
           </div>
@@ -390,7 +391,7 @@ export function JorduLandingPage() {
         {/* 13 — CONSTRUCTION */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>Jordu est encore en construction.</h2>
+            <h2 className={H2}>Zordi est encore en construction.</h2>
             <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
             <p className="mt-4 text-muted-foreground">
               Le but : quelque chose que les décoratrices auront réellement envie d’utiliser.
@@ -403,11 +404,11 @@ export function JorduLandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>Jordu est pour toi si…</h2>
+              <h2 className={cn(H2, 'mt-2')}>Zordi est pour toi si…</h2>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
               <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
-                <p className="text-sm font-semibold text-success">Jordu est pour toi si…</p>
+                <p className="text-sm font-semibold text-success">Zordi est pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-foreground/80">
@@ -418,7 +419,7 @@ export function JorduLandingPage() {
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-sm font-semibold text-muted-foreground">Jordu n’est probablement pas pour toi si…</p>
+                <p className="text-sm font-semibold text-muted-foreground">Zordi n’est probablement pas pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {NOT_FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-muted-foreground">
@@ -430,7 +431,7 @@ export function JorduLandingPage() {
               </div>
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Jordu ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
+              Zordi ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
             </p>
           </div>
         </section>
@@ -443,16 +444,16 @@ export function JorduLandingPage() {
               <p className="mt-3 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
             </div>
             <div className="mt-8">
-              <JorduHowItWorks />
+              <ZordiHowItWorks />
             </div>
           </div>
         </section>
 
-        {/* 16 — POURQUOI JORDU ? (portrait) */}
-        <section id="pourquoi-jordu" className={SECTION}>
+        {/* 16 — POURQUOI ZORDI ? (portrait) */}
+        <section id="pourquoi-zordi" className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <p className={KICKER}>Pourquoi Jordu</p>
-            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé Jordu parce que j’avais toutes les réponses.</h2>
+            <p className={KICKER}>Pourquoi Zordi</p>
+            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé Zordi parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
               <p>
                 J’ai été décoratrice, avant comptable — et mon activité n’a pas fonctionné comme je l’espérais, pas
@@ -462,13 +463,13 @@ export function JorduLandingPage() {
                 En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
                 périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
                 demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
-                amenée à réfléchir à Jordu.
+                amenée à réfléchir à Zordi.
               </p>
               <p>
-                Le nom vient de là aussi : « Jordu », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
+                Le nom vient de là aussi : « Zordi », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
                 journée qu’on a sous les yeux, celle qu’on peut refermer le soir sans y penser jusqu’au lendemain.
               </p>
-              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où Jordu ira. Mais je sais pourquoi j’ai commencé.</p>
+              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où Zordi ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
           </div>
         </section>
@@ -499,13 +500,13 @@ export function JorduLandingPage() {
               Ton travail a une place. Ta vie aussi.
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-[#DDE6EF]/85">
-              Jordu est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
+              Zordi est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
-              <JorduWaitlistForm inverted submitLabel="Je veux rejoindre Jordu" />
+              <ZordiWaitlistForm inverted submitLabel="Je veux rejoindre Zordi" />
             </div>
             <p className="text-sm text-[#DDE6EF]/80">
-              Pas de spam. Juste les nouvelles importantes concernant Jordu. Une question ?{' '}
+              Pas de spam. Juste les nouvelles importantes concernant Zordi. Une question ?{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-4">
                 {CONTACT_EMAIL}
               </a>
@@ -518,16 +519,16 @@ export function JorduLandingPage() {
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <span className="font-heading text-base font-semibold text-[#680808]">Jordu</span>
+            <ZordiWordmark className="font-heading text-base font-semibold text-[#680808]" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
-          <p>© {new Date().getFullYear()} Jordu</p>
+          <p>© {new Date().getFullYear()} Zordi</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>
           <LegalLinks />
         </div>
       </footer>
-      <CookieNotice brand="Jordu" />
+      <CookieNotice brand="Zordi" />
     </div>
   )
 }

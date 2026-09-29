@@ -73,7 +73,7 @@ describe('POST /api/waitlist', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body).toEqual({ ok: true })
     expect(upsertMock).toHaveBeenCalledWith(
-      { email: 'sophie@example.com', source: 'jordu_landing' },
+      { email: 'sophie@example.com', source: 'zordi_landing' },
       { onConflict: 'email', ignoreDuplicates: true },
     )
   })

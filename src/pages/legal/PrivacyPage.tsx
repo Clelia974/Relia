@@ -6,21 +6,21 @@ export function PrivacyPage() {
   return (
     <LegalLayout
       title="Politique de confidentialité"
-      intro="Voici, simplement, ce que JORDU fait de tes informations. Cette politique décrit la situation d'aujourd'hui ; elle sera mise à jour, et tu en seras informée, avant tout changement (par exemple l'arrivée des comptes en ligne)."
+      intro="Voici, simplement, ce que ZORDI fait de tes informations. Cette politique décrit la situation d'aujourd'hui ; elle sera mise à jour, et tu en seras informée, avant tout changement (par exemple l'arrivée des comptes en ligne)."
       sections={[
         {
           title: 'Qui est responsable ?',
           body: (
             <p>
-              JORDU est édité par {LEGAL.name}, {LEGAL.address} ({LEGAL.country}). Le site est disponible à l'adresse {LEGAL.siteUrl}. Pour toute question sur tes données : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+              ZORDI est édité par {LEGAL.name}, {LEGAL.address} ({LEGAL.country}). Le site est disponible à l'adresse {LEGAL.siteUrl}. Pour toute question sur tes données : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
           ),
         },
         {
-          title: 'Ce que JORDU collecte',
+          title: 'Ce que ZORDI collecte',
           body: (
             <>
-              <p>Aujourd'hui, JORDU ne dispose d'aucun serveur de stockage : tout ce que tu saisis reste dans ton navigateur, sur ton appareil. Nous n'y avons pas accès. Il s'agit de :</p>
+              <p>Aujourd'hui, ZORDI ne dispose d'aucun serveur de stockage : tout ce que tu saisis reste dans ton navigateur, sur ton appareil. Nous n'y avons pas accès. Il s'agit de :</p>
               <ul>
                 <li>tes mariages, tâches, budgets, prestataires, devis, factures, contrats et notes ;</li>
                 <li>les coordonnées de tes clients et de tes prestataires que tu choisis d'y inscrire ;</li>
@@ -32,7 +32,7 @@ export function PrivacyPage() {
         },
         {
           title: 'Cookies et mesure d’audience',
-          body: <p>JORDU n'utilise aucun cookie de suivi, aucune publicité et aucun outil de mesure d'audience. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>,
+          body: <p>ZORDI n'utilise aucun cookie de suivi, aucune publicité et aucun outil de mesure d'audience. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>,
         },
         {
           title: 'Ce que nous ne faisons pas',
@@ -60,7 +60,7 @@ export function PrivacyPage() {
               <ul>
                 <li>savoir quelles données te concernant sont traitées et en obtenir une copie ;</li>
                 <li>les corriger, les supprimer, ou en limiter l'usage ;</li>
-                <li>récupérer tes données dans un format réutilisable (l'export JSON de JORDU le permet dès maintenant) ;</li>
+                <li>récupérer tes données dans un format réutilisable (l'export JSON de ZORDI le permet dès maintenant) ;</li>
                 <li>t'opposer à un traitement, et retirer ton consentement à tout moment ;</li>
                 <li>ne subir aucune discrimination pour avoir exercé tes droits ;</li>
                 <li>introduire une réclamation auprès de l'autorité de protection des données de ton pays (en France : la CNIL, cnil.fr).</li>

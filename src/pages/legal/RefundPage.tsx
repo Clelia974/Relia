@@ -5,15 +5,15 @@ export function RefundPage() {
   return (
     <LegalLayout
       title="Politique de remboursement"
-      intro={`Nous voulons que tu essaies JORDU sans crainte. Le service coûte ${PRICE_MONTHLY} € par mois ou ${PRICE_ANNUAL} € par an. ${BILLING_LIVE ? '' : 'L’abonnement n’est pas encore ouvert : aucun paiement n’est possible aujourd’hui, et cette politique s’appliquera dès son ouverture.'}`}
+      intro={`Nous voulons que tu essaies ZORDI sans crainte. Le service coûte ${PRICE_MONTHLY} € par mois ou ${PRICE_ANNUAL} € par an. ${BILLING_LIVE ? '' : 'L’abonnement n’est pas encore ouvert : aucun paiement n’est possible aujourd’hui, et cette politique s’appliquera dès son ouverture.'}`}
       sections={[
         {
           title: 'D’abord, l’essai',
-          body: <p>Tu peux tester JORDU gratuitement pendant {TRIAL_DAYS} jours, sans carte bancaire. Si l'outil ne te convient pas, tu ne paies rien.</p>,
+          body: <p>Tu peux tester ZORDI gratuitement pendant {TRIAL_DAYS} jours, sans carte bancaire. Si l'outil ne te convient pas, tu ne paies rien.</p>,
         },
         {
           title: 'Remboursement intégral sous 30 jours',
-          body: <p>Si tu t'abonnes et que JORDU ne te convient pas, nous te remboursons la totalité de ton premier paiement, mensuel ou annuel, pendant 30 jours à compter de la date de paiement. Sans justification à fournir.</p>,
+          body: <p>Si tu t'abonnes et que ZORDI ne te convient pas, nous te remboursons la totalité de ton premier paiement, mensuel ou annuel, pendant 30 jours à compter de la date de paiement. Sans justification à fournir.</p>,
         },
         {
           title: 'Comment demander',

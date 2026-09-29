@@ -20,9 +20,9 @@ const STEPS: Step[] = [
     icon: FileSpreadsheet,
     label: 'Import',
     title: 'Déjà tes mariages dans un tableur ? Importe-les en une fois',
-    text: 'Glisse ton fichier Excel avec tes mariages, prestataires et budgets — JORDU reprend tout, sans ressaisie manuelle.',
+    text: 'Glisse ton fichier Excel avec tes mariages, prestataires et budgets — ZORDI reprend tout, sans ressaisie manuelle.',
     image: '/landing/import.jpg',
-    alt: 'Aperçu de l’import d’un mariage et d’un prestataire depuis un fichier Excel dans JORDU',
+    alt: 'Aperçu de l’import d’un mariage et d’un prestataire depuis un fichier Excel dans ZORDI',
   },
   {
     kind: 'screenshot',
@@ -31,7 +31,7 @@ const STEPS: Step[] = [
     title: 'Chaque matin, tu sais quoi faire',
     text: 'Priorités, dates limites, tâches reportées avec leur raison, et un calendrier mensuel filtrable par mariage ou par prestataire.',
     image: '/landing/tableau-de-bord.jpg',
-    alt: 'Liste des tâches du jour dans JORDU, avec priorités et dates',
+    alt: 'Liste des tâches du jour dans ZORDI, avec priorités et dates',
   },
   {
     kind: 'screenshot',
@@ -40,7 +40,7 @@ const STEPS: Step[] = [
     title: 'Le déroulé de la journée, minute par minute',
     text: 'Filtre par moment (installation, cérémonie, réception, démontage), appelle un prestataire d’un geste, imprime ou enregistre le tout en PDF la veille.',
     image: '/landing/jour-j.jpg',
-    alt: 'Le déroulé du Jour J dans JORDU',
+    alt: 'Le déroulé du Jour J dans ZORDI',
   },
   {
     kind: 'screenshot',
@@ -49,7 +49,7 @@ const STEPS: Step[] = [
     title: 'Le budget du couple et ta rentabilité, côte à côte',
     text: 'Ce qu’il reste à dépenser, ton profit prévisionnel et ta marge. Devis et factures indicatives numérotés automatiquement.',
     image: '/landing/finances.jpg',
-    alt: 'L’onglet Finances de JORDU',
+    alt: 'L’onglet Finances de ZORDI',
   },
   {
     kind: 'screenshot',
@@ -58,7 +58,7 @@ const STEPS: Step[] = [
     title: 'Une checklist par mariage',
     text: 'Quantité, statut, dégâts éventuels, destination au retour. Imprimable avant de partir.',
     image: '/landing/materiel.jpg',
-    alt: 'La checklist Matériel de JORDU',
+    alt: 'La checklist Matériel de ZORDI',
   },
   {
     kind: 'screenshot',
@@ -67,7 +67,7 @@ const STEPS: Step[] = [
     title: 'Un carnet unique pour tous tes prestataires',
     text: 'Coordonnées, statut propre à chaque mariage, horaire d’arrivée et coûts.',
     image: '/landing/prestataires.jpg',
-    alt: 'La liste des prestataires d’un mariage dans JORDU',
+    alt: 'La liste des prestataires d’un mariage dans ZORDI',
   },
   {
     kind: 'screenshot',
@@ -76,7 +76,7 @@ const STEPS: Step[] = [
     title: 'Un bilan à la fin de chaque mariage',
     text: 'Bilan financier, retours de ton client et ton portfolio avant/après.',
     image: '/landing/bilan.jpg',
-    alt: 'Le bilan de clôture d’un mariage dans JORDU',
+    alt: 'Le bilan de clôture d’un mariage dans ZORDI',
   },
 ]
 

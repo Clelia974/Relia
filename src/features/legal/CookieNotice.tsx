@@ -17,7 +17,7 @@ function hasSeenNotice() {
  * Si un outil de mesure d'audience ou de publicité est ajouté un jour, ce bandeau devra devenir un vrai
  * recueil de consentement (refuser aussi simple qu'accepter) et la page /cookies être mise à jour.
  */
-export function CookieNotice({ brand = 'JORDU' }: { brand?: string }) {
+export function CookieNotice({ brand = 'ZORDI' }: { brand?: string }) {
   const [visible, setVisible] = useState(() => !hasSeenNotice())
   if (!visible) return null
 

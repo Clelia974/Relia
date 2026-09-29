@@ -1,16 +1,16 @@
 import { useState } from 'react'
 
-interface UseJoinJorduWaitlistResult {
+interface UseJoinZordiWaitlistResult {
   join: (email: string) => Promise<boolean>
   isLoading: boolean
   error: string | null
 }
 
 /**
- * Envoie une adresse email depuis la landing /jordu vers api/waitlist.ts,
- * seule porte d'écriture sur `jordu_waitlist` (clé service_role, rate limitée).
+ * Envoie une adresse email depuis la landing /zordi vers api/waitlist.ts,
+ * seule porte d'écriture sur `zordi_waitlist` (clé service_role, rate limitée).
  */
-export function useJoinJorduWaitlist(): UseJoinJorduWaitlistResult {
+export function useJoinZordiWaitlist(): UseJoinZordiWaitlistResult {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -21,7 +21,7 @@ export function useJoinJorduWaitlist(): UseJoinJorduWaitlistResult {
       const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'jordu_landing' }),
+        body: JSON.stringify({ email, source: 'zordi_landing' }),
       })
       const data = (await response.json()) as { ok?: boolean; error?: string }
       if (!response.ok || !data.ok) throw new Error(data.error ?? 'Impossible d’enregistrer ton adresse.')

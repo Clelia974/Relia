@@ -75,7 +75,7 @@ export function FinancesGlobalPage() {
                 Budget du mariage
               </h2>
               <p className="text-sm text-muted-foreground">
-                Compare le budget prévu par les couples avec les dépenses et coûts suivis dans JORDU.
+                Compare le budget prévu par les couples avec les dépenses et coûts suivis dans ZORDI.
               </p>
             </div>
             {budgetConfigured.length > 0 ? (

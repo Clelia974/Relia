@@ -2,6 +2,7 @@ import { CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, Log
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InitialsBadge } from '@/components/InitialsBadge'
+import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
@@ -44,9 +45,8 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center justify-between px-6 pb-4 pt-7">
-        <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Jordu — Aujourd'hui">
-          <img src="/brand/jordu-J-mark.svg" alt="" width={32} height={32} className="size-8 rounded-lg" />
-          <span className="font-heading text-xl font-semibold tracking-tight text-primary">Jordu</span>
+        <NavLink to="/aujourdhui" aria-label="Zordi — Aujourd'hui">
+          <ZordiWordmark className="font-heading text-xl font-semibold tracking-tight text-primary" />
         </NavLink>
         <ThemeToggle />
       </div>

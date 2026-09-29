@@ -175,7 +175,7 @@ export function ParametresPage() {
     try {
       const result = await parseWorkspaceFile(file)
       if (!result.ok) {
-        toast.error('Ce fichier ne semble pas être une sauvegarde Jordu valide.', { description: result.reason })
+        toast.error('Ce fichier ne semble pas être une sauvegarde Zordi valide.', { description: result.reason })
         return
       }
       setPendingImport(result.workspace)
@@ -372,7 +372,7 @@ export function ParametresPage() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Ces informations sont indicatives et doivent être vérifiées avant émission — Jordu ne garantit pas leur conformité juridique ou fiscale.
+            Ces informations sont indicatives et doivent être vérifiées avant émission — Zordi ne garantit pas leur conformité juridique ou fiscale.
           </p>
 
           <div className="flex flex-col gap-1.5">
@@ -462,7 +462,7 @@ export function ParametresPage() {
                   className="hidden"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Remplace l'accent Jordu par défaut sur vos documents.</p>
+              <p className="text-xs text-muted-foreground">Remplace l'accent Zordi par défaut sur vos documents.</p>
             </div>
           </div>
           </div>
@@ -595,7 +595,7 @@ export function ParametresPage() {
           <CardTitle>Importer tes mariages depuis Excel</CardTitle>
           <CardDescription>
             Tu as déjà tes mariages (et tes prestataires) dans un tableur ? Télécharge le modèle, remplis-le (ou copie
-            tes données dedans), puis importe-le. Tâches et matériel s'ajoutent ensuite mariage par mariage dans JORDU.
+            tes données dedans), puis importe-le. Tâches et matériel s'ajoutent ensuite mariage par mariage dans ZORDI.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

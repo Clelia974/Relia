@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
 
 /** Chrome partagé des pages d'authentification (connexion/inscription/mot de passe) — même en-tête que LegalLayout, carte centrée pour le formulaire. */
 export function AuthCard({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
@@ -8,8 +9,8 @@ export function AuthCard({ title, description, children }: { title: string; desc
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
-          <Link to="/" aria-label="Jordu — retour à l'accueil">
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
+          <Link to="/" aria-label="Zordi — retour à l'accueil">
+            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight text-primary" />
           </Link>
         </div>
       </header>

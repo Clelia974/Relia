@@ -28,7 +28,7 @@ interface ContractPanelProps {
 const toDateInput = (iso?: string) => (iso ? iso.slice(0, 10) : '')
 const fromDateInput = (value: string) => (value ? new Date(value).toISOString() : undefined)
 
-/** Suivi du contrat d'un mariage : statut, dates d'envoi et de signature, note, et le PDF lui-même (uploadé par la décoratrice — jamais généré par Jordu). */
+/** Suivi du contrat d'un mariage : statut, dates d'envoi et de signature, note, et le PDF lui-même (uploadé par la décoratrice — jamais généré par Zordi). */
 export function ContractPanel({ contract, onChange, businessConfig, clientName, clientEmail }: ContractPanelProps) {
   const { user } = useAuth()
   const { uploadContract, isLoading: isUploading } = useUploadContract()
@@ -94,7 +94,7 @@ export function ContractPanel({ contract, onChange, businessConfig, clientName, 
     else doShare()
   }
 
-  const senderName = businessConfig.companyName?.trim() || 'Jordu'
+  const senderName = businessConfig.companyName?.trim() || 'Zordi'
 
   const shareUrl = current.shareId ? `${window.location.origin}/contrat/${current.shareId}` : undefined
   const handleCopyShareLink = async () => {

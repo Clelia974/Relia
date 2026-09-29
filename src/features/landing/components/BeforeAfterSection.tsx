@@ -34,7 +34,7 @@ function ComparisonList({ items, variant }: { items: string[]; variant: 'avant' 
           isApres ? 'bg-primary-foreground/15 text-primary-foreground' : 'bg-muted text-muted-foreground',
         )}
       >
-        {isApres ? 'Avec Jordu' : 'Sans Jordu'}
+        {isApres ? 'Avec Zordi' : 'Sans Zordi'}
       </span>
       <ul className="flex flex-col gap-3 text-sm">
         {items.map((item) => (

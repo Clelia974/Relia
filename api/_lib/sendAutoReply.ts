@@ -33,7 +33,7 @@ export async function sendAutoReply(input: {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
       body: JSON.stringify({
-        sender: { name: 'Jordu', email: 'contact@evenementscles.com' },
+        sender: { name: 'Zordi', email: 'contact@evenementscles.com' },
         to: [{ email: input.clientEmail, name: input.clientName }],
         subject: 'Votre demande a bien été reçue',
         htmlContent: `<p>Bonjour ${escapeHtml(input.clientName)},</p>

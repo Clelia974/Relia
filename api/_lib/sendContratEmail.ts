@@ -25,7 +25,7 @@ export async function sendContratEmail(input: {
 
   const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
   const contratUrl = `${siteUrl}/contrat/${input.shareId}`
-  const senderName = input.companyName?.trim() || 'Jordu'
+  const senderName = input.companyName?.trim() || 'Zordi'
 
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {

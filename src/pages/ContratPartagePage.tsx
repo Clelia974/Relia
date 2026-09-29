@@ -4,7 +4,7 @@ import { useContratPartage } from '@/features/contracts/useContratPartage'
 /**
  * Page publique (jamais authentifiée) affichant un contrat partagé par
  * une décoratrice — /contrat/:shareId. Le fichier est un PDF uploadé par
- * elle-même (jamais généré par Jordu) ; aucun en-tête Jordu.
+ * elle-même (jamais généré par Zordi) ; aucun en-tête Zordi.
  */
 export function ContratPartagePage() {
   const { shareId } = useParams<{ shareId: string }>()
