@@ -18,9 +18,15 @@ export function ZordiWordmark({ className, color = 'currentColor', checkColor = 
       <svg
         viewBox="0 0 100 100"
         aria-hidden="true"
-        style={{ position: 'absolute', right: '0.09em', top: '0.36em', width: '0.37em', height: '0.37em' }}
+        style={{
+          position: 'absolute',
+          right: 'clamp(2px, 0.09em, 999px)',
+          top: 'clamp(4px, 0.36em, 999px)',
+          width: 'clamp(13px, 0.37em, 999px)',
+          height: 'clamp(13px, 0.37em, 999px)',
+        }}
       >
-        <path d="M16,54 Q30,76 48,56 Q64,38 84,8" fill="none" stroke={checkColor} strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M16,54 Q30,76 48,56 Q64,38 84,8" fill="none" stroke={checkColor} strokeWidth="22" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   )
