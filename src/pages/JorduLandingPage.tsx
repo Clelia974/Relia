@@ -150,8 +150,9 @@ export function JorduLandingPage() {
       {/* 1 — HEADER */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" aria-label="Jordu — haut de page">
-            <img src="/brand/jordu-wordmark.svg" alt="Jordu — haut de page" width={76} height={32} className="h-8 w-auto" />
+          <a href="#haut" className="flex items-center gap-2" aria-label="Jordu — haut de page">
+            <img src="/brand/jordu-icon.svg" alt="" width={32} height={32} className="size-8 rounded-lg" />
+            <span className="font-heading text-2xl font-semibold tracking-tight text-[#680808]">Jordu</span>
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
@@ -518,7 +519,8 @@ export function JorduLandingPage() {
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <img src="/brand/jordu-wordmark.svg" alt="Jordu — organisation évènementielle" width={57} height={24} className="h-6 w-auto" />
+            <img src="/brand/jordu-icon.svg" alt="" width={24} height={24} className="size-6 rounded-md" />
+            <span className="font-heading text-base font-semibold text-[#680808]">Jordu</span>
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
           <p>© {new Date().getFullYear()} Jordu</p>

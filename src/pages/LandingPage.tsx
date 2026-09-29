@@ -72,14 +72,8 @@ export function LandingPage() {
         <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
           <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
             <a href="#haut" className="flex items-center gap-2" aria-label="Jordu — haut de page">
-              <img src="/brand/jordu-wordmark.svg" alt="Jordu — retour en haut de page" width={76} height={32} className="h-8 w-auto dark:hidden" />
-              <img
-                src="/brand/jordu-wordmark-reversed.svg"
-                alt="Jordu — retour en haut de page"
-                width={76}
-                height={32}
-                className="hidden h-8 w-auto dark:block"
-              />
+              <img src="/brand/jordu-icon.svg" alt="" width={32} height={32} className="size-8 rounded-lg" />
+              <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
               <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
