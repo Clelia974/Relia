@@ -122,7 +122,7 @@ export function FeatureCarousel() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Fais glisser pour voir chaque fonctionnalité →</p>
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-thread-text">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]">
           {String(activeIndex + 1).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')} · {step.label}
         </p>
       </div>
@@ -147,7 +147,7 @@ export function FeatureCarousel() {
               <img src={s.image} alt={s.alt} width={1200} height={800} className="h-64 w-full object-cover object-top sm:h-[26rem]" />
 
               <div className="flex flex-col gap-2 p-6 sm:p-8">
-                <p className="font-heading text-lg italic text-thread-text sm:text-xl">« {s.quote} »</p>
+                <p className="font-heading text-lg italic text-[#5F6B4C] sm:text-xl">« {s.quote} »</p>
                 <p className="max-w-xl leading-relaxed text-muted-foreground">{s.text}</p>
                 <p className="font-heading text-xl font-semibold text-foreground">{s.takeaway}</p>
                 {s.note && <p className="mt-1 text-xs text-muted-foreground">{s.note}</p>}
@@ -166,7 +166,7 @@ export function FeatureCarousel() {
             aria-selected={activeIndex === i}
             aria-label={s.label}
             onClick={() => goTo(i)}
-            className={cn('h-1.5 rounded-full transition-all duration-300', activeIndex === i ? 'w-6 bg-primary' : 'w-1.5 bg-border')}
+            className={cn('h-1.5 rounded-full transition-all duration-300', activeIndex === i ? 'w-6 bg-[#680808]' : 'w-1.5 bg-border')}
           />
         ))}
       </div>

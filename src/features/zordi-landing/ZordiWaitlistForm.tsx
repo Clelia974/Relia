@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Z_BUTTON } from '@/features/landing/zordiColors'
 import { cn } from '@/lib/utils'
 import { useJoinZordiWaitlist } from '@/features/zordi-landing/useJoinZordiWaitlist'
 
@@ -49,7 +50,12 @@ export function ZordiWaitlistForm({ id, className, inverted, submitLabel = 'Je v
         aria-invalid={Boolean(error)}
         className={cn('h-12 text-base', inverted && 'bg-card text-foreground')}
       />
-      <Button type="submit" size="lg" disabled={isLoading} className={cn('h-12 shrink-0 px-6', inverted && 'bg-card text-[#680808] hover:bg-card')}>
+      <Button
+        type="submit"
+        size="lg"
+        disabled={isLoading}
+        className={cn('h-12 shrink-0 px-6', inverted ? 'bg-card text-[#680808] hover:bg-card' : Z_BUTTON)}
+      >
         {isLoading ? 'Inscription…' : submitLabel}
       </Button>
       {error && <p className="text-sm text-risk sm:basis-full">{error}</p>}

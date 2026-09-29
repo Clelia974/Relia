@@ -16,7 +16,7 @@ const EXTRAS = [
 export function FeatureExtras() {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs font-medium uppercase tracking-[0.14em] text-thread-text">Et aussi</p>
+      <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]">Et aussi</p>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {EXTRAS.map(({ icon: Icon, label, badge, text }) => (
           <li key={label} className="rounded-xl border border-border bg-card p-5 shadow-(--shadow-card)">

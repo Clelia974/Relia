@@ -5,7 +5,7 @@ import { Check } from 'lucide-react'
 export function PlanFeature({ children }: { children: ReactNode }) {
   return (
     <li className="flex items-start gap-3">
-      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage/30 text-success">
+      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#A9B08F]/30 text-success">
         <Check className="size-3.5" aria-hidden="true" />
       </span>
       <span>{children}</span>

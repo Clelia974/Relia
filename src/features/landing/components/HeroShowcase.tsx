@@ -25,7 +25,7 @@ export function HeroShowcase() {
       `}</style>
 
       {/* Halo doux en fond, pour donner de la profondeur sans coller les éléments les uns aux autres */}
-      <div className="absolute inset-8 -z-10 rounded-[2.5rem] bg-sage/20 blur-3xl" aria-hidden="true" />
+      <div className="absolute inset-8 -z-10 rounded-[2.5rem] bg-[#A9B08F]/20 blur-3xl" aria-hidden="true" />
 
       <img
         src="/mockups/hero-macbook.png"
@@ -50,7 +50,7 @@ export function HeroShowcase() {
         className="animate-notice-in hero-float absolute -right-2 top-[32%] z-20 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-(--shadow-raised) sm:-right-6"
         style={{ animationDelay: '480ms' }}
       >
-        <Clock className="size-3.5 text-thread-text" aria-hidden="true" />
+        <Clock className="size-3.5 text-[#5F6B4C]" aria-hidden="true" />
         Minute par minute
       </span>
 
@@ -58,7 +58,7 @@ export function HeroShowcase() {
         className="animate-notice-in hero-float-alt absolute -left-2 top-1/2 z-20 hidden -translate-y-1/2 items-center gap-2 rounded-full border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-(--shadow-raised) sm:-left-8 sm:flex"
         style={{ animationDelay: '620ms' }}
       >
-        <Wallet className="size-3.5 text-thread-text" aria-hidden="true" />
+        <Wallet className="size-3.5 text-[#5F6B4C]" aria-hidden="true" />
         Budget & rentabilité
       </span>
 

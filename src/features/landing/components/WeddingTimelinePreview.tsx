@@ -5,6 +5,7 @@ import { ArrowRight, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Z_BUTTON } from '@/features/landing/zordiColors'
 import { DAY_PHASE_LABELS } from '@/lib/dayPhase'
 
 /**
@@ -48,7 +49,7 @@ export function WeddingTimelinePreview({ ctaLabel, onStart }: WeddingTimelinePre
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 sm:p-8">
       <div>
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-thread-text">Essayer maintenant — sans compte</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]">Essayer maintenant — sans compte</p>
         <h2 className="mt-2 font-heading text-2xl font-semibold text-foreground sm:text-3xl">Quelle est la date du mariage ?</h2>
         <p className="mt-1 text-sm text-muted-foreground">On te montre le déroulé, tout de suite.</p>
       </div>
@@ -58,7 +59,7 @@ export function WeddingTimelinePreview({ ctaLabel, onStart }: WeddingTimelinePre
           <Label htmlFor="preview-date">Date du mariage</Label>
           <Input id="preview-date" type="date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
         </div>
-        <Button size="lg" disabled={!dateInput} onClick={handleGenerate}>
+        <Button size="lg" className={Z_BUTTON} disabled={!dateInput} onClick={handleGenerate}>
           Générer mon déroulé
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
@@ -72,11 +73,11 @@ export function WeddingTimelinePreview({ ctaLabel, onStart }: WeddingTimelinePre
               className="animate-notice-in flex items-start gap-3 rounded-lg border border-border bg-background px-4 py-3"
               style={{ animationDelay: `${i * 90}ms` }}
             >
-              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-sage/30 text-success">
+              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[#A9B08F]/30 text-success">
                 <Check className="size-3.5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-thread-text">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#5F6B4C]">
                   {step.offsetLabel} · {format(step.date, 'd MMMM yyyy', { locale: fr })}
                 </p>
                 <p className="text-sm text-foreground">{step.title}</p>

@@ -15,6 +15,7 @@ import {
   TRIAL_DAYS,
 } from '@/features/landing/landingContent'
 import { useLaunchOfferAvailability } from '@/features/payment/useLaunchOfferAvailability'
+import { Z_BUTTON } from '@/features/landing/zordiColors'
 import { cn } from '@/lib/utils'
 
 const euro = (n: number) => `${n} €`
@@ -63,7 +64,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
             onClick={() => setBilling(value)}
             className={cn(
               'rounded-full px-4 py-1.5 font-medium transition-[color,background-color] duration-200',
-              billing === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              billing === value ? 'bg-[#680808] text-[#DDE6EF] shadow-sm' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {label}
@@ -87,12 +88,12 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
         </article>
 
         {hasLaunchOffer ? (
-          <article className="relative flex flex-col rounded-2xl border-2 border-primary bg-card p-8 shadow-(--shadow-raised)">
-            <span className="absolute -top-3 left-8 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
+          <article className="relative flex flex-col rounded-2xl border-2 border-[#680808] bg-card p-8 shadow-(--shadow-raised)">
+            <span className="absolute -top-3 left-8 rounded-full bg-[#680808] px-3 py-1 text-xs font-semibold text-[#DDE6EF] shadow-sm">
               🎉 Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes
             </span>
             <h3 className="font-heading text-2xl font-semibold text-foreground">Solo</h3>
-            <p className="text-sm font-medium text-thread-text">Tarif fondateur conservé à vie</p>
+            <p className="text-sm font-medium text-[#5F6B4C]">Tarif fondateur conservé à vie</p>
             <p className="mt-4 font-heading text-5xl font-semibold tracking-tight text-foreground">
               {billing === 'month' ? euro(LAUNCH_OFFER_PRICE_MONTHLY) : euro(LAUNCH_OFFER_PRICE_ANNUAL)}
               <span className="text-base font-normal text-muted-foreground">{billing === 'month' ? ' / mois' : ' / an'}</span>
@@ -113,7 +114,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 <PlanFeature key={f}>{f}</PlanFeature>
               ))}
             </ul>
-            <Button size="lg" className="mt-8 w-full" onClick={onStart}>
+            <Button size="lg" className={cn('mt-8 w-full', Z_BUTTON)} onClick={onStart}>
               {ctaLabel}
             </Button>
             <div className="mt-4 flex flex-col gap-1.5">
@@ -130,14 +131,14 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 className="h-2.5 w-full overflow-hidden rounded-full bg-muted"
               >
                 <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-500"
+                  className="h-full rounded-full bg-[#680808] transition-[width] duration-500"
                   style={{ width: `${Math.min(100, (launchOffer!.redeemed / LAUNCH_OFFER_LIMIT) * 100)}%` }}
                 />
               </div>
             </div>
           </article>
         ) : (
-          <article className="relative flex flex-col rounded-2xl border-2 border-primary bg-card p-8 shadow-(--shadow-raised)">
+          <article className="relative flex flex-col rounded-2xl border-2 border-[#680808] bg-card p-8 shadow-(--shadow-raised)">
             <span className="absolute -top-3 left-8 rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
               Essai gratuit {TRIAL_DAYS} jours
             </span>
@@ -154,7 +155,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 <PlanFeature key={f}>{f}</PlanFeature>
               ))}
             </ul>
-            <Button size="lg" className="mt-8 w-full" onClick={onStart}>
+            <Button size="lg" className={cn('mt-8 w-full', Z_BUTTON)} onClick={onStart}>
               Essai gratuit {TRIAL_DAYS} jours
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">Sans carte bancaire</p>

@@ -18,7 +18,7 @@ export function SolutionSection() {
           </li>
         ))}
       </ul>
-      <p className="font-heading text-xl font-semibold text-primary">Pour que ton organisation ne repose plus uniquement sur ta mémoire.</p>
+      <p className="font-heading text-xl font-semibold text-[#680808]">Pour que ton organisation ne repose plus uniquement sur ta mémoire.</p>
     </div>
   )
 }

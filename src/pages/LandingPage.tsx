@@ -14,6 +14,7 @@ import { SolutionSection } from '@/features/landing/components/SolutionSection'
 import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
 import { WhoItsForSection } from '@/features/landing/components/WhoItsForSection'
 import { CONTACT_EMAIL, TESTIMONIALS } from '@/features/landing/landingContent'
+import { Z_BUTTON } from '@/features/landing/zordiColors'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { useAuth } from '@/hooks/useAuth'
@@ -22,8 +23,8 @@ import { useWorkspaceStore } from '@/store/workspaceStore'
 
 const CONTAINER = 'mx-auto w-full max-w-5xl px-5 sm:px-8'
 const SECTION = 'scroll-mt-20 py-16 sm:py-24'
-const H2 = 'font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'
-const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-thread-text'
+const H2 = 'font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl'
+const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]'
 
 /** Copywriting complet fourni par Clélia (2026-09-29) — repris texte pour texte, à l'endroit indiqué dans son message. */
 const DAY_TIMELINE = [
@@ -81,7 +82,7 @@ export function LandingPage() {
     <div className="min-h-dvh bg-background text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#680808] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
       >
         Aller au contenu
       </a>
@@ -104,7 +105,7 @@ export function LandingPage() {
             </nav>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate('/connexion')}>Se connecter</Button>
-              <Button size="sm" onClick={start}>{ctaLabel}</Button>
+              <Button size="sm" className={Z_BUTTON} onClick={start}>{ctaLabel}</Button>
             </div>
           </div>
         </header>
@@ -116,18 +117,18 @@ export function LandingPage() {
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
               <div className="mx-auto flex max-w-2xl flex-col items-start gap-6 text-left animate-page-in lg:mx-0">
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-thread-text">
-                  <span className="size-1.5 rounded-full bg-thread" aria-hidden="true" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-[#5F6B4C]">
+                  <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
                   Pour les décoratrices et décorateurs de mariage
                 </span>
-                <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-primary sm:text-5xl">
-                  Ton travail a une place. Ta vie aussi. <span className="italic text-thread-text">Enfin de l’air.</span>
+                <h1 className="text-balance font-heading text-5xl font-semibold leading-[1.03] tracking-tight text-[#680808] sm:text-6xl">
+                  Ton travail a une place. Ta vie aussi. <span className="italic text-[#5F6B4C]">Enfin de l’air.</span>
                 </h1>
                 <div className="flex flex-col gap-3">
                   <p className="max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground">
                     ZORDI rassemble tout ce qu’il faut pour gérer tes mariages au même endroit.
                   </p>
-                  <p className="max-w-xl text-pretty text-base font-medium leading-relaxed text-thread-text">
+                  <p className="max-w-xl text-pretty text-base font-medium leading-relaxed text-[#5F6B4C]">
                     Moins de choses à chercher. Moins de choses à retenir. Plus de place pour créer.
                   </p>
                   <p className="max-w-xl text-pretty leading-relaxed text-foreground/80">
@@ -136,7 +137,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                  <Button size="lg" className="h-12 w-full px-7 text-base sm:w-auto" onClick={start}>
+                  <Button size="lg" className={cn('h-12 w-full px-7 text-base sm:w-auto', Z_BUTTON)} onClick={start}>
                     {ctaLabel}
                   </Button>
                   {!onboarded && (
@@ -164,13 +165,14 @@ export function LandingPage() {
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
             <h2 className={H2}>Tout ton mariage. Au même endroit.</h2>
-            <div className="mt-4 flex flex-col gap-1 text-base leading-relaxed text-foreground/80">
-              <p>Un mariage, ce n’est pas seulement un joli décor.</p>
-              <p>C’est une date. Des tâches. Du matériel. Des prestataires. Des horaires. Des devis. Des coûts. Des imprévus.</p>
-              <p>Et des dizaines de petites informations qu’il faut réussir à retrouver au bon moment.</p>
-            </div>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">ZORDI rassemble tout ça dans un seul espace.</p>
-            <p className="mt-2 font-heading text-xl font-semibold text-primary">Pour que tu puisses savoir où tu en es sans devoir chercher partout.</p>
+            <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Un mariage, ce n’est pas qu’un joli décor : une date, des tâches, du matériel, des prestataires, des
+              horaires, des devis, des coûts, des imprévus — et des dizaines de petites informations à retrouver au
+              bon moment.
+            </p>
+            <p className="mt-3 font-heading text-xl font-semibold text-[#680808]">
+              ZORDI rassemble tout ça, pour que tu saches où tu en es sans chercher partout.
+            </p>
           </div>
         </section>
 
@@ -178,13 +180,15 @@ export function LandingPage() {
         <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
-            <div className="mt-4 flex flex-col gap-1 text-base leading-relaxed text-foreground/80">
-              <p>Tu peux aimer créer. Aimer imaginer un décor. Aimer voir une salle prendre vie. Aimer le moment où tout s’installe enfin.</p>
-              <p>Et pourtant ne pas avoir envie de répondre à des messages à 22h30.</p>
-            </div>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">Être à ton compte ne devrait pas vouloir dire être disponible tout le temps.</p>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">Le problème n’est pas que tu ne sais pas t’organiser.</p>
-            <p className="mt-2 font-heading text-xl font-semibold text-primary">C’est que les informations dont tu as besoin sont souvent éparpillées.</p>
+            <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Tu peux aimer créer, imaginer un décor, voir une salle prendre vie — et pourtant ne pas avoir envie de
+              répondre à des messages à 22h30. Être à ton compte ne devrait pas vouloir dire être disponible tout le
+              temps.
+            </p>
+            <p className="mt-3 font-heading text-xl font-semibold text-[#680808]">
+              Le problème, ce n’est pas que tu ne sais pas t’organiser : c’est que les informations dont tu as besoin
+              sont souvent éparpillées.
+            </p>
             <p className="mt-2 text-base leading-relaxed text-foreground/80">Et quand tout est éparpillé, c’est ta tête qui fait le lien.</p>
           </div>
         </section>
@@ -211,12 +215,12 @@ export function LandingPage() {
             <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
               {DAY_TIMELINE.map((item) => (
                 <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
-                  <span className="shrink-0 font-heading text-sm font-semibold text-primary sm:w-16">{item.time}</span>
+                  <span className="shrink-0 font-heading text-sm font-semibold text-[#680808] sm:w-16">{item.time}</span>
                   <span className="text-foreground/80">{item.text}</span>
                 </li>
               ))}
             </ol>
-            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-primary">
+            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#680808]">
               ZORDI ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer.
             </p>
           </div>
@@ -284,7 +288,7 @@ export function LandingPage() {
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {TIME_RECOVERED.map((item) => (
                 <div key={item.title} className="rounded-xl border border-border bg-card p-6">
-                  <p className="text-sm font-semibold text-thread-text">{item.title}</p>
+                  <p className="text-sm font-semibold text-[#5F6B4C]">{item.title}</p>
                   <ul className="mt-2 flex flex-col gap-1 text-sm leading-relaxed text-foreground">
                     {item.lines.map((line) => (
                       <li key={line}>{line}</li>
@@ -293,7 +297,7 @@ export function LandingPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-primary">
+            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#680808]">
               Le temps que tu récupères n’a pas besoin d’être productif.
             </p>
           </div>
@@ -316,7 +320,7 @@ export function LandingPage() {
         <section className={SECTION} aria-labelledby="phrase-resume">
           <div className={cn(CONTAINER, 'max-w-3xl text-center')}>
             <p className={KICKER}>Une phrase résume ZORDI</p>
-            <blockquote id="phrase-resume" className="mt-4 text-balance font-heading text-2xl font-semibold leading-snug text-primary sm:text-3xl">
+            <blockquote id="phrase-resume" className="mt-4 text-balance font-heading text-3xl font-semibold leading-snug text-[#680808] sm:text-4xl">
               ZORDI ne réduit pas le nombre de mariages à gérer — il réduit ce que tu dois garder en tête pour les gérer.
             </blockquote>
           </div>
@@ -335,7 +339,7 @@ export function LandingPage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-6 font-heading text-lg font-semibold text-primary">Ce n’est pas son rôle.</p>
+            <p className="mt-6 font-heading text-lg font-semibold text-[#680808]">Ce n’est pas son rôle.</p>
             <p className="mt-2 text-muted-foreground">
               ZORDI s’occupe de ce qui arrive après la demande : comment tout suivre sans tout garder dans ta tête.
             </p>
@@ -375,7 +379,7 @@ export function LandingPage() {
               </div>
             </div>
             <div className="mt-8 flex flex-col items-center gap-2">
-              <Button size="lg" className="h-12 px-7 text-base" onClick={start}>
+              <Button size="lg" className={cn('h-12 px-7 text-base', Z_BUTTON)} onClick={start}>
                 {ctaLabel}
               </Button>
               <p className="text-sm text-muted-foreground">1 minute pour commencer · Sans carte bancaire</p>
@@ -400,12 +404,11 @@ export function LandingPage() {
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
             <h2 className={H2}>Tes données restent les tiennes.</h2>
-            <div className="mt-4 flex flex-col gap-1 text-base leading-relaxed text-foreground/80">
-              <p>Aujourd’hui, tes données de travail sont stockées dans ton navigateur.</p>
-              <p>Ton compte — email et mot de passe — est géré séparément.</p>
-              <p>Tu peux exporter tes données à tout moment.</p>
-            </div>
-            <p className="mt-4 font-heading text-lg font-semibold text-primary">Pas de verrouillage volontaire de tes données.</p>
+            <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Aujourd’hui, tes données de travail sont stockées dans ton navigateur. Ton compte — email et mot de
+              passe — est géré séparément, et tu peux exporter tes données à tout moment.
+            </p>
+            <p className="mt-3 font-heading text-lg font-semibold text-[#680808]">Pas de verrouillage volontaire de tes données.</p>
           </div>
         </section>
 
@@ -421,31 +424,29 @@ export function LandingPage() {
         </section>
 
         {/* 18 — APPEL FINAL */}
-        <section className="bg-primary py-20 text-primary-foreground sm:py-28" aria-labelledby="final">
+        <section className="bg-[#680808] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <div className="flex flex-col gap-1">
               <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
                 Tu as un mariage à organiser ?
               </h2>
-              <p className="mt-2 text-lg text-primary-foreground/85">Commence par celui-là.</p>
+              <p className="mt-2 text-lg text-[#DDE6EF]/85">Commence par celui-là.</p>
             </div>
-            <p className="max-w-xl text-base leading-relaxed text-primary-foreground/85">
-              Pas besoin de tout changer. Pas besoin de tout importer. Pas besoin de tout comprendre avant de commencer.
-            </p>
-            <p className="max-w-xl text-lg font-medium leading-relaxed text-primary-foreground">
-              Crée ton espace. Ajoute ton mariage. Et regarde si ZORDI peut te faire respirer un peu plus.
+            <p className="max-w-xl text-lg font-medium leading-relaxed text-[#DDE6EF]">
+              Pas besoin de tout changer, tout importer ou tout comprendre avant de commencer. Crée ton espace,
+              ajoute ton mariage, et regarde si ZORDI peut te faire respirer un peu plus.
             </p>
             <p className="text-balance font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
               Ton travail a une place. Ta vie aussi.
             </p>
             <Button
               size="lg"
-              className="h-12 bg-card px-7 text-base text-primary shadow-(--shadow-raised) hover:bg-card hover:shadow-(--shadow-raised)"
+              className="h-12 bg-card px-7 text-base text-[#680808] shadow-(--shadow-raised) hover:bg-card hover:shadow-(--shadow-raised)"
               onClick={start}
             >
               {ctaLabel}
             </Button>
-            <p className="text-sm text-primary-foreground/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
+            <p className="text-sm text-[#DDE6EF]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
           </div>
         </section>
       </main>
