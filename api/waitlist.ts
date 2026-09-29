@@ -12,8 +12,8 @@ const WaitlistSchema = z.object({
 })
 
 /**
- * Point d'accès public (landing /oui, jamais authentifiée) : seule porte
- * d'écriture sur `oui_waitlist`, même logique que api/leads.ts — rate
+ * Point d'accès public (landing /jordu, jamais authentifiée) : seule porte
+ * d'écriture sur `jordu_waitlist`, même logique que api/leads.ts — rate
  * limiting + validation avant insertion avec la clé service_role.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -40,13 +40,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ignoreDuplicates : une même personne peut cliquer plusieurs fois sans erreur ni doublon —
   // on ne révèle jamais si l'adresse était déjà inscrite.
   const { error } = await supabaseAdmin
-    .from('oui_waitlist')
+    .from('jordu_waitlist')
     .upsert(
-      { email: parsed.data.email.trim().toLowerCase(), source: parsed.data.source || 'oui_landing' },
+      { email: parsed.data.email.trim().toLowerCase(), source: parsed.data.source || 'jordu_landing' },
       { onConflict: 'email', ignoreDuplicates: true },
     )
   if (error) {
-    console.error('Erreur inscription liste d’attente OUI :', error.message)
+    console.error('Erreur inscription liste d’attente Jordu :', error.message)
     res.status(500).json({ error: 'Erreur interne.' })
     return
   }

@@ -1,18 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { OuiTimeCalculator } from '@/features/oui-landing/OuiTimeCalculator'
+import { JorduTimeCalculator } from '@/features/jordu-landing/JorduTimeCalculator'
 
 afterEach(cleanup)
 
-describe('OuiTimeCalculator', () => {
+describe('JorduTimeCalculator', () => {
   it("n'affiche aucun résultat tant que les champs sont vides (effet de révélation)", () => {
-    render(<OuiTimeCalculator />)
+    render(<JorduTimeCalculator />)
     expect(screen.queryByText(/h$/)).toBeNull()
     expect(screen.getByText('Renseigne tes chiffres pour voir ton estimation.')).toBeInTheDocument()
   })
 
   it('affiche l’estimation une fois les deux champs nécessaires renseignés', () => {
-    render(<OuiTimeCalculator />)
+    render(<JorduTimeCalculator />)
     fireEvent.change(screen.getByLabelText(/Demandes reçues/), { target: { value: '50' } })
     fireEvent.change(screen.getByLabelText(/Minutes par demande/), { target: { value: '15' } })
     expect(screen.getByText('≈ 12.5 h')).toBeInTheDocument()

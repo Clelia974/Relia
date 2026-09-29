@@ -47,7 +47,7 @@ function StatField({ id, icon: Icon, label, placeholder, value, onChange }: Stat
   )
 }
 
-export function OuiTimeCalculator() {
+export function JorduTimeCalculator() {
   // Champs vides par défaut (pas de valeurs pré-remplies) : le résultat n'apparaît
   // qu'une fois que la décoratrice a saisi ses propres chiffres — effet de révélation
   // plutôt qu'un calcul déjà affiché avant toute interaction.
@@ -64,9 +64,9 @@ export function OuiTimeCalculator() {
   return (
     <div className="rounded-2xl bg-primary p-6 text-primary-foreground shadow-(--shadow-raised) sm:p-8">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatField id="oui-calc-count" icon={Inbox} label="Demandes reçues" placeholder="50" value={count} onChange={setCount} />
-        <StatField id="oui-calc-minutes" icon={Clock} label="Minutes par demande" placeholder="15" value={avgMinutes} onChange={setAvgMinutes} />
-        <StatField id="oui-calc-repeats" icon={RotateCcw} label="Relances par demande" placeholder="2" value={repeats} onChange={setRepeats} />
+        <StatField id="jordu-calc-count" icon={Inbox} label="Demandes reçues" placeholder="50" value={count} onChange={setCount} />
+        <StatField id="jordu-calc-minutes" icon={Clock} label="Minutes par demande" placeholder="15" value={avgMinutes} onChange={setAvgMinutes} />
+        <StatField id="jordu-calc-repeats" icon={RotateCcw} label="Relances par demande" placeholder="2" value={repeats} onChange={setRepeats} />
       </div>
 
       {hasResult ? (

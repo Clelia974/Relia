@@ -3,9 +3,9 @@ import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useJoinOuiWaitlist } from '@/features/oui-landing/useJoinOuiWaitlist'
+import { useJoinJorduWaitlist } from '@/features/jordu-landing/useJoinJorduWaitlist'
 
-interface OuiWaitlistFormProps {
+interface JorduWaitlistFormProps {
   id?: string
   className?: string
   inverted?: boolean
@@ -13,8 +13,8 @@ interface OuiWaitlistFormProps {
 }
 
 /** Formulaire d'inscription réutilisé partout sur la landing (hero, appel final) — un seul point d'envoi vers api/waitlist.ts. */
-export function OuiWaitlistForm({ id, className, inverted, submitLabel = "Je m'inscris" }: OuiWaitlistFormProps) {
-  const { join, isLoading, error } = useJoinOuiWaitlist()
+export function JorduWaitlistForm({ id, className, inverted, submitLabel = "Je m'inscris" }: JorduWaitlistFormProps) {
+  const { join, isLoading, error } = useJoinJorduWaitlist()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
@@ -29,18 +29,18 @@ export function OuiWaitlistForm({ id, className, inverted, submitLabel = "Je m'i
     return (
       <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-primary-foreground' : 'text-success', className)}>
         <Check className="size-5 shrink-0" aria-hidden="true" />
-        Merci ! Tu seras informée dès que OUI avance.
+        Merci ! Tu seras informée dès que Jordu avance.
       </div>
     )
   }
 
   return (
     <form id={id} onSubmit={handleSubmit} className={cn('flex w-full flex-col gap-2 sm:flex-row', className)} noValidate>
-      <label htmlFor={`${id ?? 'oui'}-email`} className="sr-only">
+      <label htmlFor={`${id ?? 'jordu'}-email`} className="sr-only">
         Adresse email
       </label>
       <Input
-        id={`${id ?? 'oui'}-email`}
+        id={`${id ?? 'jordu'}-email`}
         type="email"
         required
         placeholder="ton@email.com"

@@ -12,7 +12,7 @@ import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
-import { OuiLandingPage } from '@/pages/OuiLandingPage'
+import { JorduLandingPage } from '@/pages/JorduLandingPage'
 import { RootGate } from '@/pages/RootGate'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { PasswordResetPage } from '@/pages/auth/PasswordResetPage'
@@ -117,7 +117,7 @@ export function AppRouter() {
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
-      <Route path="/oui" element={<OuiLandingPage />} />
+      <Route path="/jordu" element={<JorduLandingPage />} />
       <Route path="/devis/:shareId" element={<DevisPartagePage />} />
       <Route path="/facture/:shareId" element={<FacturePartageePage />} />
       <Route path="/contrat/:shareId" element={<ContratPartagePage />} />

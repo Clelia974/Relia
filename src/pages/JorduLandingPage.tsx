@@ -18,9 +18,9 @@ import {
 } from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
-import { OuiHowItWorks } from '@/features/oui-landing/OuiHowItWorks'
-import { OuiTimeCalculator } from '@/features/oui-landing/OuiTimeCalculator'
-import { OuiWaitlistForm } from '@/features/oui-landing/OuiWaitlistForm'
+import { JorduHowItWorks } from '@/features/jordu-landing/JorduHowItWorks'
+import { JorduTimeCalculator } from '@/features/jordu-landing/JorduTimeCalculator'
+import { JorduWaitlistForm } from '@/features/jordu-landing/JorduWaitlistForm'
 import { cn } from '@/lib/utils'
 
 const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
@@ -28,6 +28,7 @@ const SECTION = 'scroll-mt-20 py-14 sm:py-20'
 const H2 = 'font-heading text-2xl font-semibold tracking-tight text-primary sm:text-3xl'
 const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-thread-text'
 const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-thread-text'
+// TODO : adresse à remplacer une fois le nom de domaine/mail Jordu mis en place (encore hello@relia.com en attendant).
 const CONTACT_EMAIL = 'hello@relia.com'
 
 const HEAD_THOUGHTS = [
@@ -65,7 +66,7 @@ const BEFORE_AFTER = [
   { before: '« Je continue après le dîner. »', after: '« Je sais où reprendre demain. »' },
 ]
 
-const WHAT_OUI_DOES_NOT = [
+const WHAT_JORDU_DOES_NOT = [
   'faire venir des clientes à ta place ;',
   'remplacer ton Instagram ;',
   'remplacer ton savoir-faire ;',
@@ -91,12 +92,12 @@ const NOT_FOR_YOU = [
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: 'OUI est-il déjà disponible ?',
+    q: 'Jordu est-il déjà disponible ?',
     a: 'Pas encore, c’est en construction. En t’inscrivant, tu seras informée des prochaines étapes et de l’ouverture des premiers tests.',
   },
   {
-    q: 'Est-ce que OUI va m’apporter plus de clientes ?',
-    a: 'Non. OUI ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
+    q: 'Est-ce que Jordu va m’apporter plus de clientes ?',
+    a: 'Non. Jordu ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
   },
   {
     q: 'Est-ce uniquement pour les mariages ?',
@@ -107,17 +108,17 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Non. L’idée est de t’aider à gérer les demandes qui arrivent de différents endroits, pas de choisir un seul canal.',
   },
   {
-    q: 'Quand pourrai-je tester OUI ?',
+    q: 'Quand pourrai-je tester Jordu ?',
     a: 'Les premières personnes inscrites seront informées dès l’ouverture des premiers tests.',
   },
 ]
 
 /**
- * Landing "bis" — /oui : uniquement une collecte d'emails en attendant que
- * le MVP OUI soit prêt, distincte de la vraie landing RELIA (RootGate /).
+ * Landing "bis" — /jordu : uniquement une collecte d'emails en attendant que
+ * le MVP Jordu soit prêt, distincte de la vraie landing RELIA (RootGate /).
  * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
  */
-export function OuiLandingPage() {
+export function JorduLandingPage() {
   useEffect(() => {
     const root = document.documentElement
     const wasDark = root.classList.contains('dark')
@@ -143,13 +144,14 @@ export function OuiLandingPage() {
       {/* 1 — HEADER */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" className="font-heading text-2xl font-semibold tracking-tight text-primary" aria-label="OUI — haut de page">
-            OUI
+          <a href="#haut" className="flex items-center gap-2" aria-label="Jordu — haut de page">
+            <img src="/brand/jordu-icon.svg" alt="" className="size-8 shrink-0" />
+            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
             <a href="#comment-ca-marche" className="transition-colors hover:text-foreground">Comment ça marche</a>
-            <a href="#pourquoi-oui" className="transition-colors hover:text-foreground">Pourquoi OUI</a>
+            <a href="#pourquoi-jordu" className="transition-colors hover:text-foreground">Pourquoi Jordu</a>
             <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
           </nav>
           <button
@@ -157,7 +159,7 @@ export function OuiLandingPage() {
             onClick={scrollToInscription}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Je découvre OUI
+            Je découvre Jordu
           </button>
         </div>
       </header>
@@ -168,7 +170,7 @@ export function OuiLandingPage() {
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-thread-text">
               <span className="size-1.5 rounded-full bg-thread" aria-hidden="true" />
-              OUI — en construction
+              Jordu — en construction
             </span>
             <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-primary sm:text-5xl">
               Tu finis à 18h. Tu poses ton téléphone.
@@ -176,16 +178,16 @@ export function OuiLandingPage() {
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
               Tu as créé ton activité pour décorer, créer, imaginer — pas pour répondre à WhatsApp à 21h ou chercher
-              un devis pendant que ta famille t’attend. OUI t’aide à mieux gérer tes demandes, pour que ton travail
+              un devis pendant que ta famille t’attend. Jordu t’aide à mieux gérer tes demandes, pour que ton travail
               reprenne sa place.
             </p>
 
             <div className="mt-2 w-full max-w-md">
-              <p className="mb-3 text-sm font-medium text-foreground">Je veux découvrir OUI →</p>
-              <OuiWaitlistForm id="inscription" />
+              <p className="mb-3 text-sm font-medium text-foreground">Je veux découvrir Jordu →</p>
+              <JorduWaitlistForm id="inscription" />
             </div>
             <p className="text-sm text-muted-foreground">
-              OUI est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
+              Jordu est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
             </p>
           </div>
         </section>
@@ -278,17 +280,17 @@ export function OuiLandingPage() {
               ))}
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              OUI ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
+              Jordu ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
             </p>
           </div>
         </section>
 
-        {/* 9 — OUI, C'EST QUOI ? */}
+        {/* 9 — JORDU, C'EST QUOI ? */}
         <section id="comment-ca-marche" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
-              <h2 className={cn(H2, 'mt-2')}>OUI, c’est quoi ?</h2>
+              <h2 className={cn(H2, 'mt-2')}>Jordu, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">Une idée simple : une demande devrait avoir un endroit où aller.</p>
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -356,18 +358,18 @@ export function OuiLandingPage() {
               </p>
             </div>
             <div className="mt-10">
-              <OuiTimeCalculator />
+              <JorduTimeCalculator />
             </div>
           </div>
         </section>
 
-        {/* 12 — CE QUE OUI NE PROMET PAS */}
+        {/* 12 — CE QUE JORDU NE PROMET PAS */}
         <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>On ne va pas te raconter que OUI va régler toute ton activité.</h2>
-            <p className="mt-4 text-muted-foreground">OUI ne va pas :</p>
+            <h2 className={H2}>On ne va pas te raconter que Jordu va régler toute ton activité.</h2>
+            <p className="mt-4 text-muted-foreground">Jordu ne va pas :</p>
             <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
-              {WHAT_OUI_DOES_NOT.map((item) => (
+              {WHAT_JORDU_DOES_NOT.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
                   {item}
@@ -375,7 +377,7 @@ export function OuiLandingPage() {
               ))}
             </ul>
             <p className="mt-6 text-muted-foreground">
-              Ce n’est pas son rôle. OUI s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
+              Ce n’est pas son rôle. Jordu s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
               garder dans ta tête.
             </p>
           </div>
@@ -384,7 +386,7 @@ export function OuiLandingPage() {
         {/* 13 — CONSTRUCTION */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>OUI est encore en construction.</h2>
+            <h2 className={H2}>Jordu est encore en construction.</h2>
             <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
             <p className="mt-4 text-muted-foreground">
               Le but : quelque chose que les décoratrices auront réellement envie d’utiliser.
@@ -397,11 +399,11 @@ export function OuiLandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>OUI est pour toi si…</h2>
+              <h2 className={cn(H2, 'mt-2')}>Jordu est pour toi si…</h2>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
               <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
-                <p className="text-sm font-semibold text-success">OUI est pour toi si…</p>
+                <p className="text-sm font-semibold text-success">Jordu est pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-foreground/80">
@@ -412,7 +414,7 @@ export function OuiLandingPage() {
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-sm font-semibold text-muted-foreground">OUI n’est probablement pas pour toi si…</p>
+                <p className="text-sm font-semibold text-muted-foreground">Jordu n’est probablement pas pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {NOT_FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-muted-foreground">
@@ -424,7 +426,7 @@ export function OuiLandingPage() {
               </div>
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              OUI ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
+              Jordu ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
             </p>
           </div>
         </section>
@@ -437,16 +439,16 @@ export function OuiLandingPage() {
               <p className="mt-3 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
             </div>
             <div className="mt-8">
-              <OuiHowItWorks />
+              <JorduHowItWorks />
             </div>
           </div>
         </section>
 
-        {/* 16 — POURQUOI OUI ? (portrait) */}
-        <section id="pourquoi-oui" className={SECTION}>
+        {/* 16 — POURQUOI JORDU ? (portrait) */}
+        <section id="pourquoi-jordu" className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <p className={KICKER}>Pourquoi OUI</p>
-            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé OUI parce que j’avais toutes les réponses.</h2>
+            <p className={KICKER}>Pourquoi Jordu</p>
+            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé Jordu parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
               <p>
                 J’ai été décoratrice, avant comptable — et mon activité n’a pas fonctionné comme je l’espérais, pas
@@ -456,9 +458,13 @@ export function OuiLandingPage() {
                 En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
                 périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
                 demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
-                amenée à réfléchir à OUI.
+                amenée à réfléchir à Jordu.
               </p>
-              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où OUI ira. Mais je sais pourquoi j’ai commencé.</p>
+              <p>
+                Le nom vient de là aussi : « Jordu », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
+                journée qu’on a sous les yeux, celle qu’on peut refermer le soir sans y penser jusqu’au lendemain.
+              </p>
+              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où Jordu ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
           </div>
         </section>
@@ -489,13 +495,13 @@ export function OuiLandingPage() {
               Ton travail a une place. Ta vie aussi.
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-primary-foreground/85">
-              OUI est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
+              Jordu est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
-              <OuiWaitlistForm inverted submitLabel="Je découvre OUI" />
+              <JorduWaitlistForm inverted submitLabel="Je découvre Jordu" />
             </div>
             <p className="text-sm text-primary-foreground/80">
-              Pas de spam. Juste les nouvelles importantes concernant OUI. Une question ?{' '}
+              Pas de spam. Juste les nouvelles importantes concernant Jordu. Une question ?{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-4">
                 {CONTACT_EMAIL}
               </a>
@@ -507,11 +513,14 @@ export function OuiLandingPage() {
       {/* 19 — FOOTER */}
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
-          <div>
-            <p className="font-heading text-lg font-semibold text-primary">OUI</p>
-            <p>L’organisation pensée pour les décoratrices événementielles.</p>
+          <div className="flex items-center gap-2">
+            <img src="/brand/jordu-icon.svg" alt="" className="size-6 shrink-0" />
+            <div>
+              <p className="font-heading text-lg font-semibold text-primary">Jordu</p>
+              <p>L’organisation pensée pour les décoratrices événementielles.</p>
+            </div>
           </div>
-          <p>© {new Date().getFullYear()} OUI · un projet Relia</p>
+          <p>© {new Date().getFullYear()} Jordu · un projet Relia</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>
           <LegalLinks />
