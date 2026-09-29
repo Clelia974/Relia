@@ -7,9 +7,9 @@ const AUTOPLAY_MS = 3500
 type Tone = 'new' | 'pending' | 'progress' | 'done' | 'muted'
 
 const TONE_CLASSES: Record<Tone, string> = {
-  new: 'bg-primary text-primary-foreground',
+  new: 'bg-[#680808] text-[#DDE6EF]',
   pending: 'bg-warning-bg text-warning',
-  progress: 'bg-thread/20 text-thread-text',
+  progress: 'bg-[#A9B08F]/20 text-[#5F6B4C]',
   done: 'bg-success/15 text-success',
   muted: 'bg-muted text-muted-foreground',
 }
@@ -124,13 +124,13 @@ export function JorduHowItWorks() {
               aria-pressed={active === i}
               className={cn(
                 'flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition-colors',
-                active === i ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40',
+                active === i ? 'border-[#680808] bg-[#680808]/5' : 'border-border hover:border-[#680808]/40',
               )}
             >
               <span
                 className={cn(
                   'flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors',
-                  active === i ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
+                  active === i ? 'bg-[#680808] text-[#DDE6EF]' : 'bg-muted text-muted-foreground',
                 )}
               >
                 {i + 1}
@@ -145,7 +145,7 @@ export function JorduHowItWorks() {
       </ol>
 
       <div key={active} className="animate-notice-in rounded-2xl border border-border bg-card p-5 sm:sticky sm:top-24">
-        <p className="text-xs font-medium uppercase tracking-wide text-thread-text">{step.headline}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-[#5F6B4C]">{step.headline}</p>
         <div className="mt-3 flex flex-col divide-y divide-border">
           {ROWS.map((row, i) => (
             <div key={row.name} className="flex items-center justify-between gap-3 py-2.5">

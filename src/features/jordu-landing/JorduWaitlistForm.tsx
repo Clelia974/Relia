@@ -27,7 +27,7 @@ export function JorduWaitlistForm({ id, className, inverted, submitLabel = "Je m
 
   if (sent) {
     return (
-      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-primary-foreground' : 'text-success', className)}>
+      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-[#DDE6EF]' : 'text-success', className)}>
         <Check className="size-5 shrink-0" aria-hidden="true" />
         Merci ! Tu seras informée dès que Jordu avance.
       </div>
@@ -49,7 +49,7 @@ export function JorduWaitlistForm({ id, className, inverted, submitLabel = "Je m
         aria-invalid={Boolean(error)}
         className={cn('h-12 text-base', inverted && 'bg-card text-foreground')}
       />
-      <Button type="submit" size="lg" disabled={isLoading} className={cn('h-12 shrink-0 px-6', inverted && 'bg-card text-primary hover:bg-card')}>
+      <Button type="submit" size="lg" disabled={isLoading} className={cn('h-12 shrink-0 px-6', inverted && 'bg-card text-[#680808] hover:bg-card')}>
         {isLoading ? 'Inscription…' : submitLabel}
       </Button>
       {error && <p className="text-sm text-risk sm:basis-full">{error}</p>}

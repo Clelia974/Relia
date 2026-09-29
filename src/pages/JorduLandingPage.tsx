@@ -23,11 +23,18 @@ import { JorduTimeCalculator } from '@/features/jordu-landing/JorduTimeCalculato
 import { JorduWaitlistForm } from '@/features/jordu-landing/JorduWaitlistForm'
 import { cn } from '@/lib/utils'
 
+// Couleurs de marque Jordu, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
+// #680808 primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
+// distinctes des tokens --primary/--thread de l'app Relia existante, laissés intacts ailleurs
+// dans le produit tant que le rebrand complet n'est pas décidé.
 const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
 const SECTION = 'scroll-mt-20 py-14 sm:py-20'
-const H2 = 'font-heading text-2xl font-semibold tracking-tight text-primary sm:text-3xl'
-const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-thread-text'
-const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-thread-text'
+// Note : classes Tailwind écrites en toutes lettres (jamais interpolées via les constantes
+// ci-dessus) — le scanner de Tailwind lit le texte source tel quel, une valeur injectée par
+// template literal ne serait pas détectée et la règle CSS ne serait jamais générée.
+const H2 = 'font-heading text-2xl font-semibold tracking-tight text-[#680808] sm:text-3xl'
+const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]'
+const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#5F6B4C]'
 // TODO : adresse à remplacer une fois le nom de domaine/mail Jordu mis en place (encore hello@relia.com en attendant).
 const CONTACT_EMAIL = 'hello@relia.com'
 
@@ -133,10 +140,10 @@ export function JorduLandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
+    <div className="min-h-dvh bg-[#DDE6EF] text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#680808] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
       >
         Aller au contenu
       </a>
@@ -144,9 +151,8 @@ export function JorduLandingPage() {
       {/* 1 — HEADER */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" className="flex items-center gap-2" aria-label="Jordu — haut de page">
-            <img src="/brand/jordu-icon.svg" alt="" className="size-8 shrink-0" />
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
+          <a href="#haut" aria-label="Jordu — haut de page">
+            <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-8 w-auto" />
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
@@ -157,7 +163,7 @@ export function JorduLandingPage() {
           <button
             type="button"
             onClick={scrollToInscription}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="rounded-lg bg-[#680808] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#680808]/90"
           >
             Je découvre Jordu
           </button>
@@ -168,11 +174,11 @@ export function JorduLandingPage() {
         {/* 2 — HERO */}
         <section id="haut" className="overflow-hidden pb-14 pt-14 sm:pb-20 sm:pt-20">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-thread-text">
-              <span className="size-1.5 rounded-full bg-thread" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-[#5F6B4C]">
+              <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
               Jordu — en construction
             </span>
-            <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-primary sm:text-5xl">
+            <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#680808] sm:text-5xl">
               Tu finis à 18h. Tu poses ton téléphone.
               <br className="hidden sm:block" /> Tu profites de ta soirée.
             </h1>
@@ -237,7 +243,7 @@ export function JorduLandingPage() {
             <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
               {DAY_TIMELINE.map((item) => (
                 <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
-                  <span className="shrink-0 font-heading text-sm font-semibold text-primary sm:w-16">{item.time}</span>
+                  <span className="shrink-0 font-heading text-sm font-semibold text-[#680808] sm:w-16">{item.time}</span>
                   <span className="text-foreground/80">{item.text}</span>
                 </li>
               ))}
@@ -333,9 +339,9 @@ export function JorduLandingPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
-                <p className="text-sm font-semibold text-primary">Avec une organisation claire</p>
-                <ul className="mt-4 flex flex-col divide-y divide-primary/15">
+              <div className="rounded-2xl border border-[#680808]/30 bg-[#680808]/5 p-6">
+                <p className="text-sm font-semibold text-[#680808]">Avec une organisation claire</p>
+                <ul className="mt-4 flex flex-col divide-y divide-[#680808]/15">
                   {BEFORE_AFTER.map((row) => (
                     <li key={row.after} className="py-2.5 text-sm text-foreground first:pt-0 last:pb-0">
                       {row.after}
@@ -489,18 +495,18 @@ export function JorduLandingPage() {
         </section>
 
         {/* 18 — APPEL FINAL */}
-        <section className="bg-primary py-20 text-primary-foreground sm:py-28" aria-labelledby="final">
+        <section className="bg-[#680808] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
               Ton travail a une place. Ta vie aussi.
             </h2>
-            <p className="max-w-xl text-lg leading-relaxed text-primary-foreground/85">
+            <p className="max-w-xl text-lg leading-relaxed text-[#DDE6EF]/85">
               Jordu est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
               <JorduWaitlistForm inverted submitLabel="Je découvre Jordu" />
             </div>
-            <p className="text-sm text-primary-foreground/80">
+            <p className="text-sm text-[#DDE6EF]/80">
               Pas de spam. Juste les nouvelles importantes concernant Jordu. Une question ?{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-4">
                 {CONTACT_EMAIL}
@@ -513,12 +519,9 @@ export function JorduLandingPage() {
       {/* 19 — FOOTER */}
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
-          <div className="flex items-center gap-2">
-            <img src="/brand/jordu-icon.svg" alt="" className="size-6 shrink-0" />
-            <div>
-              <p className="font-heading text-lg font-semibold text-primary">Jordu</p>
-              <p>L’organisation pensée pour les décoratrices événementielles.</p>
-            </div>
+          <div className="flex items-center gap-3">
+            <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-6 w-auto" />
+            <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
           <p>© {new Date().getFullYear()} Jordu · un projet Relia</p>
         </div>
