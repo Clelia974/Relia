@@ -8,8 +8,7 @@ export function AuthCard({ title, description, children }: { title: string; desc
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
-          <Link to="/" className="flex items-center gap-2" aria-label="Jordu — retour à l'accueil">
-            <img src="/brand/jordu-icon.svg" alt="" width={36} height={36} className="size-9 rounded-lg" />
+          <Link to="/" aria-label="Jordu — retour à l'accueil">
             <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Jordu</span>
           </Link>
         </div>

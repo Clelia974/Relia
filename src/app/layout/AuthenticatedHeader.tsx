@@ -28,7 +28,7 @@ export function AuthenticatedHeader() {
     <header className="no-print sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2" aria-label="Jordu — retour à l'accueil">
-          <img src="/brand/jordu-icon.svg" alt="" width={28} height={28} className="size-7 rounded-md" />
+          <img src="/brand/jordu-J-mark.svg" alt="" width={28} height={28} className="size-7 rounded-md" />
           <span className="font-heading text-lg font-semibold text-primary">Jordu</span>
         </Link>
 
