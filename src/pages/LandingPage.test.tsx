@@ -97,10 +97,14 @@ describe('LandingPage', () => {
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
       'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
+      'Ton travail a une place. Ta vie aussi.',
       'Tu connais déjà ces situations',
+      'À quel moment ta journée finit vraiment ?',
       'Zordi, c’est quoi ?',
       'Ce que tu peux faire avec Zordi',
+      'Et le temps que tu récupères, tu en fais quoi ?',
       'Avant Zordi. Après Zordi.',
+      'On ne va pas te raconter que Zordi va régler toute ton activité.',
       'Zordi est pour toi si tu as déjà une base',
       'Tarifs simples, pas de piège',
       'Tout ce que tu te demandes avant de commencer',

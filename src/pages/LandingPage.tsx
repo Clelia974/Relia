@@ -28,6 +28,35 @@ const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-thread-text
 
 const HERO_CHECKLIST = ['Moins de stress la veille du mariage', 'Ta marge, visible avant la fin de chaque mariage', 'Plus de temps pour ta créativité']
 
+/**
+ * Version « plus détaillée » de la landing d'attente (/zordi, ZordiLandingPage.tsx) :
+ * mêmes sections narratives (manifeste, journée qui déborde, temps récupéré, ce
+ * que Zordi ne promet pas), reprises ici presque telles quelles pour garder la
+ * même voix — complétées par la preuve produit que /zordi n'a pas encore
+ * (vrais écrans, vrais tarifs, vraie FAQ) puisque Zordi est réellement disponible ici.
+ */
+const DAY_TIMELINE = [
+  { time: '8h00', text: 'Tu regardes tes messages avant même le café.' },
+  { time: '11h00', text: 'Une cliente demande où en est son devis.' },
+  { time: '14h30', text: 'Tu cherches un numéro de prestataire, quelque part dans tes mails.' },
+  { time: '18h00', text: 'Tu voudrais t’arrêter. Mais tu penses à ce qui reste en attente.' },
+  { time: '21h00', text: 'Tu reprends ton téléphone « juste pour vérifier ».' },
+]
+
+const TIME_RECOVERED = [
+  { title: 'Ta créativité', text: 'Créer, chercher une idée, en avoir de nouveau envie.' },
+  { title: 'Ta famille', text: 'Être vraiment là, sans une tâche qui traîne dans un coin de la tête.' },
+  { title: 'Ton couple', text: 'Dîner sans « attends, je réponds vite ».' },
+  { title: 'Toi', text: 'Sortir, lire, dormir, ne rien faire.' },
+]
+
+const WHAT_ZORDI_DOES_NOT = [
+  'remplir ton carnet de commandes à ta place ;',
+  'remplacer ton savoir-faire ou ta créativité ;',
+  'gérer tes mariages à ta place ;',
+  'te promettre un nombre d’heures gagnées par semaine.',
+]
+
 export function LandingPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
@@ -140,8 +169,19 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 2 — PROBLÈME — bloc couleur */}
-        <section id="probleme" className={cn(SECTION, 'bg-card')}>
+        {/* 2 — MANIFESTE — bloc couleur */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
+            <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
+            <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Tu peux aimer créer, imaginer, voir un mariage prendre vie — et ne pas avoir envie de répondre à des
+              messages tous les soirs. Être à son compte, ce n’est pas être disponible tout le temps.
+            </p>
+          </div>
+        </section>
+
+        {/* 3 — PROBLÈME */}
+        <section id="probleme" className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Le problème</p>
@@ -154,7 +194,28 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 3 — SOLUTION */}
+        {/* 4 — LA JOURNÉE QUI DÉBORDE — bloc couleur */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="max-w-2xl">
+              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
+            </div>
+            <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
+              {DAY_TIMELINE.map((item) => (
+                <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
+                  <span className="shrink-0 font-heading text-sm font-semibold text-primary sm:w-16">{item.time}</span>
+                  <span className="text-foreground/80">{item.text}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-8 max-w-2xl text-muted-foreground">
+              Et demain, il faudra se souvenir de tout ce qui reste. Zordi ne réduit pas le nombre de mariages à gérer —
+              il réduit ce que tu dois garder en tête pour les gérer.
+            </p>
+          </div>
+        </section>
+
+        {/* 5 — SOLUTION */}
         <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -171,8 +232,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 4 — FONCTIONNALITÉS (carrousel, une grande fenêtre à la fois) — bloc couleur */}
-        <section id="fonctionnalites" className={cn(SECTION, 'bg-card')}>
+        {/* 6 — FONCTIONNALITÉS (carrousel, une grande fenêtre à la fois) */}
+        <section id="fonctionnalites" className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
@@ -188,9 +249,27 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 5 — TÉMOIGNAGES (affichés uniquement s'il y en a de vrais) */}
+        {/* 7 — LE TEMPS RÉCUPÉRÉ — bloc couleur */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="max-w-2xl">
+              <h2 className={H2}>Et le temps que tu récupères, tu en fais quoi ?</h2>
+            </div>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {TIME_RECOVERED.map((item) => (
+                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
+                  <p className="text-sm font-semibold text-thread-text">{item.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground">{item.text}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 max-w-2xl text-muted-foreground">Zordi ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.</p>
+          </div>
+        </section>
+
+        {/* 8 — TÉMOIGNAGES (affichés uniquement s'il y en a de vrais) */}
         {TESTIMONIALS.length > 0 && (
-          <section className={SECTION} aria-labelledby="temoignages">
+          <section className={cn(SECTION, 'bg-card')} aria-labelledby="temoignages">
             <div className={CONTAINER}>
               <h2 id="temoignages" className={H2}>Ce que disent les décoratrices et décorateurs</h2>
               <ul className="mt-12 grid gap-6 md:grid-cols-3">
@@ -207,7 +286,7 @@ export function LandingPage() {
           </section>
         )}
 
-        {/* 6 — AVANT / APRÈS */}
+        {/* 9 — AVANT / APRÈS */}
         <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -220,8 +299,28 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 7 — POUR QUI — bloc couleur */}
+        {/* 10 — CE QUE ZORDI NE PROMET PAS — bloc couleur */}
         <section className={cn(SECTION, 'bg-card')}>
+          <div className={cn(CONTAINER, 'max-w-2xl')}>
+            <h2 className={H2}>On ne va pas te raconter que Zordi va régler toute ton activité.</h2>
+            <p className="mt-4 text-muted-foreground">Zordi ne va pas :</p>
+            <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
+              {WHAT_ZORDI_DOES_NOT.map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-muted-foreground">
+              Ce n’est pas son rôle. Zordi s’occupe de ce qui arrive après la demande — comment tout suivre sans le
+              garder dans ta tête.
+            </p>
+          </div>
+        </section>
+
+        {/* 11 — POUR QUI */}
+        <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
@@ -233,8 +332,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 8 — TARIFS */}
-        <section id="tarifs" className={SECTION}>
+        {/* 12 — TARIFS — bloc couleur */}
+        <section id="tarifs" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>
@@ -246,8 +345,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 9 — FAQ — bloc couleur */}
-        <section id="questions" className={cn(SECTION, 'bg-card')} aria-labelledby="faq">
+        {/* 13 — FAQ */}
+        <section id="questions" className={SECTION} aria-labelledby="faq">
           <div className={cn(CONTAINER, 'max-w-3xl')}>
             <p className={KICKER}>Questions fréquentes</p>
             <h2 id="faq" className={cn(H2, 'mt-2')}>Tout ce que tu te demandes avant de commencer</h2>
@@ -257,7 +356,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 10 — APPEL FINAL */}
+        {/* 14 — APPEL FINAL */}
         <section className="bg-primary py-20 text-primary-foreground sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
