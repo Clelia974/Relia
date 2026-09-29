@@ -1,9 +1,10 @@
--- Relia — Renomme la table de la liste d'attente Jordu → Zordi, suite au
--- changement de nom de marque (Jordu → Zordi). Idempotent : ne fait rien si
--- la table a déjà été renommée ou si elle n'existe pas encore (premier
--- déploiement direct sous le nom Zordi).
+-- Relia — Table de la liste d'attente Zordi (ex-Jordu). La migration
+-- 012_jordu_waitlist.sql n'a jamais été exécutée en base (table jamais
+-- créée), donc on crée directement zordi_waitlist plutôt que de renommer
+-- une table inexistante. Idempotent : peut être ré-exécuté sans erreur,
+-- et renomme jordu_waitlist si jamais elle existe déjà ailleurs.
 --
--- À exécuter manuellement dans Supabase → SQL Editor, après 012_jordu_waitlist.sql.
+-- À exécuter manuellement dans Supabase → SQL Editor.
 
 do $$
 begin
@@ -12,6 +13,15 @@ begin
     alter table public.jordu_waitlist rename to zordi_waitlist;
   end if;
 end $$;
+
+create table if not exists public.zordi_waitlist (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  source text not null default 'zordi_landing',
+  created_at timestamptz not null default now()
+);
+
+alter table public.zordi_waitlist enable row level security;
 
 update public.zordi_waitlist set source = 'zordi_landing' where source = 'jordu_landing';
 
