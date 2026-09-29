@@ -27,9 +27,9 @@ export function AuthenticatedHeader() {
   return (
     <header className="no-print sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link to="/" className="flex items-center gap-2" aria-label="Relia">
-          <img src="/brand/relia-monogram.svg" alt="" className="size-7" />
-          <span className="font-heading text-lg font-semibold text-primary">Relia</span>
+        <Link to="/" className="flex items-center gap-2" aria-label="Jordu">
+          <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-7 w-auto dark:hidden" />
+          <img src="/brand/jordu-wordmark-reversed.svg" alt="Jordu" className="hidden h-7 w-auto dark:block" />
         </Link>
 
         <div className="flex items-center gap-3">

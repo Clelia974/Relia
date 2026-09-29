@@ -31,7 +31,7 @@ interface Step {
 const STEPS: Step[] = [
   {
     title: 'Tu reçois une demande',
-    caption: 'Peu importe le canal, elle arrive au même endroit.',
+    caption: 'Tu la centralises dans ton suivi.',
     headline: 'Nouvelle demande — Camille & Antoine',
     rows: [
       { tone: 'new', label: 'Nouveau' },

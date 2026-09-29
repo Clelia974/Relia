@@ -35,3 +35,4 @@ secrets.json
 .env.local
 .vercel
 .env*
+supabase/.temp

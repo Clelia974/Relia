@@ -35,8 +35,7 @@ const SECTION = 'scroll-mt-20 py-14 sm:py-20'
 const H2 = 'font-heading text-2xl font-semibold tracking-tight text-[#680808] sm:text-3xl'
 const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]'
 const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#5F6B4C]'
-// TODO : adresse à remplacer une fois le nom de domaine/mail Jordu mis en place (encore hello@relia.com en attendant).
-const CONTACT_EMAIL = 'hello@relia.com'
+const CONTACT_EMAIL = 'contact@evenementscles.com'
 
 const HEAD_THOUGHTS = [
   { source: 'Instagram', icon: Camera, thought: '« Elle m’avait demandé quoi déjà ? »' },
@@ -165,7 +164,7 @@ export function JorduLandingPage() {
             onClick={scrollToInscription}
             className="rounded-lg bg-[#680808] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#680808]/90"
           >
-            Je découvre Jordu
+            Je veux rejoindre Jordu
           </button>
         </div>
       </header>
@@ -179,8 +178,7 @@ export function JorduLandingPage() {
               Jordu — en construction
             </span>
             <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#680808] sm:text-5xl">
-              Tu finis à 18h. Tu poses ton téléphone.
-              <br className="hidden sm:block" /> Tu profites de ta soirée.
+              Et si tu pouvais vraiment fermer ton ordinateur à 18h ?
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
               Tu as créé ton activité pour décorer, créer, imaginer — pas pour répondre à WhatsApp à 21h ou chercher
@@ -189,8 +187,8 @@ export function JorduLandingPage() {
             </p>
 
             <div className="mt-2 w-full max-w-md">
-              <p className="mb-3 text-sm font-medium text-foreground">Je veux découvrir Jordu →</p>
-              <JorduWaitlistForm id="inscription" />
+              <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre Jordu →</p>
+              <JorduWaitlistForm id="inscription" submitLabel="Je veux rejoindre Jordu" />
             </div>
             <p className="text-sm text-muted-foreground">
               Jordu est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
@@ -504,7 +502,7 @@ export function JorduLandingPage() {
               Jordu est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
-              <JorduWaitlistForm inverted submitLabel="Je découvre Jordu" />
+              <JorduWaitlistForm inverted submitLabel="Je veux rejoindre Jordu" />
             </div>
             <p className="text-sm text-[#DDE6EF]/80">
               Pas de spam. Juste les nouvelles importantes concernant Jordu. Une question ?{' '}
@@ -523,13 +521,13 @@ export function JorduLandingPage() {
             <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-6 w-auto" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
-          <p>© {new Date().getFullYear()} Jordu · un projet Relia</p>
+          <p>© {new Date().getFullYear()} Jordu</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>
           <LegalLinks />
         </div>
       </footer>
-      <CookieNotice />
+      <CookieNotice brand="Jordu" />
     </div>
   )
 }

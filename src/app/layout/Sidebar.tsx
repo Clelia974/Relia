@@ -44,9 +44,9 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center justify-between px-6 pb-4 pt-7">
-        <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Relia — Aujourd'hui">
-          <img src="/brand/relia-monogram.svg" alt="" className="size-8" />
-          <span className="font-heading text-xl font-semibold tracking-tight text-primary">Relia</span>
+        <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Jordu — Aujourd'hui">
+          <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-8 w-auto dark:hidden" />
+          <img src="/brand/jordu-wordmark-reversed.svg" alt="Jordu" className="hidden h-8 w-auto dark:block" />
         </NavLink>
         <ThemeToggle />
       </div>

@@ -13,7 +13,7 @@ interface JorduWaitlistFormProps {
 }
 
 /** Formulaire d'inscription réutilisé partout sur la landing (hero, appel final) — un seul point d'envoi vers api/waitlist.ts. */
-export function JorduWaitlistForm({ id, className, inverted, submitLabel = "Je m'inscris" }: JorduWaitlistFormProps) {
+export function JorduWaitlistForm({ id, className, inverted, submitLabel = 'Je veux rejoindre Jordu' }: JorduWaitlistFormProps) {
   const { join, isLoading, error } = useJoinJorduWaitlist()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
