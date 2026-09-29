@@ -152,7 +152,7 @@ export function ZordiLandingPage() {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
           <a href="#haut" aria-label="Zordi — haut de page">
-            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight text-[#680808]" />
+            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight" />
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
@@ -519,7 +519,7 @@ export function ZordiLandingPage() {
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <ZordiWordmark className="font-heading text-base font-semibold text-[#680808]" />
+            <ZordiWordmark className="font-heading text-base font-semibold" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
           <p>© {new Date().getFullYear()} Zordi</p>

@@ -102,7 +102,7 @@ export function LandingPage() {
         <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
           <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
             <a href="#haut" aria-label="Zordi — haut de page">
-              <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight text-primary" />
+              <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight" />
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
               <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>

@@ -20,8 +20,16 @@ interface ZordiWordmarkProps {
  * (14 à 48px testés). Valeurs calibrées par mesure réelle des métriques de
  * Source Serif 4 (hauteur d'x, ascendante du "d", baseline), pas par essais
  * visuels au pif.
+ *
+ * `color` défaut sur le bordeaux de marque (#680808), jamais sur --primary :
+ * le token --primary de l'app (#6B1F23 clair / #A63F4E sombre, hérité du
+ * design system Relia) est une teinte différente. Comme ce style inline
+ * l'emporte de toute façon sur une classe `text-*` passée en `className`
+ * (attribut style > classe), un `currentColor` par défaut rendait le
+ * wordmark dans la couleur du texte ambiant plutôt qu'en bordeaux partout
+ * où `color` n'était pas fourni explicitement — c'est-à-dire partout.
  */
-export function ZordiWordmark({ className, color = 'currentColor', checkColor = '#A9B08F' }: ZordiWordmarkProps) {
+export function ZordiWordmark({ className, color = '#680808', checkColor = '#A9B08F' }: ZordiWordmarkProps) {
   return (
     <span className={cn('relative inline-flex items-baseline', className)} style={{ color, lineHeight: 1 }}>
       zordı
