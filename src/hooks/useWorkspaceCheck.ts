@@ -10,7 +10,7 @@ interface UseWorkspaceCheckResult {
 /**
  * hasWorkspace reflète l'onboarding réel (`workspace.userProfile.onboarded`)
  * — la même condition que celle déjà utilisée par LandingPage pour choisir
- * la destination du CTA ("Commencer gratuitement" vs "Ouvrir l'application",
+ * la destination du CTA ("Créer mon espace gratuitement" vs "Ouvrir l'application",
  * cf. src/pages/LandingPage.tsx). isLoading reste à `false` : le store est
  * hydraté de manière synchrone depuis localStorage au montage, il n'y a
  * jamais d'état de chargement réseau à attendre ici.

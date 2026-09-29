@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils'
 const euro = (n: number) => `${n} €`
 
 interface PricingSectionProps {
-  /** Auth-aware : "Commencer gratuitement" tant qu'il n'y a pas de compte, "Ouvrir l'application"/"Continuer" ensuite. */
+  /** Auth-aware : "Créer mon espace gratuitement" tant qu'il n'y a pas de compte, "Ouvrir l'application"/"Continuer" ensuite. */
   ctaLabel: string
   onStart: () => void
 }
@@ -91,7 +91,8 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
             <span className="absolute -top-3 left-8 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
               🎉 Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes
             </span>
-            <h3 className="font-heading text-2xl font-semibold text-foreground">Solo — offre de lancement</h3>
+            <h3 className="font-heading text-2xl font-semibold text-foreground">Solo</h3>
+            <p className="text-sm font-medium text-thread-text">Tarif fondateur conservé à vie</p>
             <p className="mt-4 font-heading text-5xl font-semibold tracking-tight text-foreground">
               {billing === 'month' ? euro(LAUNCH_OFFER_PRICE_MONTHLY) : euro(LAUNCH_OFFER_PRICE_ANNUAL)}
               <span className="text-base font-normal text-muted-foreground">{billing === 'month' ? ' / mois' : ' / an'}</span>

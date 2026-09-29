@@ -41,7 +41,9 @@ export const LAUNCH_OFFER_ANNUAL_FREE_MONTHS = Math.round(
 export const GRATUIT_FEATURES = ['3 mariages', 'Tâches, planning, prestataires et matériel', 'Export de tes données en JSON']
 export const PRO_FEATURES = [
   'Mariages illimités',
-  'Devis, factures, finances et bilan post-mariage',
+  'Devis et factures indicatifs',
+  'Finances et rentabilité',
+  'Bilan post-mariage',
   'Support prioritaire',
   'Sauvegarde en ligne',
 ]
@@ -58,69 +60,79 @@ export interface Testimonial {
 /** Vide tant qu'il n'y a pas de vrais avis clients, consentants : la section n'est alors pas affichée. */
 export const TESTIMONIALS: Testimonial[] = []
 
-export const PAIN_POINTS = [
-  { title: 'Des tâches notées partout', text: 'Mails, notes du téléphone, post-it… et le reste dans ta tête.' },
-  { title: '« J’ai oublié les chaises ! »', text: 'On s’en aperçoit la veille au soir, quand il est déjà trop tard.' },
-  { title: 'Un budget flou', text: 'Les coûts d’un côté, les devis de l’autre, et ta marge quelque part entre les deux.' },
-  { title: '« C’est bien confirmé ? »', text: 'Le statut de chaque prestataire reste un mystère jusqu’au dernier moment.' },
-  { title: 'Des appels à 22 h 30', text: '« Sophie, c’est bien confirmé pour demain ? » La veille, quand tu devrais dormir.' },
+/** 4 moments reconnaissables, chacun avec sa question et ses lignes — reprend "Tu connais déjà ces moments" telle qu'écrite par Clélia. */
+export const PAIN_MOMENTS = [
+  {
+    quote: '« J’ai noté ça où déjà ? »',
+    lines: ['Une information dans WhatsApp.', 'Une autre dans tes mails.', 'Une note dans ton téléphone.', 'Un post-it sur ton bureau.', 'Et le reste… dans ta mémoire.'],
+  },
+  {
+    quote: '« Il manque quoi pour demain ? »',
+    lines: ['Tu regardes ton matériel.', 'Tu vérifies tes listes.', 'Tu essaies de te souvenir de ce qui est déjà chargé.', 'Puis tu vérifies encore.'],
+  },
+  {
+    quote: '« C’est bien confirmé ? »',
+    lines: ['Quel prestataire arrive à quelle heure ?', 'Qui a confirmé ?', 'Qui doit encore répondre ?', 'Qui doit être payé ?'],
+  },
+  {
+    quote: '« Où j’en suis sur ce mariage ? »',
+    lines: ['Le budget est dans un fichier.', 'Les dépenses ailleurs.', 'Les devis dans les mails.', 'Les tâches dans un carnet.', 'Et ta marge quelque part entre les deux.'],
+  },
 ]
 
-export const SOLUTION_POINTS = [
-  {
-    title: 'Un seul endroit pour tout orchestrer',
-    text: 'Tâches, matériel, prestataires, finances, planning du Jour J. Fini les post-it, les mails perdus et les tableurs qui plantent.',
-  },
-  {
-    title: 'Le Jour J, minute par minute',
-    text: 'Qui fait quoi, à quelle heure, où. ZORDI repère même les chevauchements de planning avant qu’ils ne t’attrapent.',
-  },
-  {
-    title: 'Une checklist matériel claire',
-    text: 'Quantités, statut, dégâts éventuels, destination au retour. Tu sais ce qui est parti et ce qui est revenu.',
-  },
-  {
-    title: 'Des finances toujours à jour',
-    text: 'Le budget du couple et ta rentabilité côte à côte : ce qu’il reste à dépenser, ton profit, ta marge.',
-  },
-  {
-    title: 'Tes données restent les tiennes',
-    text: 'Aujourd’hui, elles sont stockées dans ton navigateur — seul ton compte (email, mot de passe) est géré ailleurs — et tu peux tout exporter à tout moment.',
-  },
+export const PAIN_CLOSING = {
+  quote: 'Tu regardes ton téléphone alors que ta journée est déjà terminée.',
+  lines: ['Pas parce que tu veux travailler.', 'Parce que tu veux être sûre de ne rien avoir oublié.'],
+}
+
+/** Ce que ZORDI est concrètement — liste de pilotage, pas de discours. */
+export const ZORDI_FEATURE_LIST = ['Tâches', 'Planning', 'Matériel', 'Prestataires', 'Budget', 'Devis', 'Jour J', 'Bilan']
+export const ZORDI_NOT_LIST = ['Pas pour remplacer ton métier.', 'Pas pour créer à ta place.', 'Pas pour décider à ta place.']
+
+/** "Avant / Avec ZORDI" — 3 groupes de chaque côté, mêmes verbes qui structurent la comparaison. */
+export const BEFORE_GROUPS = [
+  { verb: 'Tu cherches.', items: ['Des mails.', 'Des messages.', 'Des notes.', 'Des fichiers.', 'Des post-it.', 'Ta mémoire.'] },
+  { verb: 'Tu vérifies.', items: ['Les prestataires.', 'Le matériel.', 'Les horaires.', 'Les paiements.'] },
+  { verb: 'Tu recommences.', items: ['À chercher.', 'À vérifier.', 'À te demander si tu n’as rien oublié.'] },
+]
+export const AFTER_GROUPS = [
+  { verb: 'Tu vois.', items: ['Tes tâches.', 'Tes mariages.', 'Ton planning.', 'Tes prestataires.'] },
+  { verb: 'Tu sais.', items: ['Ce qui est fait.', 'Ce qui reste à faire.', 'Ce qui doit être confirmé.', 'Ce qui doit être payé.'] },
+  { verb: 'Tu avances.', items: ['Sans devoir tout garder dans ta tête.'] },
 ]
 
 export const FAQ = [
   {
-    q: `Le prix est-il justifié ?`,
-    a: `ZORDI coûte ${PRICE_MONTHLY} € par mois, ou ${PRICE_ANNUAL} € par an (${ANNUAL_FREE_MONTHS} mois offerts). Ce que tu paies : un seul endroit pour tes tâches, ton budget, tes prestataires, tes devis et ton déroulé du Jour J, plutôt que cinq outils à recoller. Nous ne te promettons aucun gain chiffré : le meilleur test, c’est l’essai de ${TRIAL_DAYS} jours, sans carte bancaire.`,
+    q: 'Est-ce difficile à utiliser ?',
+    a: 'Non. ZORDI est pensé pour être utilisé au quotidien par des professionnels de la décoration, sans compétences techniques particulières. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances.',
   },
   {
-    q: 'En quoi est-ce différent des alternatives gratuites ?',
-    a: 'Excel, Notion ou Google Sheets sont excellents, et gratuits. Mais tu dois construire et entretenir toi-même la structure : le suivi de marge par mariage, la numérotation des devis, le déroulé imprimable. ZORDI est déjà pensé pour le métier de décoratrice de mariage. Si tu es à l’aise avec ton système actuel et qu’il te suffit, tu n’as peut-être pas besoin de nous.',
+    q: 'Est-ce que je peux importer mes anciens mariages ?',
+    a: 'Oui. Si tes données sont déjà dans Excel, tu peux les importer dans ZORDI. Tu évites ainsi de recommencer toute ta saisie.',
   },
   {
-    q: 'Combien de temps faut-il pour voir des résultats ?',
-    a: 'Le bénéfice le plus rapide est l’ordre : dès que tu as saisi un mariage, tâches, budget, prestataires et Jour J sont réunis au même endroit. Compte un après-midi pour y mettre un mariage en cours, ou quelques minutes pour explorer la démo. Les effets sur ta marge dépendent de ta façon de travailler : nous ne les chiffrons pas.',
+    q: 'Est-ce que je peux commencer sans payer ?',
+    a: `Oui. Tu peux commencer gratuitement et tester les fonctionnalités Solo pendant ${TRIAL_DAYS} jours, sans carte bancaire. Après l’essai, tu peux rester sur l’offre gratuite jusqu’à 3 mariages ou passer à Solo.`,
   },
   {
-    q: 'Est-ce difficile à utiliser ? Faut-il des compétences techniques ?',
-    a: 'Non. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances. Si tu sais utiliser un tableur ou un agenda, tu sais utiliser ZORDI. La démo te permet de tout voir avec des données fictives avant de commencer.',
-  },
-  {
-    q: 'Où sont stockées mes données ?',
-    a: 'Tes mariages, tâches, prestataires et finances restent dans ton navigateur, sur ton appareil. Seuls ton email et ton mot de passe (pour te connecter) sont gérés par notre prestataire d’authentification. Depuis les Paramètres, un bouton « Sauvegarder maintenant » envoie une copie en ligne, à la demande. Sur un nouvel appareil jamais utilisé, cette copie se restaure automatiquement dès ta première connexion. Sur un appareil qui contient déjà des données (le tien, par exemple, si tu changes de téléphone), utilise le bouton « Restaurer depuis le cloud » pour la retirer explicitement — elle remplace alors tout ce qui est enregistré sur cet appareil, une confirmation te sera demandée avant. Ce n’est pas une synchronisation en continu : si tu passes d’un appareil à l’autre régulièrement, pense à sauvegarder depuis celui où tu viens de travailler, sinon les changements n’apparaissent pas tout seuls ailleurs. L’export/import JSON manuel reste disponible en complément, à tout moment.',
-  },
-  {
-    q: 'Est-ce que ça marche sans internet ?',
+    q: 'Est-ce que je peux utiliser ZORDI sans internet ?',
     a: 'ZORDI a besoin d’une connexion pour s’ouvrir : il n’y a pas encore de mode hors-ligne complet. Bon réflexe, la veille : imprime ou enregistre en PDF ton déroulé du Jour J (bouton « Imprimer / Exporter »). Tu l’as alors avec toi, même sans réseau.',
   },
   {
-    q: 'Mon client a-t-il accès à ZORDI ?',
-    a: 'Non : ZORDI est ton poste de pilotage. Ton client reçoit les devis et factures que tu lui envoies (imprimés ou enregistrés en PDF). Tu gères, il voit ce qu’il doit voir.',
+    q: 'Où sont stockées mes données ?',
+    a: 'Aujourd’hui, tes données de travail (mariages, tâches, prestataires, finances) sont stockées dans ton navigateur, sur ton appareil. Ton compte — email et mot de passe — est géré séparément, par notre prestataire d’authentification. Depuis les Paramètres, un bouton « Sauvegarder maintenant » envoie une copie en ligne à la demande, et tu peux exporter tes données à tout moment.',
+  },
+  {
+    q: 'Mes clientes ont-elles accès à ZORDI ?',
+    a: 'Non. ZORDI est ton espace de gestion. Tes clientes n’ont pas besoin d’avoir un compte pour que tu utilises l’outil — elles reçoivent les devis et factures que tu leur envoies.',
   },
   {
     q: 'Les devis et factures sont-ils conformes ?',
-    a: 'ZORDI numérote automatiquement tes devis et factures et affiche les coordonnées du client. Ce sont des documents indicatifs : vérifie tes obligations légales et fiscales avant émission.',
+    a: 'Les documents générés par ZORDI sont indicatifs. Ils ne remplacent pas tes obligations légales et comptables : vérifie toujours les obligations applicables à ton activité avant émission.',
+  },
+  {
+    q: 'Et si je ne veux pas continuer après l’essai ?',
+    a: 'Aucun problème. Tu peux rester sur l’offre gratuite jusqu’à 3 mariages, ou passer à Solo si tu veux continuer avec les fonctionnalités avancées.',
   },
 ]
 

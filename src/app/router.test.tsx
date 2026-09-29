@@ -53,7 +53,7 @@ describe('AppRouter — routing protégé', () => {
   it('« / » affiche la landing publique, sans en-tête authentifié, quand non connecté·e', () => {
     renderAt('/')
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Toutes tes infos, un seul endroit. Enfin de l’air.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Ton travail a une place. Ta vie aussi. Enfin de l’air.' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: "Aller à mon application" })).not.toBeInTheDocument()
   })
 
@@ -67,7 +67,7 @@ describe('AppRouter — routing protégé', () => {
   it('/aujourdhui sans compte renvoie vers la landing (pas de redirection en boucle, pas de fuite de contenu protégé)', () => {
     renderAt('/aujourdhui')
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Toutes tes infos, un seul endroit. Enfin de l’air.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Ton travail a une place. Ta vie aussi. Enfin de l’air.' })).toBeInTheDocument()
     expect(appLayoutNav()).not.toBeInTheDocument()
   })
 
@@ -90,7 +90,7 @@ describe('AppRouter — routing protégé', () => {
   it('/onboarding sans compte renvoie vers la landing', () => {
     renderAt('/onboarding')
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Toutes tes infos, un seul endroit. Enfin de l’air.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Ton travail a une place. Ta vie aussi. Enfin de l’air.' })).toBeInTheDocument()
   })
 
   it('/onboarding avec compte (sans espace) reste accessible', async () => {

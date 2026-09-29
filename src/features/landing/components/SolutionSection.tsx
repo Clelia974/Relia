@@ -1,28 +1,24 @@
-import { Check } from 'lucide-react'
-import { SOLUTION_POINTS } from '@/features/landing/landingContent'
+import { ZORDI_FEATURE_LIST, ZORDI_NOT_LIST } from '@/features/landing/landingContent'
 
-/**
- * Porté depuis LandingPage.tsx ("Découvre Zordi") — même contenu et même
- * structure que la vraie landing, c'est le pont narratif entre le problème
- * et "Comment ça marche" qui manquait dans la version test.
- */
 export function SolutionSection() {
   return (
-    <div className="flex flex-col gap-10">
-      <ul className="grid gap-x-10 gap-y-8 md:grid-cols-2">
-        {SOLUTION_POINTS.map((point) => (
-          <li key={point.title} className="flex gap-4">
-            <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-sage/30 text-success">
-              <Check className="size-4" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="font-heading text-xl font-semibold text-foreground">{point.title}</p>
-              <p className="mt-1.5 leading-relaxed text-muted-foreground">{point.text}</p>
-            </div>
+    <div className="flex flex-col gap-8">
+      <ul className="flex flex-wrap gap-2.5">
+        {ZORDI_FEATURE_LIST.map((item) => (
+          <li key={item} className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-foreground shadow-(--shadow-card)">
+            {item}
           </li>
         ))}
       </ul>
-      <p className="font-heading text-2xl font-semibold text-primary">Le résultat ? Moins de charge mentale, plus de place pour créer.</p>
+      <ul className="flex flex-col gap-2 text-muted-foreground">
+        {ZORDI_NOT_LIST.map((item) => (
+          <li key={item} className="flex items-start gap-2.5">
+            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
+            {item}
+          </li>
+        ))}
+      </ul>
+      <p className="font-heading text-xl font-semibold text-primary">Pour que ton organisation ne repose plus uniquement sur ta mémoire.</p>
     </div>
   )
 }

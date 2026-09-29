@@ -53,12 +53,12 @@ describe('LandingPage', () => {
     setup()
     const h1 = screen.getAllByRole('heading', { level: 1 })
     expect(h1).toHaveLength(1)
-    expect(h1[0].textContent).toBe('Toutes tes infos, un seul endroit. Enfin de l’air.')
+    expect(h1[0].textContent).toBe('Ton travail a une place. Ta vie aussi. Enfin de l’air.')
   })
 
   it("sans compte : le bouton principal mène à l'inscription", () => {
     setup()
-    fireEvent.click(screen.getAllByRole('button', { name: /Commencer gratuitement/ })[0])
+    fireEvent.click(screen.getAllByRole('button', { name: /Créer mon espace gratuitement/ })[0])
     expect(screen.getByTestId('where').textContent).toBe('/inscription')
   })
 
@@ -97,18 +97,21 @@ describe('LandingPage', () => {
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
       'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
+      'Tout ton mariage. Au même endroit.',
       'Ton travail a une place. Ta vie aussi.',
-      'Tu connais déjà ces situations',
+      'Tu connais déjà ces moments',
       'À quel moment ta journée finit vraiment ?',
-      'Zordi, c’est quoi ?',
-      'Ce que tu peux faire avec Zordi',
+      'ZORDI, c’est quoi ?',
+      'Chaque fonctionnalité part d’un problème réel',
       'Et le temps que tu récupères, tu en fais quoi ?',
-      'Avant Zordi. Après Zordi.',
-      'On ne va pas te raconter que Zordi va régler toute ton activité.',
-      'Zordi est pour toi si tu as déjà une base',
+      'Avant ZORDI. Avec ZORDI.',
+      'On ne va pas te raconter que ZORDI va régler toute ton activité.',
+      'ZORDI est fait pour toi si…',
+      '14 jours pour essayer ZORDI',
       'Tarifs simples, pas de piège',
+      'Tes données restent les tiennes.',
       'Tout ce que tu te demandes avant de commencer',
-      'Prêt·e à respirer le Jour J ?',
+      'Tu as un mariage à organiser ?',
     ])
   })
 

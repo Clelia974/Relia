@@ -1,30 +1,13 @@
 import { Check, X } from 'lucide-react'
+import { AFTER_GROUPS, BEFORE_GROUPS } from '@/features/landing/landingContent'
 import { cn } from '@/lib/utils'
 
-/**
- * Reformulation courte des PAIN_POINTS / SOLUTION_POINTS existants
- * (landingContent.ts) — même contenu, pas de nouvelle affirmation
- * inventée, juste présenté en comparaison directe plutôt qu'en deux
- * listes séparées.
- */
-const AVANT = [
-  'Des tâches notées partout : mails, post-it, mémoire',
-  'Un budget flou entre devis et coûts réels',
-  'Le statut de chaque prestataire, un mystère jusqu’au bout',
-]
-
-const APRES = [
-  'Tâches, prestataires, matériel et finances au même endroit',
-  'Le déroulé du Jour J généré en un instant',
-  'Les chevauchements de planning repérés avant qu’ils n’arrivent',
-]
-
-function ComparisonList({ items, variant }: { items: string[]; variant: 'avant' | 'apres' }) {
+function GroupedList({ groups, variant }: { groups: typeof BEFORE_GROUPS; variant: 'avant' | 'apres' }) {
   const isApres = variant === 'apres'
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 rounded-2xl border p-6 sm:p-8',
+        'flex flex-col gap-5 rounded-2xl border p-6 sm:p-8',
         isApres ? 'border-transparent bg-primary text-primary-foreground' : 'border-border bg-card',
       )}
     >
@@ -34,23 +17,28 @@ function ComparisonList({ items, variant }: { items: string[]; variant: 'avant' 
           isApres ? 'bg-primary-foreground/15 text-primary-foreground' : 'bg-muted text-muted-foreground',
         )}
       >
-        {isApres ? 'Avec Zordi' : 'Sans Zordi'}
+        {isApres ? 'Avec ZORDI' : 'Avant ZORDI'}
       </span>
-      <ul className="flex flex-col gap-3 text-sm">
-        {items.map((item) => (
-          <li key={item} className="flex items-start gap-3">
-            <span
-              className={cn(
-                'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full',
-                isApres ? 'bg-primary-foreground/15 text-primary-foreground' : 'bg-risk-bg text-risk',
-              )}
-            >
-              {isApres ? <Check className="size-3.5" aria-hidden="true" /> : <X className="size-3.5" aria-hidden="true" />}
-            </span>
-            <span className={isApres ? 'text-primary-foreground/90' : 'text-foreground'}>{item}</span>
-          </li>
-        ))}
-      </ul>
+      {groups.map((group) => (
+        <div key={group.verb} className="flex flex-col gap-2">
+          <p className={cn('font-heading text-base font-semibold', isApres ? 'text-primary-foreground' : 'text-foreground')}>{group.verb}</p>
+          <ul className="flex flex-col gap-1.5 text-sm">
+            {group.items.map((item) => (
+              <li key={item} className="flex items-start gap-2.5">
+                <span
+                  className={cn(
+                    'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full',
+                    isApres ? 'bg-primary-foreground/15 text-primary-foreground' : 'bg-risk-bg text-risk',
+                  )}
+                >
+                  {isApres ? <Check className="size-2.5" aria-hidden="true" /> : <X className="size-2.5" aria-hidden="true" />}
+                </span>
+                <span className={isApres ? 'text-primary-foreground/90' : 'text-foreground'}>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }
@@ -58,8 +46,8 @@ function ComparisonList({ items, variant }: { items: string[]; variant: 'avant' 
 export function BeforeAfterSection() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <ComparisonList items={AVANT} variant="avant" />
-      <ComparisonList items={APRES} variant="apres" />
+      <GroupedList groups={BEFORE_GROUPS} variant="avant" />
+      <GroupedList groups={AFTER_GROUPS} variant="apres" />
     </div>
   )
 }
