@@ -33,3 +33,5 @@ secrets.json
 *.sw?
 
 .env.local
+.vercel
+.env*
