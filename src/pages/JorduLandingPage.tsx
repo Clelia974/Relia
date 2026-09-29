@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 
 // Couleurs de marque Jordu, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
 // #680808 primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
-// distinctes des tokens --primary/--thread de l'app Relia existante, laissés intacts ailleurs
+// distinctes des tokens --primary/--thread de l'app existante, laissés intacts ailleurs
 // dans le produit tant que le rebrand complet n'est pas décidé.
 const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
 const SECTION = 'scroll-mt-20 py-14 sm:py-20'
@@ -121,7 +121,7 @@ const FAQ: { q: string; a: string }[] = [
 
 /**
  * Landing "bis" — /jordu : uniquement une collecte d'emails en attendant que
- * le MVP Jordu soit prêt, distincte de la vraie landing RELIA (RootGate /).
+ * le MVP Jordu soit prêt, distincte de la vraie landing "lancement" (RootGate /).
  * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
  */
 export function JorduLandingPage() {
@@ -151,7 +151,7 @@ export function JorduLandingPage() {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
           <a href="#haut" aria-label="Jordu — haut de page">
-            <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-8 w-auto" />
+            <img src="/brand/jordu-wordmark.svg" alt="Jordu — haut de page" width={76} height={32} className="h-8 w-auto" />
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
@@ -518,7 +518,7 @@ export function JorduLandingPage() {
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-6 w-auto" />
+            <img src="/brand/jordu-wordmark.svg" alt="Jordu — organisation évènementielle" width={57} height={24} className="h-6 w-auto" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
           <p>© {new Date().getFullYear()} Jordu</p>

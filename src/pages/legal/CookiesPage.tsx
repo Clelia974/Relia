@@ -6,7 +6,7 @@ export function CookiesPage() {
   return (
     <LegalLayout
       title="Cookies et stockage local"
-      intro="Bonne nouvelle : RELIA n'utilise aucun cookie de suivi ni de publicité, donc aucun consentement à te demander. Cette page détaille ce qui est tout de même enregistré dans ton navigateur."
+      intro="Bonne nouvelle : JORDU n'utilise aucun cookie de suivi ni de publicité, donc aucun consentement à te demander. Cette page détaille ce qui est tout de même enregistré dans ton navigateur."
       sections={[
         {
           title: 'Ce qui est enregistré',
@@ -26,8 +26,8 @@ export function CookiesPage() {
           title: 'Les supprimer ou les désactiver',
           body: (
             <>
-              <p>Tu peux tout effacer depuis les réglages de ton navigateur (« Effacer les données de navigation » ou « Données de sites »). Attention : cela supprime aussi ton espace RELIA. Exporte-le avant, depuis les Paramètres de l'application.</p>
-              <p>Si tu bloques complètement le stockage local, RELIA ne pourra pas enregistrer ton travail.</p>
+              <p>Tu peux tout effacer depuis les réglages de ton navigateur (« Effacer les données de navigation » ou « Données de sites »). Attention : cela supprime aussi ton espace JORDU. Exporte-le avant, depuis les Paramètres de l'application.</p>
+              <p>Si tu bloques complètement le stockage local, JORDU ne pourra pas enregistrer ton travail.</p>
             </>
           ),
         },

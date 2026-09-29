@@ -15,7 +15,7 @@ interface EmailPreviewDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   clientName: string
-  /** Nom affiché comme expéditeur — celui de la décoratrice, jamais "Relia" (cf. businessConfig.companyName, avec repli). */
+  /** Nom affiché comme expéditeur — celui de la décoratrice, jamais "Jordu" (cf. businessConfig.companyName, avec repli). */
   senderName: string
   subject: string
   /** Phrase fixe décrivant ce qui est partagé (ex. "vous a préparé un devis — vous pouvez le consulter directement en ligne :"). */

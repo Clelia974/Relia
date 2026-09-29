@@ -6,7 +6,7 @@ import { LandingPage } from '@/pages/LandingPage'
  * configuré. Routage par nom d'hôte plutôt que par chemin : jordu.evenementscles.com/
  * doit afficher directement la landing Jordu (pas de "/jordu" à taper), pendant que
  * relia.evenementscles.com/ (et tout autre hôte, ex. les previews Vercel) garde la
- * vraie landing Relia. Le chemin "/jordu" continue aussi de fonctionner sur les deux
+ * vraie landing Jordu. Le chemin "/jordu" continue aussi de fonctionner sur les deux
  * hôtes — RootGate ne gère que la racine.
  */
 export function RootGate() {

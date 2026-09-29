@@ -8,9 +8,15 @@ export function AuthCard({ title, description, children }: { title: string; desc
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
-          <Link to="/" className="flex items-center gap-2" aria-label="Relia — retour à l'accueil">
-            <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
-            <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
+          <Link to="/" className="flex items-center gap-2" aria-label="Jordu — retour à l'accueil">
+            <img src="/brand/jordu-wordmark.svg" alt="Jordu — retour à l'accueil" width={86} height={36} className="h-9 w-auto dark:hidden" />
+            <img
+              src="/brand/jordu-wordmark-reversed.svg"
+              alt="Jordu — retour à l'accueil"
+              width={86}
+              height={36}
+              className="hidden h-9 w-auto dark:block"
+            />
           </Link>
         </div>
       </header>

@@ -30,7 +30,7 @@ export function useLeadActions(refresh: () => void) {
   /** Lead en attente de confirmation dans l'aperçu d'email de relance — null si aucun n'est ouvert. */
   const [relanceTarget, setRelanceTarget] = useState<Lead | null>(null)
 
-  const senderName = businessConfig.companyName?.trim() || 'Relia'
+  const senderName = businessConfig.companyName?.trim() || 'Jordu'
 
   const handleStatusChange = async (lead: Lead, next: LeadStatus) => {
     setPendingId(lead.id)

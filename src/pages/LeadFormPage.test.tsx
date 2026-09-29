@@ -16,12 +16,12 @@ function renderAt(path: string) {
 }
 
 describe('LeadFormPage — intégration (lien classique vs iframe)', () => {
-  it("n'affiche jamais la marque Relia — la cliente ne doit voir que la décoratrice, jamais la plateforme", () => {
+  it("n'affiche jamais la marque Jordu — la cliente ne doit voir que la décoratrice, jamais la plateforme", () => {
     useSubmitLeadMock.mockReturnValue({ submitLead: vi.fn(), isLoading: false, error: null })
     renderAt('/lead/new/u1')
 
-    expect(screen.queryByLabelText("Relia — retour à l'accueil")).not.toBeInTheDocument()
-    expect(screen.queryByText('Relia')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Jordu — retour à l\'accueil')).not.toBeInTheDocument()
+    expect(screen.queryByText('Jordu')).not.toBeInTheDocument()
     expect(screen.getByText('Faire une demande')).toBeInTheDocument()
   })
 
@@ -29,7 +29,7 @@ describe('LeadFormPage — intégration (lien classique vs iframe)', () => {
     useSubmitLeadMock.mockReturnValue({ submitLead: vi.fn(), isLoading: false, error: null })
     renderAt('/lead/new/u1?embed=1')
 
-    expect(screen.queryByText('Relia')).not.toBeInTheDocument()
+    expect(screen.queryByText('Jordu')).not.toBeInTheDocument()
     expect(screen.getByText('Faire une demande')).toBeInTheDocument()
   })
 })

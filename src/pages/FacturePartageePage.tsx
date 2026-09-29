@@ -6,7 +6,7 @@ import { useFacturePartagee } from '@/features/invoices/useFacturePartagee'
  * Page publique (jamais authentifiée) affichant une facture envoyée par
  * une décoratrice — /facture/:shareId. Même principe que
  * DevisPartagePage.tsx : réutilise InvoiceDocumentPreview telle quelle,
- * aucun en-tête Relia.
+ * aucun en-tête Jordu.
  */
 export function FacturePartageePage() {
   const { shareId } = useParams<{ shareId: string }>()

@@ -7,7 +7,7 @@ import { useDevisPartage } from '@/features/proposals/useDevisPartage'
  * décoratrice — /devis/:shareId, lien communiqué par email (cf.
  * api/devis/share.ts). Réutilise ProposalDocumentPreview telle quelle :
  * même rendu que dans l'éditeur, sans aucune donnée du compte au-delà de
- * l'instantané figé au moment de l'envoi. Aucun en-tête Relia : la cliente
+ * l'instantané figé au moment de l'envoi. Aucun en-tête Jordu : la cliente
  * ne doit voir que sa décoratrice (nom/logo déjà affichés par
  * ProposalDocumentPreview elle-même), jamais la marque de la plateforme.
  */

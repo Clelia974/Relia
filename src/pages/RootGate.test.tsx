@@ -38,14 +38,15 @@ describe('RootGate — routage par nom d’hôte', () => {
     expect(screen.getByText('Jordu est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.')).toBeInTheDocument()
   })
 
-  it('affiche la landing Relia sur relia.evenementscles.com', () => {
+  it('affiche la landing "lancement" sur relia.evenementscles.com', () => {
     renderAt('relia.evenementscles.com')
-    expect(screen.getAllByText(/Relia/).length).toBeGreaterThan(0)
+    expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
     expect(screen.queryByText(/Jordu est encore en construction/)).toBeNull()
   })
 
-  it('affiche la landing Relia par défaut (autre hôte, ex. preview Vercel)', () => {
+  it('affiche la landing "lancement" par défaut (autre hôte, ex. preview Vercel)', () => {
     renderAt('relia-abc123.vercel.app')
+    expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
     expect(screen.queryByText(/Jordu est encore en construction/)).toBeNull()
   })
 })

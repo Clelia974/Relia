@@ -43,8 +43,14 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <NavLink to="/aujourdhui" className="flex items-center gap-2" aria-label="Jordu — Aujourd'hui">
-          <img src="/brand/jordu-wordmark.svg" alt="Jordu" className="h-7 w-auto dark:hidden" />
-          <img src="/brand/jordu-wordmark-reversed.svg" alt="Jordu" className="hidden h-7 w-auto dark:block" />
+          <img src="/brand/jordu-wordmark.svg" alt="Jordu — aujourd'hui" width={67} height={28} className="h-7 w-auto dark:hidden" />
+          <img
+            src="/brand/jordu-wordmark-reversed.svg"
+            alt="Jordu — aujourd'hui"
+            width={67}
+            height={28}
+            className="hidden h-7 w-auto dark:block"
+          />
         </NavLink>
 
         <div className="flex items-center gap-1">

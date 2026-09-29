@@ -75,7 +75,7 @@ describe('ContractPanel', () => {
     expect(onChange).toHaveBeenCalledWith({ status: 'a_rediger', notes: 'Clause acompte à revoir' })
   })
 
-  it("propose d'uploader un PDF, jamais généré par Relia elle-même", () => {
+  it("propose d'uploader un PDF, jamais généré par Jordu elle-même", () => {
     setup()
     expect(screen.getByRole('button', { name: /Uploader un PDF/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Marquer comme envoyé/ })).not.toBeInTheDocument()

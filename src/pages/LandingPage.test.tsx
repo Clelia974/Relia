@@ -98,10 +98,10 @@ describe('LandingPage', () => {
     expect(titles).toEqual([
       'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
       'Tu connais déjà ces situations',
-      'Découvre Relia',
-      'Ce que tu peux faire avec Relia',
-      'Avant Relia. Après Relia.',
-      'Relia a été pensé pour les personnes qui ont déjà une base',
+      'Découvre Jordu',
+      'Ce que tu peux faire avec Jordu',
+      'Avant Jordu. Après Jordu.',
+      'Jordu a été pensé pour les personnes qui ont déjà une base',
       'Tarifs simples, pas de piège',
       'Tout ce que tu te demandes avant de commencer',
       'Prêt·e à respirer le Jour J ?',

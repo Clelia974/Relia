@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /**
- * Schémas Zod — source de vérité du modèle de données Relia.
+ * Schémas Zod — source de vérité du modèle de données Jordu.
  * Les types TypeScript (src/types/entities.ts) sont dérivés par z.infer
  * pour ne jamais dupliquer la forme des données entre TS et la validation.
  *
@@ -94,7 +94,7 @@ export const BusinessConfigSchema = z.object({
   currency: z.string().min(1),
   legalMentions: z.string().optional(),
   logoDataUrl: z.string().optional(),
-  /** Couleur d'accent de marque (hex) appliquée sur les documents (devis/factures) — remplace l'accent Relia par défaut. */
+  /** Couleur d'accent de marque (hex) appliquée sur les documents (devis/factures) — remplace l'accent Jordu par défaut. */
   brandColor: z.string().optional(),
 })
 
@@ -123,7 +123,7 @@ export const ContractSchema = z.object({
   /** Renseignée uniquement quand le contrat est signé. */
   signedAt: isoDate.optional(),
   notes: z.string().optional(),
-  /** Chemin du fichier dans le bucket Supabase "contrats" (uploadé par la décoratrice elle-même — un PDF rédigé/signé ailleurs, jamais généré par Relia). */
+  /** Chemin du fichier dans le bucket Supabase "contrats" (uploadé par la décoratrice elle-même — un PDF rédigé/signé ailleurs, jamais généré par Jordu). */
   storagePath: z.string().optional(),
   fileName: z.string().optional(),
   /** Id du contrats_partages Supabase créé au dernier partage (cf. api/contrats/share.ts) — même principe que Proposal.shareId. */
@@ -138,7 +138,7 @@ export const WeddingSchema = z.object({
   /** Coordonnées du client — reprises par défaut sur les devis et factures (mentions attendues sur ces documents). */
   clientAddress: z.string().optional(),
   clientPhone: z.string().optional(),
-  /** Nécessaire pour l'envoi d'un devis depuis Relia (lien de consultation par email) — pas seulement une coordonnée de courtoisie. */
+  /** Nécessaire pour l'envoi d'un devis depuis Jordu (lien de consultation par email) — pas seulement une coordonnée de courtoisie. */
   clientEmail: z.string().email('Adresse email invalide.').optional().or(z.literal('')),
   /** Facultatif — utile pour le traiteur/la logistique, jamais requis à la création. */
   guestCount: z.number().int().nonnegative('Le nombre d’invités ne peut pas être négatif.').optional(),
@@ -229,7 +229,7 @@ export const TaskSchema = z.object({
   waitingOn: TaskWaitingOnSchema.optional(),
   waitingReason: z.string().optional(),
   notes: z.string().optional(),
-  /** 'automatic' = créée par Relia (ex. confirmation prestataire), jamais par une saisie manuelle directe. */
+  /** 'automatic' = créée par Jordu (ex. confirmation prestataire), jamais par une saisie manuelle directe. */
   source: z.enum(['manual', 'automatic']).default('manual'),
   /** Phase du jour J (Vue Jour J, Phase 3) — facultative, cf. DayPhaseSchema. */
   phase: DayPhaseSchema.optional(),
@@ -528,7 +528,7 @@ export const InvoiceSchema = z.object({
 
 /**
  * Mode d'obtention d'un élément matériel pour CE mariage — jamais un
- * mouvement de stock ni une réservation : Relia ne gère pas d'inventaire
+ * mouvement de stock ni une réservation : Jordu ne gère pas d'inventaire
  * global partagé entre mariages (cf. Phase 2, hors périmètre volontaire).
  */
 export const EquipmentAcquisitionModeSchema = z.enum(['stock_personnel', 'achat', 'location', 'fabrication', 'autre'])

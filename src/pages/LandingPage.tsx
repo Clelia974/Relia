@@ -71,9 +71,15 @@ export function LandingPage() {
       ) : (
         <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
           <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-            <a href="#haut" className="flex items-center gap-2" aria-label="RELIA — haut de page">
-              <img src="/brand/relia-monogram.svg" alt="" className="size-9" />
-              <span className="font-heading text-2xl font-semibold tracking-tight text-primary">Relia</span>
+            <a href="#haut" className="flex items-center gap-2" aria-label="Jordu — haut de page">
+              <img src="/brand/jordu-wordmark.svg" alt="Jordu — retour en haut de page" width={76} height={32} className="h-8 w-auto dark:hidden" />
+              <img
+                src="/brand/jordu-wordmark-reversed.svg"
+                alt="Jordu — retour en haut de page"
+                width={76}
+                height={32}
+                className="hidden h-8 w-auto dark:block"
+              />
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
               <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
@@ -159,9 +165,9 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La solution</p>
-              <h2 className={cn(H2, 'mt-2')}>Découvre Relia</h2>
+              <h2 className={cn(H2, 'mt-2')}>Découvre Jordu</h2>
               <p className="mt-3 text-muted-foreground">
-                RELIA est née d’une question simple : et si le Jour J n’était pas un chaos organisé, mais tout simplement…
+                JORDU est née d’une question simple : et si le Jour J n’était pas un chaos organisé, mais tout simplement…
                 organisé ? Elle est pensée pour les décoratrices et décorateurs de mariage indépendants.
               </p>
             </div>
@@ -176,7 +182,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
-              <h2 className={cn(H2, 'mt-2')}>Ce que tu peux faire avec Relia</h2>
+              <h2 className={cn(H2, 'mt-2')}>Ce que tu peux faire avec Jordu</h2>
               <p className="mt-3 text-muted-foreground">6 fonctionnalités, une fenêtre à la fois.</p>
             </div>
             <div className="mt-10">
@@ -212,7 +218,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La différence</p>
-              <h2 className={cn(H2, 'mt-2')}>Avant Relia. Après Relia.</h2>
+              <h2 className={cn(H2, 'mt-2')}>Avant Jordu. Après Jordu.</h2>
             </div>
             <div className="mt-10">
               <BeforeAfterSection />
@@ -225,7 +231,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>Relia a été pensé pour les personnes qui ont déjà une base</h2>
+              <h2 className={cn(H2, 'mt-2')}>Jordu a été pensé pour les personnes qui ont déjà une base</h2>
             </div>
             <div className="mt-10">
               <WhoItsForSection />
@@ -285,7 +291,7 @@ export function LandingPage() {
 
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
-          <p>© {new Date().getFullYear()} RELIA · Le fil conducteur de vos mariages</p>
+          <p>© {new Date().getFullYear()} JORDU · Le fil conducteur de vos mariages</p>
           <p>Les devis et factures générés sont indicatifs : vérifie tes obligations légales avant émission.</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>

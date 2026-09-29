@@ -46,7 +46,7 @@ export const PRO_FEATURES = [
   'Sauvegarde en ligne',
 ]
 
-export const CONTACT_EMAIL = 'hello@relia.com'
+export const CONTACT_EMAIL = 'contact@evenementscles.com'
 
 export interface Testimonial {
   quote: string
@@ -73,7 +73,7 @@ export const SOLUTION_POINTS = [
   },
   {
     title: 'Le Jour J, minute par minute',
-    text: 'Qui fait quoi, à quelle heure, où. RELIA repère même les chevauchements de planning avant qu’ils ne t’attrapent.',
+    text: 'Qui fait quoi, à quelle heure, où. JORDU repère même les chevauchements de planning avant qu’ils ne t’attrapent.',
   },
   {
     title: 'Une checklist matériel claire',
@@ -92,11 +92,11 @@ export const SOLUTION_POINTS = [
 export const FAQ = [
   {
     q: `Le prix est-il justifié ?`,
-    a: `RELIA coûte ${PRICE_MONTHLY} € par mois, ou ${PRICE_ANNUAL} € par an (${ANNUAL_FREE_MONTHS} mois offerts). Ce que tu paies : un seul endroit pour tes tâches, ton budget, tes prestataires, tes devis et ton déroulé du Jour J, plutôt que cinq outils à recoller. Nous ne te promettons aucun gain chiffré : le meilleur test, c’est l’essai de ${TRIAL_DAYS} jours, sans carte bancaire.`,
+    a: `JORDU coûte ${PRICE_MONTHLY} € par mois, ou ${PRICE_ANNUAL} € par an (${ANNUAL_FREE_MONTHS} mois offerts). Ce que tu paies : un seul endroit pour tes tâches, ton budget, tes prestataires, tes devis et ton déroulé du Jour J, plutôt que cinq outils à recoller. Nous ne te promettons aucun gain chiffré : le meilleur test, c’est l’essai de ${TRIAL_DAYS} jours, sans carte bancaire.`,
   },
   {
     q: 'En quoi est-ce différent des alternatives gratuites ?',
-    a: 'Excel, Notion ou Google Sheets sont excellents, et gratuits. Mais tu dois construire et entretenir toi-même la structure : le suivi de marge par mariage, la numérotation des devis, le déroulé imprimable. RELIA est déjà pensé pour le métier de décoratrice de mariage. Si tu es à l’aise avec ton système actuel et qu’il te suffit, tu n’as peut-être pas besoin de nous.',
+    a: 'Excel, Notion ou Google Sheets sont excellents, et gratuits. Mais tu dois construire et entretenir toi-même la structure : le suivi de marge par mariage, la numérotation des devis, le déroulé imprimable. JORDU est déjà pensé pour le métier de décoratrice de mariage. Si tu es à l’aise avec ton système actuel et qu’il te suffit, tu n’as peut-être pas besoin de nous.',
   },
   {
     q: 'Combien de temps faut-il pour voir des résultats ?',
@@ -104,7 +104,7 @@ export const FAQ = [
   },
   {
     q: 'Est-ce difficile à utiliser ? Faut-il des compétences techniques ?',
-    a: 'Non. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances. Si tu sais utiliser un tableur ou un agenda, tu sais utiliser RELIA. La démo te permet de tout voir avec des données fictives avant de commencer.',
+    a: 'Non. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances. Si tu sais utiliser un tableur ou un agenda, tu sais utiliser JORDU. La démo te permet de tout voir avec des données fictives avant de commencer.',
   },
   {
     q: 'Où sont stockées mes données ?',
@@ -112,15 +112,15 @@ export const FAQ = [
   },
   {
     q: 'Est-ce que ça marche sans internet ?',
-    a: 'RELIA a besoin d’une connexion pour s’ouvrir : il n’y a pas encore de mode hors-ligne complet. Bon réflexe, la veille : imprime ou enregistre en PDF ton déroulé du Jour J (bouton « Imprimer / Exporter »). Tu l’as alors avec toi, même sans réseau.',
+    a: 'JORDU a besoin d’une connexion pour s’ouvrir : il n’y a pas encore de mode hors-ligne complet. Bon réflexe, la veille : imprime ou enregistre en PDF ton déroulé du Jour J (bouton « Imprimer / Exporter »). Tu l’as alors avec toi, même sans réseau.',
   },
   {
-    q: 'Mon client a-t-il accès à RELIA ?',
-    a: 'Non : RELIA est ton poste de pilotage. Ton client reçoit les devis et factures que tu lui envoies (imprimés ou enregistrés en PDF). Tu gères, il voit ce qu’il doit voir.',
+    q: 'Mon client a-t-il accès à JORDU ?',
+    a: 'Non : JORDU est ton poste de pilotage. Ton client reçoit les devis et factures que tu lui envoies (imprimés ou enregistrés en PDF). Tu gères, il voit ce qu’il doit voir.',
   },
   {
     q: 'Les devis et factures sont-ils conformes ?',
-    a: 'RELIA numérote automatiquement tes devis et factures et affiche les coordonnées du client. Ce sont des documents indicatifs : vérifie tes obligations légales et fiscales avant émission.',
+    a: 'JORDU numérote automatiquement tes devis et factures et affiche les coordonnées du client. Ce sont des documents indicatifs : vérifie tes obligations légales et fiscales avant émission.',
   },
 ]
 
@@ -129,6 +129,6 @@ export const LEGAL = {
   name: 'EI Clélia Blard — Evenements Clés',
   country: 'France',
   address: '15 Impasse François Saint-Amand, 97430, La Réunion',
-  siteUrl: 'https://relia-app.vercel.app',
+  siteUrl: 'https://relia.evenementscles.com',
   updatedOn: '20 septembre 2026',
 } as const

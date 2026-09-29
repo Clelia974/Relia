@@ -29,7 +29,7 @@ const euro = (n: number) => `${n} €`
 
 const STATUS_MESSAGE: Record<string, string> = {
   trial: "Vous profitez de l'essai Pro complet — aucune carte bancaire requise.",
-  grace: "Votre essai Pro (14 jours) est terminé. Vous continuez à utiliser Relia normalement — passez au Pro dès que vous êtes prête pour continuer à en profiter.",
+  grace: "Votre essai Pro (14 jours) est terminé. Vous continuez à utiliser Jordu normalement — passez au Pro dès que vous êtes prête pour continuer à en profiter.",
   expired: "Votre essai Pro est terminé. Vous restez sur la version Gratuite — passez au Pro dès que vous êtes prête.",
   active: 'Merci ! Votre abonnement Pro est actif.',
   cancelled: 'Votre abonnement a été annulé. Réabonnez-vous pour retrouver le Pro.',

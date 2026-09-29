@@ -163,7 +163,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
 
       <p className="mx-auto max-w-2xl text-center text-sm text-muted-foreground">
         Résilie en un clic, sans justification à donner. Tes mariages, tâches et finances restent stockés sur ton appareil — exportables
-        en un clic à tout moment, même si tu arrêtes RELIA.
+        en un clic à tout moment, même si tu arrêtes JORDU.
       </p>
     </div>
   )

@@ -17,11 +17,11 @@ import { useSubmitLead } from '@/features/leads/useSubmitLead'
 
 /**
  * Formulaire public (jamais authentifié) : une prospect n'a pas de compte
- * Relia — lien propre à chaque décoratrice (/lead/new/:userId), à
+ * Jordu — lien propre à chaque décoratrice (/lead/new/:userId), à
  * partager elle-même (bio Instagram, réponse WhatsApp…) ou à intégrer
  * directement sur son propre site (lien classique ou iframe).
  *
- * `?embed=1` : sans en-tête Relia ni fond de page — pensé pour un
+ * `?embed=1` : sans en-tête Jordu ni fond de page — pensé pour un
  * <iframe> encastré dans une autre page, qui a déjà son propre habillage.
  */
 export function LeadFormPage() {
