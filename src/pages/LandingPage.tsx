@@ -146,7 +146,7 @@ export function LandingPage() {
             <div className="max-w-2xl">
               <p className={KICKER}>Le problème</p>
               <h2 className={cn(H2, 'mt-2')}>Tu connais déjà ces situations</h2>
-              <p className="mt-3 text-muted-foreground">Ce qui bloque la plupart des décoratrices, et qui n’a rien à voir avec un manque d’organisation naturelle.</p>
+              <p className="mt-3 text-muted-foreground">Pas un manque d’organisation. Juste des informations éparpillées partout, et ta tête qui essaie de tout retenir.</p>
             </div>
             <div className="mt-10">
               <PainPointCards />
@@ -159,10 +159,10 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La solution</p>
-              <h2 className={cn(H2, 'mt-2')}>Découvre Zordi</h2>
+              <h2 className={cn(H2, 'mt-2')}>Zordi, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">
-                ZORDI est née d’une question simple : et si le Jour J n’était pas un chaos organisé, mais tout simplement…
-                organisé ? Elle est pensée pour les décoratrices et décorateurs de mariage indépendants.
+                Une idée simple : que chaque mariage ait un seul endroit où aller — tâches, budget, prestataires, devis,
+                jusqu’au Jour J. Pensé pour les décoratrices et décorateurs de mariage indépendants.
               </p>
             </div>
             <div className="mt-10">
@@ -225,7 +225,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>Zordi a été pensé pour les personnes qui ont déjà une base</h2>
+              <h2 className={cn(H2, 'mt-2')}>Zordi est pour toi si tu as déjà une base</h2>
             </div>
             <div className="mt-10">
               <WhoItsForSection />
@@ -285,7 +285,7 @@ export function LandingPage() {
 
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
-          <p>© {new Date().getFullYear()} ZORDI · Le fil conducteur de vos mariages</p>
+          <p>© {new Date().getFullYear()} ZORDI · L’organisation pensée pour les décoratrices et décorateurs de mariage</p>
           <p>Les devis et factures générés sont indicatifs : vérifie tes obligations légales avant émission.</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>

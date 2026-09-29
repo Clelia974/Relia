@@ -98,10 +98,10 @@ describe('LandingPage', () => {
     expect(titles).toEqual([
       'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
       'Tu connais déjà ces situations',
-      'Découvre Zordi',
+      'Zordi, c’est quoi ?',
       'Ce que tu peux faire avec Zordi',
       'Avant Zordi. Après Zordi.',
-      'Zordi a été pensé pour les personnes qui ont déjà une base',
+      'Zordi est pour toi si tu as déjà une base',
       'Tarifs simples, pas de piège',
       'Tout ce que tu te demandes avant de commencer',
       'Prêt·e à respirer le Jour J ?',
