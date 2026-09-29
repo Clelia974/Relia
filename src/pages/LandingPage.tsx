@@ -99,11 +99,11 @@ export function LandingPage() {
                   Pour les décoratrices et décorateurs de mariage
                 </span>
                 <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-primary sm:text-5xl">
-                  Tout orchestré. <span className="italic text-thread-text">Enfin la paix.</span>
+                  Toutes tes infos, un seul endroit. <span className="italic text-thread-text">Enfin de l’air.</span>
                 </h1>
                 <p className="max-w-xl text-pretty text-lg leading-relaxed text-foreground/80">
-                  L’app pensée pour les décoratrices et décorateurs de mariage qui veulent enfin respirer le Jour J, passer
-                  moins de temps à s’inquiéter et plus de temps à créer.
+                  L’app qui centralise tâches, budget, prestataires et devis de chaque mariage, dès que tu les saisis. Moins
+                  de temps à chercher une info, plus de temps pour créer.
                 </p>
                 <ul className="flex flex-col gap-2.5 text-base">
                   {HERO_CHECKLIST.map((item) => (

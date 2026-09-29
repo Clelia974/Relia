@@ -22,7 +22,7 @@ export function SolutionSection() {
           </li>
         ))}
       </ul>
-      <p className="font-heading text-2xl font-semibold text-primary">Le résultat ? Tu respires. Tu crées. Tu réussis.</p>
+      <p className="font-heading text-2xl font-semibold text-primary">Le résultat ? Moins de charge mentale, plus de place pour créer.</p>
     </div>
   )
 }

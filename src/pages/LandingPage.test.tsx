@@ -53,7 +53,7 @@ describe('LandingPage', () => {
     setup()
     const h1 = screen.getAllByRole('heading', { level: 1 })
     expect(h1).toHaveLength(1)
-    expect(h1[0].textContent).toBe('Tout orchestré. Enfin la paix.')
+    expect(h1[0].textContent).toBe('Toutes tes infos, un seul endroit. Enfin de l’air.')
   })
 
   it("sans compte : le bouton principal mène à l'inscription", () => {
