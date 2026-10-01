@@ -349,3 +349,20 @@ p { text-wrap: pretty; }
     background: #FFFFFF;
     }
 }
+
+/* Landing « aérienne » : mêmes couleurs de marque, mais le thème global (pensé pour
+   l'app, bleu pâle dense) est éclairci UNIQUEMENT à l'intérieur de la landing —
+   fond bleu très clair, cartes blanches, bordures et ombres plus légères. Les
+   composants de la landing continuent d'utiliser bg-card/border-border : seules les
+   valeurs changent ici, rien dans l'app connectée. */
+.landing-airy {
+  --background: #F5F8FB;
+  --card: #FFFFFF;
+  --popover: #FFFFFF;
+  --secondary: #ECF1F7;
+  --muted: #ECF1F7;
+  --accent: #E7EEF6;
+  --border: #E2E8F0;
+  --shadow-card: 0 1px 2px rgb(31 45 61 / 0.03), 0 12px 32px -14px rgb(31 45 61 / 0.10);
+  --shadow-raised: 0 2px 6px rgb(31 45 61 / 0.04), 0 28px 56px -24px rgb(31 45 61 / 0.18);
+}

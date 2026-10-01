@@ -15,11 +15,9 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 }
 
 /**
- * jsdom ne fournit pas non plus IntersectionObserver — utilisé par
- * FeatureCarousel (landing) pour suivre quelle fenêtre du carrousel est
- * visible. Le stub n'observe jamais réellement : le carrousel reste sur
- * sa première étape dans les tests, ce qui est le comportement attendu
- * au montage de toute façon.
+ * jsdom ne fournit pas non plus IntersectionObserver — stub inerte, gardé
+ * pour tout composant futur qui l'utiliserait (l'ancien carrousel de la
+ * landing, qui en dépendait, a été retiré).
  */
 class IntersectionObserverStub {
   observe() {}

@@ -61,7 +61,7 @@ describe('workspaceStore — clôture et bilan (Phase 5)', () => {
 
   it('5. addPortfolioImage ajoute une image, removePortfolioImage la retire', () => {
     useWorkspaceStore.getState().closeWedding(weddingId)
-    useWorkspaceStore.getState().addPortfolioImage(weddingId, 'data:image/png;base64,abc', 'Avant')
+    useWorkspaceStore.getState().addPortfolioImage(weddingId, 'u1/w1/abc.jpg', 'Avant')
 
     let closing = useWorkspaceStore.getState().workspace.closingSessions.find((c) => c.weddingId === weddingId)
     expect(closing?.portfolioImages).toHaveLength(1)
@@ -76,7 +76,7 @@ describe('workspaceStore — clôture et bilan (Phase 5)', () => {
   it('6. addPortfolioImage refuse au-delà de 5 images', () => {
     useWorkspaceStore.getState().closeWedding(weddingId)
     for (let i = 0; i < 6; i++) {
-      useWorkspaceStore.getState().addPortfolioImage(weddingId, `data:image/png;base64,img${i}`)
+      useWorkspaceStore.getState().addPortfolioImage(weddingId, `u1/w1/img${i}.jpg`)
     }
     const closing = useWorkspaceStore.getState().workspace.closingSessions.find((c) => c.weddingId === weddingId)
     expect(closing?.portfolioImages).toHaveLength(5)

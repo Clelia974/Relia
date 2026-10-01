@@ -11,7 +11,7 @@ import { z } from 'zod'
  * déjà conformes.
  */
 
-export const CURRENT_SCHEMA_VERSION = 12 as const
+export const CURRENT_SCHEMA_VERSION = 14 as const
 
 const isoDate = z
   .string()
@@ -130,6 +130,19 @@ export const ContractSchema = z.object({
   shareId: z.string().optional(),
 })
 
+/** Couleur hexadécimale #RRGGBB (palette du Design, couleurs du moodboard). */
+const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide.')
+
+/** Point d'entrée créatif d'un mariage (onglet Design) — tout est facultatif, rien n'est jamais exigé. */
+export const WeddingDesignSchema = z.object({
+  /** Mots de style : « bohème », « champêtre chic »… */
+  styleKeywords: z.array(z.string().min(1)).default([]),
+  palette: z.array(z.object({ hex: hexColor, label: z.string().optional() })).default([]),
+  /** Matières : lin, eucalyptus, laiton… */
+  materials: z.array(z.string().min(1)).default([]),
+  ambiance: z.string().optional(),
+})
+
 export const WeddingSchema = z.object({
   id,
   coupleName: z.string().min(1, 'Le nom du couple est obligatoire.'),
@@ -151,6 +164,8 @@ export const WeddingSchema = z.object({
   notes: z.string().optional(),
   /** Marge minimale recommandée entre deux moments du planning (minutes) — remplace la valeur globale par défaut si renseignée. */
   minBufferMinutes: z.number().int().nonnegative().optional(),
+  /** Onglet Design (palette, style, matières, ambiance) — absent tant que rien n'a été saisi. */
+  design: WeddingDesignSchema.optional(),
   /** Renseigné une fois la clôture (Phase 5) effectuée — cf. ClosingSessionSchema. Présence = mariage verrouillé (édition non recommandée hors réouverture explicite). */
   closingSessionId: id.optional(),
   createdAt: isoDate,
@@ -563,13 +578,17 @@ export const EquipmentItemSchema = z.object({
   updatedAt: isoDate,
 })
 
-export const PortfolioImageSchema = z.object({
-  id,
-  caption: z.string().optional(),
-  /** Image encodée en base64 — jamais téléversée ailleurs qu'en LocalStorage (cf. Phase 5, hors périmètre volontaire : pas de stockage cloud). */
-  dataUrl: z.string().startsWith('data:image'),
-  uploadedAt: isoDate,
-})
+export const PortfolioImageSchema = z
+  .object({
+    id,
+    caption: z.string().optional(),
+    /** Chemin dans le bucket privé "inspirations" (cf. src/features/assets) — format actuel de toute nouvelle image. */
+    storagePath: z.string().optional(),
+    /** Ancien format : image en base64 dans le localStorage. Encore lu pour les images déjà enregistrées, plus jamais écrit (quota ~5 Mo). */
+    dataUrl: z.string().startsWith('data:image').optional(),
+    uploadedAt: isoDate,
+  })
+  .refine((img) => img.storagePath !== undefined || img.dataUrl !== undefined, { message: 'Image sans fichier.' })
 
 /**
  * Bilan figé au moment de la clôture — une photographie, jamais recalculée
@@ -613,6 +632,113 @@ export const ClosingSessionSchema = z.object({
   updatedAt: isoDate,
 })
 
+export const MoodboardItemKindSchema = z.enum(['image', 'texte', 'couleur', 'matiere'])
+
+/**
+ * Élément posé librement sur un moodboard. Coordonnées en pixels « monde »
+ * (indépendants du zoom), origine en haut à gauche ; `rotation` en degrés
+ * autour du centre ; `z` = ordre d'empilement (plus grand = devant).
+ */
+export const MoodboardItemSchema = z.object({
+  id,
+  kind: MoodboardItemKindSchema,
+  x: z.number(),
+  y: z.number(),
+  w: z.number().positive(),
+  h: z.number().positive(),
+  rotation: z.number().default(0),
+  z: z.number().int().default(0),
+  /** Image : chemin dans le bucket privé "inspirations" (jamais de base64). */
+  storagePath: z.string().optional(),
+  /** Texte, note, ou nom d'une matière. */
+  text: z.string().optional(),
+  /** Couleur (pastille de palette) ou teinte de fond d'une note. */
+  color: hexColor.optional(),
+  /** Lien facultatif vers un élément de la checklist Matériel du même mariage. */
+  equipmentItemId: id.optional(),
+})
+
+/** Un mariage peut avoir plusieurs moodboards (cérémonie, réception, version « pluie »…). */
+export const MoodboardSchema = z.object({
+  id,
+  weddingId: id,
+  title: z.string().min(1, 'Donne un nom à ce moodboard.'),
+  items: z.array(MoodboardItemSchema).default([]),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+})
+
+/** Invité du mariage — une seule liste par mariage, partagée par toutes les versions du plan de salle. */
+export const GuestSchema = z.object({
+  id,
+  weddingId: id,
+  name: z.string().min(1, 'Le nom est obligatoire.'),
+  /** Groupe libre : « Famille de Camille », « Amis d'Antoine »… */
+  group: z.string().optional(),
+  /** Régime, allergie, enfant, mobilité réduite… */
+  notes: z.string().optional(),
+  createdAt: isoDate,
+})
+
+export const FloorElementKindSchema = z.enum([
+  'table_ronde',
+  'table_rect',
+  /** Table d'honneur : invités d'un seul côté, face à la salle. */
+  'table_honneur',
+  'piste',
+  'scene',
+  'bar',
+  'buffet',
+  /** Rectangle libre (cérémonie, photobooth, espace enfants…). */
+  'zone',
+  'texte',
+  /** Murs / contour de la salle : ligne brisée libre, fermée (salle) ou ouverte (cloison, estrade…). */
+  'contour',
+])
+
+/** Forme posée librement sur le plan — même repère « monde » que les moodboards. */
+export const FloorElementSchema = z.object({
+  id,
+  kind: FloorElementKindSchema,
+  x: z.number(),
+  y: z.number(),
+  w: z.number().positive(),
+  h: z.number().positive(),
+  rotation: z.number().default(0),
+  z: z.number().int().default(0),
+  /** Nom affiché : « Table 1 », « Les Oliviers », « Bar »… */
+  label: z.string().optional(),
+  /** Tables uniquement : nombre de places. */
+  seats: z.number().int().min(1).max(40).optional(),
+  color: hexColor.optional(),
+  /**
+   * Contour uniquement : angles du tracé, relatifs au coin haut-gauche de la
+   * boîte (qui englobe tout le tracé). `bulge` arrondit le mur qui part de
+   * cet angle vers le suivant : flèche de l'arc en px, signée (0 = droit).
+   */
+  points: z.array(z.object({ x: z.number(), y: z.number(), bulge: z.number().optional() })).min(2).optional(),
+  /** Contour uniquement : tracé fermé (forme de la salle) ou ligne ouverte. */
+  closed: z.boolean().optional(),
+})
+
+/** Un invité assis à une place précise d'une table (index de place 0…seats-1). */
+export const SeatAssignmentSchema = z.object({
+  guestId: id,
+  elementId: id,
+  seat: z.number().int().nonnegative(),
+})
+
+/** Une version du plan de salle (« Principal », « Version pluie »…) avec son propre placement des invités. */
+export const FloorPlanSchema = z.object({
+  id,
+  weddingId: id,
+  title: z.string().min(1, 'Donne un nom à cette version.'),
+  elements: z.array(FloorElementSchema).default([]),
+  assignments: z.array(SeatAssignmentSchema).default([]),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+})
+
 export const UiPreferencesSchema = z.object({
   theme: z.enum(['system', 'light', 'dark']).default('system'),
 })
@@ -638,6 +764,9 @@ export const WorkspaceSchema = z
     invoices: z.array(InvoiceSchema),
     equipmentItems: z.array(EquipmentItemSchema).default([]),
     closingSessions: z.array(ClosingSessionSchema).default([]),
+    moodboards: z.array(MoodboardSchema).default([]),
+    guests: z.array(GuestSchema).default([]),
+    floorPlans: z.array(FloorPlanSchema).default([]),
     /** Dernier numéro attribué par type et par année (clé "devis:2026") — ne fait qu'augmenter, même si un document est supprimé. */
     documentCounters: z.record(z.string(), z.number().int().nonnegative()).default({}),
     uiPreferences: UiPreferencesSchema,
@@ -695,6 +824,34 @@ export const WorkspaceSchema = z
       checkWeddingRef(['timelineEvents', i, 'weddingId'], event.weddingId)
       checkVendorRef(['timelineEvents', i, 'vendorId'], event.vendorId)
     })
+    const equipmentWeddingById = new Map(workspace.equipmentItems.map((e) => [e.id, e.weddingId]))
+    workspace.moodboards.forEach((board, i) => {
+      checkWeddingRef(['moodboards', i, 'weddingId'], board.weddingId)
+      board.items.forEach((item, j) => {
+        if (item.equipmentItemId && equipmentWeddingById.get(item.equipmentItemId) !== board.weddingId) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['moodboards', i, 'items', j, 'equipmentItemId'],
+            message: `equipmentItemId "${item.equipmentItemId}" ne correspond à aucun matériel de ce mariage.`,
+          })
+        }
+      })
+    })
+    const guestWeddingById = new Map(workspace.guests.map((g) => [g.id, g.weddingId]))
+    workspace.guests.forEach((guest, i) => checkWeddingRef(['guests', i, 'weddingId'], guest.weddingId))
+    workspace.floorPlans.forEach((plan, i) => {
+      checkWeddingRef(['floorPlans', i, 'weddingId'], plan.weddingId)
+      const elementIds = new Set(plan.elements.map((e) => e.id))
+      plan.assignments.forEach((a, j) => {
+        if (guestWeddingById.get(a.guestId) !== plan.weddingId || !elementIds.has(a.elementId)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['floorPlans', i, 'assignments', j],
+            message: `Placement invalide (invité "${a.guestId}", table "${a.elementId}").`,
+          })
+        }
+      })
+    })
     workspace.expenses.forEach((expense, i) => {
       checkWeddingRef(['expenses', i, 'weddingId'], expense.weddingId)
     })
@@ -744,6 +901,15 @@ export type VatStatus = z.infer<typeof VatStatusSchema>
 export type BusinessConfig = z.infer<typeof BusinessConfigSchema>
 export type UserProfile = z.infer<typeof UserProfileSchema>
 export type Wedding = z.infer<typeof WeddingSchema>
+export type WeddingDesign = z.infer<typeof WeddingDesignSchema>
+export type MoodboardItemKind = z.infer<typeof MoodboardItemKindSchema>
+export type MoodboardItem = z.infer<typeof MoodboardItemSchema>
+export type Moodboard = z.infer<typeof MoodboardSchema>
+export type Guest = z.infer<typeof GuestSchema>
+export type FloorElementKind = z.infer<typeof FloorElementKindSchema>
+export type FloorElement = z.infer<typeof FloorElementSchema>
+export type SeatAssignment = z.infer<typeof SeatAssignmentSchema>
+export type FloorPlan = z.infer<typeof FloorPlanSchema>
 export type Vendor = z.infer<typeof VendorSchema>
 export type VendorWeddingLink = z.infer<typeof VendorWeddingLinkSchema>
 export type PostponeEntry = z.infer<typeof PostponeEntrySchema>

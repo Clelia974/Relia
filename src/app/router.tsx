@@ -76,6 +76,15 @@ const WeddingDayOfTab = lazy(() =>
 const WeddingBreakdownTab = lazy(() =>
   import('@/pages/mariages/WeddingBreakdownTab').then((m) => ({ default: m.WeddingBreakdownTab })),
 )
+const WeddingDesignTab = lazy(() =>
+  import('@/pages/mariages/WeddingDesignTab').then((m) => ({ default: m.WeddingDesignTab })),
+)
+const WeddingFloorPlanTab = lazy(() =>
+  import('@/pages/mariages/WeddingFloorPlanTab').then((m) => ({ default: m.WeddingFloorPlanTab })),
+)
+const MoodboardEditorPage = lazy(() =>
+  import('@/pages/mariages/MoodboardEditorPage').then((m) => ({ default: m.MoodboardEditorPage })),
+)
 const WeddingClosingTab = lazy(() =>
   import('@/pages/mariages/WeddingClosingTab').then((m) => ({ default: m.WeddingClosingTab })),
 )
@@ -151,6 +160,9 @@ export function AppRouter() {
             <Route path="jour-j" element={<WeddingDayOfTab />} />
             <Route path="demontage" element={<WeddingBreakdownTab />} />
             <Route path="cloture" element={<WeddingClosingTab />} />
+            <Route path="design" element={<WeddingDesignTab />} />
+            <Route path="design/moodboards/:moodboardId" element={<MoodboardEditorPage />} />
+            <Route path="plan" element={<WeddingFloorPlanTab />} />
             <Route path="documents/propositions/:proposalId" element={<ProposalBuilderPage />} />
             <Route path="documents/factures/:invoiceId" element={<InvoicePreviewPage />} />
           </Route>

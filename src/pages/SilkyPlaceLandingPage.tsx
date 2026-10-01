@@ -1,24 +1,24 @@
 import { useEffect } from 'react'
 import {
+  Armchair,
+  ArrowRight,
   Brain,
   Camera,
   ChevronDown,
-  Eye,
-  Heart,
-  ListChecks,
+  LayoutGrid,
   Mail,
   MessageCircle,
-  Moon,
+  Palette,
   Phone,
-  Power,
-  Repeat,
-  Sparkles,
   StickyNote,
-  Users,
+  type LucideIcon,
 } from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
+import { BORDEAUX_GRADIENT, ComparisonPanels } from '@/features/landing/components/BeforeAfterSection'
+import { DayTimeline } from '@/features/landing/components/DayTimeline'
+import { AudienceCards } from '@/features/landing/components/WhoItsForSection'
 import { SilkyPlaceHowItWorks } from '@/features/silkyplace-landing/SilkyPlaceHowItWorks'
 import { SilkyPlaceTimeCalculator } from '@/features/silkyplace-landing/SilkyPlaceTimeCalculator'
 import { SilkyPlaceWaitlistForm } from '@/features/silkyplace-landing/SilkyPlaceWaitlistForm'
@@ -28,14 +28,13 @@ import { cn } from '@/lib/utils'
 // #520C0C primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
 // distinctes des tokens --primary/--thread de l'app existante, laissés intacts ailleurs
 // dans le produit tant que le rebrand complet n'est pas décidé.
-const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
-const SECTION = 'scroll-mt-20 py-14 sm:py-20'
+const CONTAINER = 'mx-auto w-full max-w-5xl px-5 sm:px-8'
+const SECTION = 'scroll-mt-24 py-20 sm:py-32'
 // Note : classes Tailwind écrites en toutes lettres (jamais interpolées via les constantes
 // ci-dessus) — le scanner de Tailwind lit le texte source tel quel, une valeur injectée par
 // template literal ne serait pas détectée et la règle CSS ne serait jamais générée.
-const H2 = 'font-heading text-2xl font-semibold tracking-tight text-[#520C0C] sm:text-3xl'
-const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]'
-const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#5F6B4C]'
+const H2 = 'text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-5xl'
+const KICKER = 'text-xs font-semibold uppercase tracking-[0.16em] text-[#5F6B4C]'
 const CONTACT_EMAIL = 'contact@evenementscles.com'
 
 const HEAD_THOUGHTS = [
@@ -57,11 +56,24 @@ const DAY_TIMELINE = [
   { time: '21h00', text: 'Tu recherches une information que tu avais vue quelque part.' },
 ]
 
-const TIME_RECOVERED = [
-  { icon: Users, title: 'Ta famille', text: 'Être vraiment là, sans téléphone à côté de toi.' },
-  { icon: Sparkles, title: 'Ta créativité', text: 'Créer, chercher une idée, en avoir de nouveau envie.' },
-  { icon: Heart, title: 'Ton couple', text: 'Dîner sans « attends, je réponds vite ».' },
-  { icon: Moon, title: 'Toi', text: 'Sortir, lire, dormir, ne rien faire.' },
+
+/** Après le « oui » : ce qui se prépare ensuite dans SilkyPlace. */
+const AFTER_YES = [
+  {
+    icon: Palette,
+    title: 'Le moodboard',
+    text: 'Palette, matières, photos d’inspiration : tu poses tout librement, puis tu l’envoies aux mariés en PDF ou en image.',
+  },
+  {
+    icon: LayoutGrid,
+    title: 'Le plan de salle',
+    text: 'Tu redessines la salle, même biscornue, et tu places tables, piste de danse, bar et buffet où tu veux.',
+  },
+  {
+    icon: Armchair,
+    title: 'Le plan de table',
+    text: 'Tu assois chaque invité d’un glisser-déposer, et tu imprimes la liste par table pour le jour J.',
+  },
 ]
 
 const BEFORE_AFTER = [
@@ -73,13 +85,6 @@ const BEFORE_AFTER = [
   { before: '« Je continue après le dîner. »', after: '« Je sais où reprendre demain. »' },
 ]
 
-const WHAT_SILKYPLACE_DOES_NOT = [
-  'faire venir des clientes à ta place ;',
-  'remplacer ton Instagram ;',
-  'remplacer ton savoir-faire ;',
-  'gérer tes événements à ta place ;',
-  'te promettre X heures gagnées par semaine.',
-]
 
 const FOR_YOU = [
   'Tu es décoratrice événementielle.',
@@ -120,10 +125,28 @@ const FAQ: { q: string; a: string }[] = [
   },
 ]
 
+/** Teintes de marque en alternance pour les pastilles d'icône — mêmes que la landing. */
+const TILE_TONES = ['bg-[#DDE6EF] text-[#520C0C]', 'bg-[#A9B08F]/25 text-[#5F6B4C]', 'bg-[#520C0C]/[0.07] text-[#520C0C]']
+
+
+/** Carte à pastille d'icône — même gabarit que les cartes de fonctionnalités de la landing. */
+function IconCard({ icon: Icon, title, text, tone }: { icon: LucideIcon; title: string; text: string; tone: number }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-7 shadow-(--shadow-card)">
+      <span className={cn('flex size-11 items-center justify-center rounded-xl', TILE_TONES[tone % TILE_TONES.length])}>
+        <Icon className="size-5" aria-hidden="true" />
+      </span>
+      <p className="mt-1 font-heading text-lg font-semibold text-foreground">{title}</p>
+      <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>
+    </div>
+  )
+}
+
 /**
  * Landing "bis" — /liste-attente : uniquement une collecte d'emails en attendant que
  * le MVP SilkyPlace soit prêt, distincte de la vraie landing "lancement" (RootGate /).
- * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
+ * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts. Même style
+ * « aérien » que la landing (classe landing-airy, cartes, halos).
  */
 export function SilkyPlaceLandingPage() {
   useEffect(() => {
@@ -140,7 +163,7 @@ export function SilkyPlaceLandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#DDE6EF] text-foreground">
+    <div className="landing-airy min-h-dvh bg-background text-foreground">
       <a
         href="#contenu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
@@ -149,12 +172,12 @@ export function SilkyPlaceLandingPage() {
       </a>
 
       {/* 1 — HEADER */}
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
-        <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-card/80 backdrop-blur-md">
+        <div className={cn(CONTAINER, 'flex h-20 items-center justify-between gap-4')}>
           <a href="#haut" aria-label="SilkyPlace — haut de page">
-            <SilkyPlaceWordmark className="font-heading text-2xl font-semibold tracking-tight" />
+            <SilkyPlaceWordmark className="text-[26px] sm:text-[32px]" />
           </a>
-          <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+          <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
             <a href="#comment-ca-marche" className="transition-colors hover:text-foreground">Comment ça marche</a>
             <a href="#pourquoi-silkyplace" className="transition-colors hover:text-foreground">Pourquoi SilkyPlace</a>
@@ -163,7 +186,7 @@ export function SilkyPlaceLandingPage() {
           <button
             type="button"
             onClick={scrollToInscription}
-            className="rounded-lg bg-[#520C0C] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#520C0C]/90"
+            className="rounded-full bg-[#520C0C] px-5 py-2.5 text-sm font-medium text-[#DDE6EF] shadow-(--shadow-raised) transition-colors hover:bg-[#520C0C]/90"
           >
             Je veux rejoindre SilkyPlace
           </button>
@@ -172,13 +195,15 @@ export function SilkyPlaceLandingPage() {
 
       <main id="contenu" className="flex flex-col">
         {/* 2 — HERO */}
-        <section id="haut" className="overflow-hidden pb-14 pt-14 sm:pb-20 sm:pt-20">
-          <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-[#5F6B4C]">
+        <section id="haut" className="relative isolate overflow-hidden pb-24 pt-16 sm:pb-32 sm:pt-28">
+          <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[42rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-32 top-24 -z-10 size-[30rem] rounded-full bg-[#520C0C] opacity-[0.05] blur-3xl" />
+          <div className={cn(CONTAINER, 'flex flex-col items-center gap-8 text-center animate-page-in')}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.12em] text-[#5F6B4C] shadow-(--shadow-card)">
               <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
               SilkyPlace — en construction
             </span>
-            <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#520C0C] sm:text-5xl">
+            <h1 className="max-w-4xl text-balance font-heading text-5xl font-semibold leading-[1.04] tracking-tight text-[#520C0C] sm:text-7xl">
               Et si tu pouvais vraiment fermer ton ordinateur à 18h ?
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
@@ -186,8 +211,7 @@ export function SilkyPlaceLandingPage() {
               un devis pendant que ta famille t’attend. SilkyPlace t’aide à mieux gérer tes demandes, pour que ton travail
               reprenne sa place.
             </p>
-
-            <div className="mt-2 w-full max-w-md">
+            <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-left shadow-(--shadow-raised)">
               <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre SilkyPlace →</p>
               <SilkyPlaceWaitlistForm id="inscription" submitLabel="Je veux rejoindre SilkyPlace" />
             </div>
@@ -197,292 +221,187 @@ export function SilkyPlaceLandingPage() {
           </div>
         </section>
 
-        {/* 3 — MANIFESTE */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">
-              Tu peux aimer créer, imaginer, voir un événement prendre vie — et ne pas avoir envie de répondre à des
-              messages tous les soirs. Être à son compte, ce n’est pas être disponible tout le temps.
-            </p>
-          </div>
-        </section>
-
-        {/* 4 — LE PROBLÈME */}
-        <section id="probleme" className={SECTION}>
+        {/* 2 — LE PROBLÈME */}
+        <section id="probleme" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
-            <div className="max-w-2xl">
+            <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Le problème</p>
-              <h2 className={cn(H2, 'mt-2')}>Tes demandes peuvent être partout</h2>
-              <p className="mt-3 text-muted-foreground">
+              <h2 className={cn(H2, 'mt-3')}>Tes demandes peuvent être partout</h2>
+              <p className="mt-5 text-lg text-muted-foreground">
                 Pas forcément trop de travail — plutôt des demandes éparpillées partout, et ta tête qui essaie de se
                 souvenir de tout.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {HEAD_THOUGHTS.map((item) => (
-                <div key={item.source} className="rounded-xl border border-border bg-card p-5">
-                  <p className={CARD_KICKER}>
-                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
-                    {item.source}
-                  </p>
-                  <p className="mt-2 text-foreground">{item.thought}</p>
-                </div>
+            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {HEAD_THOUGHTS.map((item, i) => (
+                <IconCard key={item.source} icon={item.icon} title={item.thought} text={item.source} tone={i} />
               ))}
             </div>
           </div>
         </section>
 
-        {/* 5 — LA JOURNÉE QUI DÉBORDE */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={CONTAINER}>
-            <div className="max-w-2xl">
-              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
-            </div>
-            <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
-              {DAY_TIMELINE.map((item) => (
-                <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
-                  <span className="shrink-0 font-heading text-sm font-semibold text-[#520C0C] sm:w-16">{item.time}</span>
-                  <span className="text-foreground/80">{item.text}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-8 max-w-2xl text-muted-foreground">
-              Et demain, il faudra se souvenir de tout ce qui reste. Est-ce que ton travail sait vraiment s’arrêter ?
-            </p>
-          </div>
-        </section>
-
-        {/* 6 — LA VIE QUE TU VEUX RETROUVER */}
+        {/* 3 — LA JOURNÉE QUI DÉBORDE — frise interactive (sa conclusion reprend « Imagine… ») */}
         <section className={SECTION}>
-          <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>Imagine.</h2>
-            <div className="mt-6 flex flex-col gap-3 text-lg leading-relaxed text-foreground/80">
-              <p>
-                18h05, tu poses ton téléphone. Tu sais ce qui est traité, en attente, ce que tu retrouveras demain —
-                alors tu arrêtes, sans peur d’avoir oublié quelque chose.
-              </p>
-              <p className="font-medium text-foreground">Et le dimanche… tu ne regardes pas tes demandes.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* 7 — LE TEMPS RÉCUPÉRÉ */}
-        <section className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
-            <div className="max-w-2xl">
-              <h2 className={H2}>Et le temps que tu récupères, tu en fais quoi ?</h2>
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
+              <p className="mt-4 text-muted-foreground">Clique sur une heure.</p>
             </div>
-            <div className="mt-10 grid gap-6 sm:grid-cols-2">
-              {TIME_RECOVERED.map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
-                  <p className={CARD_KICKER}>
-                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
-                    {item.title}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-foreground">{item.text}</p>
-                </div>
-              ))}
+            <div className="mt-12">
+              <DayTimeline
+                moments={DAY_TIMELINE}
+                conclusion="Et demain, il faudra se souvenir de tout ce qui reste. Imagine plutôt : 18h05, tu poses ton téléphone, sans peur d’avoir oublié quelque chose."
+              />
             </div>
-            <p className="mt-8 max-w-2xl text-muted-foreground">
-              SilkyPlace ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
-            </p>
           </div>
         </section>
 
-        {/* 9 — SilkyPlace, C'EST QUOI ? */}
+        {/* 4 — UNE DEMANDE ARRIVE (démo interactive) */}
         <section id="comment-ca-marche" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
-            <div className="max-w-2xl">
-              <p className={KICKER}>Comment ça marche</p>
-              <h2 className={cn(H2, 'mt-2')}>SilkyPlace, c’est quoi ?</h2>
-              <p className="mt-3 text-muted-foreground">Une idée simple : une demande devrait avoir un endroit où aller.</p>
-            </div>
-            <div className="mt-10 grid gap-6 sm:grid-cols-2">
-              {[
-                { icon: Eye, title: 'Voir', text: 'Toutes tes demandes au même endroit.' },
-                { icon: ListChecks, title: 'Savoir', text: 'Ce qui est à traiter, en attente, confirmé.' },
-                { icon: Repeat, title: 'Suivre', text: 'Qui relancer, sans compter sur ta mémoire.' },
-                { icon: Power, title: 'Décrocher', text: 'Fermer l’ordinateur en sachant où tu en es.' },
-              ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
-                  <p className={CARD_KICKER}>
-                    <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
-                    {item.title}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-foreground">{item.text}</p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-8 max-w-2xl text-muted-foreground">
-              Pas une usine à gaz. Une organisation pensée pour la réalité d’une décoratrice événementielle.
-            </p>
-          </div>
-        </section>
-
-        {/* 10 — AVANT / APRÈS */}
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="max-w-2xl">
-              <p className={KICKER}>La différence</p>
-              <h2 className={cn(H2, 'mt-2')}>Pas pour travailler plus vite. Pour avoir moins de choses à retenir.</h2>
-            </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
-              <div className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-sm font-semibold text-muted-foreground">Aujourd’hui</p>
-                <ul className="mt-4 flex flex-col divide-y divide-border">
-                  {BEFORE_AFTER.map((row) => (
-                    <li key={row.before} className="py-2.5 text-sm text-muted-foreground first:pt-0 last:pb-0">
-                      {row.before}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-2xl border border-[#520C0C]/30 bg-[#520C0C]/5 p-6">
-                <p className="text-sm font-semibold text-[#520C0C]">Avec une organisation claire</p>
-                <ul className="mt-4 flex flex-col divide-y divide-[#520C0C]/15">
-                  {BEFORE_AFTER.map((row) => (
-                    <li key={row.after} className="py-2.5 text-sm text-foreground first:pt-0 last:pb-0">
-                      {row.after}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 11 — PETIT CALCULATEUR */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <div className="text-center">
-              <p className={KICKER}>Petit calculateur</p>
-              <h2 className={cn(H2, 'mt-2')}>Et tout ce temps passé à gérer tes demandes ?</h2>
-              <p className="mt-3 text-muted-foreground">
-                Pendant les grosses périodes, quelques minutes par demande peuvent rapidement s’accumuler.
-              </p>
-            </div>
-            <div className="mt-10">
-              <SilkyPlaceTimeCalculator />
-            </div>
-          </div>
-        </section>
-
-        {/* 12 — CE QUE SilkyPlace NE PROMET PAS */}
-        <section className={SECTION}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>On ne va pas te raconter que SilkyPlace va régler toute ton activité.</h2>
-            <p className="mt-4 text-muted-foreground">SilkyPlace ne va pas :</p>
-            <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
-              {WHAT_SILKYPLACE_DOES_NOT.map((item) => (
-                <li key={item} className="flex items-start gap-2.5">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-muted-foreground">
-              Ce n’est pas son rôle. SilkyPlace s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
-              garder dans ta tête.
-            </p>
-          </div>
-        </section>
-
-        {/* 13 — CONSTRUCTION */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>SilkyPlace est encore en construction.</h2>
-            <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
-            <p className="mt-4 text-muted-foreground">
-              Le but : quelque chose que les décoratrices auront réellement envie d’utiliser.
-            </p>
-          </div>
-        </section>
-
-        {/* 14 — POUR QUI ? */}
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="max-w-2xl">
-              <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>SilkyPlace est pour toi si…</h2>
-            </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
-              <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
-                <p className="text-sm font-semibold text-success">SilkyPlace est pour toi si…</p>
-                <ul className="mt-4 flex flex-col gap-2.5">
-                  {FOR_YOU.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-foreground/80">
-                      <span className="mt-0.5 text-success">✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-sm font-semibold text-muted-foreground">SilkyPlace n’est probablement pas pour toi si…</p>
-                <ul className="mt-4 flex flex-col gap-2.5">
-                  {NOT_FOR_YOU.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-muted-foreground">
-                      <span className="mt-0.5">×</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <p className="mt-8 max-w-2xl text-muted-foreground">
-              SilkyPlace ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
-            </p>
-          </div>
-        </section>
-
-        {/* 15 — COMMENT ÇA POURRAIT FONCTIONNER */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={CONTAINER}>
-            <div className="max-w-2xl">
+            <div className="mx-auto max-w-2xl text-center">
               <h2 className={H2}>Une demande arrive.</h2>
-              <p className="mt-3 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
+              <p className="mt-4 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
             </div>
-            <div className="mt-8">
+            <div className="mt-12 rounded-[2rem] border border-border bg-background p-6 shadow-(--shadow-card) sm:p-10">
               <SilkyPlaceHowItWorks />
             </div>
           </div>
         </section>
 
-        {/* 16 — POURQUOI SilkyPlace ? (portrait) */}
-        <section id="pourquoi-silkyplace" className={SECTION}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <p className={KICKER}>Pourquoi SilkyPlace</p>
-            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé SilkyPlace parce que j’avais toutes les réponses.</h2>
-            <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
-              <p>
-                J’ai été comptable, avant décoratrice — et mon activité de décoratrice n’a pas fonctionné comme je
-                l’espérais, pas assez de demandes pour en vivre.
+        {/* 5 — APRÈS LE OUI : moodboard, plan de salle, plan de table */}
+        <section id="apres-le-oui" className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Après le oui</p>
+              <h2 className={cn(H2, 'mt-3')}>Et une fois le mariage signé ?</h2>
+              <p className="mt-5 text-lg text-muted-foreground">
+                Tout se prépare au même endroit : de l’ambiance au placement des invités, sans jongler entre Canva, Excel
+                et une feuille de papier.
               </p>
-              <p>
-                En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
-                périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
-                demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
-                amenée à réfléchir à SilkyPlace.
-              </p>
-              <p>
-                Le nom vient de là aussi. <em>Silky</em>, c’est la soie : ce qui glisse, sans accroc. <em>Place</em>,
-                c’est un lieu. SilkyPlace, c’est l’endroit où tes projets s’enchaînent en douceur et où chaque pièce
-                trouve sa place, pour que tu retrouves l’esprit libre, et du temps.
-              </p>
-              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où SilkyPlace ira. Mais je sais pourquoi j’ai commencé.</p>
+            </div>
+            <div className="mt-14 grid gap-5 sm:grid-cols-3">
+              {AFTER_YES.map((item, i) => (
+                <IconCard key={item.title} icon={item.icon} title={item.title} text={item.text} tone={i} />
+              ))}
             </div>
           </div>
         </section>
 
-        {/* 17 — FAQ */}
+        {/* 6 — AVANT / APRÈS */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>La différence</p>
+              <h2 className={cn(H2, 'mt-3')}>Pas pour travailler plus vite. Pour avoir moins de choses à retenir.</h2>
+            </div>
+            <div className="mt-14">
+              <ComparisonPanels
+                before={{ label: 'Avant', title: 'Aujourd’hui', rows: BEFORE_AFTER.map((row) => ({ text: row.before })) }}
+                after={{ label: 'Après', title: 'Avec une organisation claire', rows: BEFORE_AFTER.map((row) => ({ text: row.after })) }}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 7 — PETIT CALCULATEUR */}
+        <section className={SECTION}>
+          <div className={cn(CONTAINER, 'max-w-3xl')}>
+            <div className="text-center">
+              <p className={KICKER}>Petit calculateur</p>
+              <h2 className={cn(H2, 'mt-3')}>Et tout ce temps passé à gérer tes demandes ?</h2>
+              <p className="mt-5 text-lg text-muted-foreground">
+                Pendant les grosses périodes, quelques minutes par demande peuvent rapidement s’accumuler.
+              </p>
+            </div>
+            <div className="mt-12">
+              <SilkyPlaceTimeCalculator />
+            </div>
+          </div>
+        </section>
+
+        {/* 8 — POUR QUI ? */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Pour qui</p>
+              <h2 className={cn(H2, 'mt-3')}>SilkyPlace est pour toi si…</h2>
+            </div>
+            <div className="mt-14">
+              <AudienceCards
+                items={FOR_YOU}
+                notForLabel="Pas pour toi si…"
+                notFor={
+                  <ul className="flex flex-col gap-3">
+                    {NOT_FOR_YOU.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                }
+                fitLabel="Exactement au bon endroit si…"
+                fit={
+                  <>
+                    <p className="text-xl leading-relaxed sm:text-2xl">
+                      SilkyPlace ne cherche pas à remplir ton agenda.{' '}
+                      <span className="font-semibold text-white">Il cherche à t’aider à mieux vivre avec celui que tu as.</span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={scrollToInscription}
+                      className="inline-flex w-fit items-center gap-2 rounded-full bg-[#DDE6EF] px-7 py-3.5 text-base font-medium text-[#520C0C] shadow-(--shadow-raised) transition-colors hover:bg-white"
+                    >
+                      Je veux rejoindre SilkyPlace
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </button>
+                  </>
+                }
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 9 — POURQUOI SilkyPlace ? (portrait + origine du nom) */}
+        <section id="pourquoi-silkyplace" className={SECTION}>
+          <div className={cn(CONTAINER, 'max-w-3xl')}>
+            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-(--shadow-card) sm:p-12">
+              <p className={KICKER}>Pourquoi SilkyPlace</p>
+              <h2 className="mt-3 text-balance font-heading text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
+                Je n’ai pas créé SilkyPlace parce que j’avais toutes les réponses.
+              </h2>
+              <div className="mt-6 flex flex-col gap-4 text-lg leading-relaxed text-foreground/80">
+                <p>
+                  J’ai été comptable, avant décoratrice — et mon activité de décoratrice n’a pas fonctionné comme je
+                  l’espérais, pas assez de demandes pour en vivre.
+                </p>
+                <p>
+                  En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
+                  périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
+                  demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
+                  amenée à réfléchir à SilkyPlace.
+                </p>
+                <p>
+                  Le nom vient de là aussi. <em>Silky</em>, c’est la soie : ce qui glisse, sans accroc. <em>Place</em>,
+                  c’est un lieu. SilkyPlace, c’est l’endroit où tes projets s’enchaînent en douceur et où chaque pièce
+                  trouve sa place, pour que tu retrouves l’esprit libre, et du temps.
+                </p>
+                <p className="font-heading text-xl font-semibold text-[#520C0C]">
+                  Je ne sais pas encore jusqu’où SilkyPlace ira. Mais je sais pourquoi j’ai commencé.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 10 — FAQ */}
         <section id="faq" className={cn(SECTION, 'bg-card')} aria-labelledby="faq-title">
           <div className={cn(CONTAINER, 'max-w-3xl')}>
-            <p className={KICKER}>Questions fréquentes</p>
-            <h2 id="faq-title" className={cn(H2, 'mt-2')}>Tout ce que tu te demandes avant de t’inscrire</h2>
-            <div className="mt-8 divide-y divide-border border-y border-border">
+            <div className="text-center">
+              <p className={KICKER}>Questions fréquentes</p>
+              <h2 id="faq-title" className={cn(H2, 'mt-3')}>Tout ce que tu te demandes avant de t’inscrire</h2>
+            </div>
+            <div className="mt-12 flex flex-col gap-3">
               {FAQ.map((item) => (
-                <details key={item.q} className="group py-5">
+                <details key={item.q} className="group rounded-2xl border border-border bg-background px-6 py-5 shadow-(--shadow-card)">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-md text-left font-heading text-lg font-semibold text-foreground outline-none marker:content-none focus-visible:ring-3 focus-visible:ring-ring/40">
                     {item.q}
                     <ChevronDown className="size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
@@ -494,10 +413,10 @@ export function SilkyPlaceLandingPage() {
           </div>
         </section>
 
-        {/* 18 — APPEL FINAL */}
-        <section className="bg-[#520C0C] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
+        {/* 11 — APPEL FINAL */}
+        <section className={cn('py-24 text-[#DDE6EF] sm:py-36', BORDEAUX_GRADIENT)} aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
-            <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
+            <h2 id="final" className="text-balance font-heading text-4xl font-semibold tracking-tight text-white sm:text-6xl">
               Ton travail a une place. Ta vie aussi.
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-[#DDE6EF]/85">
@@ -516,11 +435,11 @@ export function SilkyPlaceLandingPage() {
         </section>
       </main>
 
-      {/* 19 — FOOTER */}
-      <footer className="border-t border-border py-8">
+      {/* 12 — FOOTER */}
+      <footer className="border-t border-border py-12">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <SilkyPlaceWordmark className="font-heading text-base font-semibold" />
+            <SilkyPlaceWordmark className="text-xl" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
           <p>© {new Date().getFullYear()} SilkyPlace</p>

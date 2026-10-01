@@ -7,6 +7,8 @@ import { isInvoiceStatusLocked } from '@/lib/invoiceStatus'
 import { nowIso } from '@/lib/now'
 import { isProposalEditable, isProposalStatusLocked } from '@/lib/proposalStatus'
 import { createDefaultProposalTemplates } from '@/features/proposals/templates'
+import * as floorPlanOps from '@/features/floorplan/floorPlanOps'
+import * as moodboardOps from '@/features/moodboard/moodboardOps'
 import { createDemoWorkspace, createEmptyWorkspace } from '@/lib/workspace/factories'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
 import { createSafeWorkspaceStorage } from '@/lib/workspace/safeStorage'
@@ -19,6 +21,7 @@ import type {
   Expense,
   Invoice,
   InvoiceStatus,
+  MoodboardItem,
   Proposal,
   ProposalStatus,
   ProposalTemplate,
@@ -36,6 +39,7 @@ import type {
   VendorStatus,
   VendorWeddingLink,
   Wedding,
+  WeddingDesign,
   Workspace,
 } from '@/types/entities'
 
@@ -255,9 +259,34 @@ interface WorkspaceStoreState {
    */
   reopenWedding: (weddingId: string) => void
   /** Ajoute une image au portfolio avant/après de la clôture — jusqu'à 5, silencieusement ignorée au-delà (le contrôle utilisateur se fait côté UI). */
-  addPortfolioImage: (weddingId: string, dataUrl: string, caption?: string) => void
+  /** `storagePath` : image déjà envoyée dans le bucket privé (cf. src/features/assets/assetStorage.ts). */
+  addPortfolioImage: (weddingId: string, storagePath: string, caption?: string) => void
   removePortfolioImage: (weddingId: string, imageId: string) => void
   updateClientFeedback: (weddingId: string, patch: { clientFeedback?: string; clientRating?: number }) => void
+
+  /** Moodboards et onglet Design — logique dans src/features/moodboard/moodboardOps.ts. */
+  createMoodboard: (weddingId: string, title: string) => string
+  renameMoodboard: (moodboardId: string, title: string) => void
+  /** Renvoie l'id de la copie, ou null si le moodboard n'existe plus. */
+  duplicateMoodboard: (moodboardId: string) => string | null
+  /** Renvoie les fichiers image devenus inutilisés, à supprimer du stockage par l'appelant. */
+  deleteMoodboard: (moodboardId: string) => string[]
+  /** Enregistre les éléments à la fin d'un geste ; renvoie les fichiers image devenus inutilisés. */
+  setMoodboardItems: (moodboardId: string, items: MoodboardItem[]) => string[]
+  updateWeddingDesign: (weddingId: string, patch: Partial<WeddingDesign>) => void
+
+  /** Plan de salle + plan de table — logique dans src/features/floorplan/floorPlanOps.ts. */
+  createFloorPlan: (weddingId: string, title: string) => string
+  /** Renvoie l'id de la copie, ou null si la version n'existe plus. */
+  duplicateFloorPlan: (floorPlanId: string, title: string) => string | null
+  renameFloorPlan: (floorPlanId: string, title: string) => void
+  deleteFloorPlan: (floorPlanId: string) => void
+  /** Enregistre formes + placement à la fin d'un geste (placements devenus impossibles retirés). */
+  setFloorPlanContent: (floorPlanId: string, content: floorPlanOps.FloorPlanContent) => void
+  addGuests: (weddingId: string, guests: floorPlanOps.NewGuest[]) => void
+  updateGuest: (guestId: string, patch: Partial<floorPlanOps.NewGuest>) => void
+  /** Retire aussi l'invité de toutes les versions du plan. */
+  deleteGuest: (guestId: string) => void
 
   updateBusinessConfig: (patch: Partial<Omit<BusinessConfig, 'id'>>) => void
 
@@ -357,6 +386,9 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
               soldServices: w.soldServices.filter((s) => s.weddingId !== id),
               equipmentItems: w.equipmentItems.filter((e) => e.weddingId !== id),
               closingSessions: w.closingSessions.filter((c) => c.weddingId !== id),
+              moodboards: w.moodboards.filter((b) => b.weddingId !== id),
+              guests: w.guests.filter((g) => g.weddingId !== id),
+              floorPlans: w.floorPlans.filter((p) => p.weddingId !== id),
             },
           }
         })
@@ -1138,13 +1170,13 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         }))
       },
 
-      addPortfolioImage: (weddingId, dataUrl, caption) => {
+      addPortfolioImage: (weddingId, storagePath, caption) => {
         set((state) => {
           const wedding = state.workspace.weddings.find((w) => w.id === weddingId)
           const closing = state.workspace.closingSessions.find((c) => c.id === wedding?.closingSessionId)
           if (!closing || closing.portfolioImages.length >= 5) return { workspace: state.workspace }
           const timestamp = nowIso()
-          const image = { id: generateId(), caption, dataUrl, uploadedAt: timestamp }
+          const image = { id: generateId(), caption, storagePath, uploadedAt: timestamp }
           return {
             workspace: {
               ...state.workspace,
@@ -1172,6 +1204,78 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             },
           }
         })
+      },
+
+      createMoodboard: (weddingId, title) => {
+        const id = generateId()
+        set((state) => ({ workspace: moodboardOps.createMoodboard(state.workspace, weddingId, title, id, nowIso()) }))
+        return id
+      },
+
+      renameMoodboard: (moodboardId, title) => {
+        set((state) => ({ workspace: moodboardOps.renameMoodboard(state.workspace, moodboardId, title, nowIso()) }))
+      },
+
+      duplicateMoodboard: (moodboardId) => {
+        if (!get().workspace.moodboards.some((b) => b.id === moodboardId)) return null
+        const id = generateId()
+        set((state) => ({ workspace: moodboardOps.duplicateMoodboard(state.workspace, moodboardId, id, generateId, nowIso()) }))
+        return id
+      },
+
+      deleteMoodboard: (moodboardId) => {
+        const before = get().workspace
+        const after = moodboardOps.deleteMoodboard(before, moodboardId)
+        set({ workspace: after })
+        return moodboardOps.orphanImagePaths(before, after)
+      },
+
+      setMoodboardItems: (moodboardId, items) => {
+        const before = get().workspace
+        const after = moodboardOps.setMoodboardItems(before, moodboardId, items, nowIso())
+        set({ workspace: after })
+        return moodboardOps.orphanImagePaths(before, after)
+      },
+
+      updateWeddingDesign: (weddingId, patch) => {
+        set((state) => ({ workspace: moodboardOps.updateWeddingDesign(state.workspace, weddingId, patch, nowIso()) }))
+      },
+
+      createFloorPlan: (weddingId, title) => {
+        const id = generateId()
+        set((state) => ({ workspace: floorPlanOps.createFloorPlan(state.workspace, weddingId, title, id, nowIso()) }))
+        return id
+      },
+
+      duplicateFloorPlan: (floorPlanId, title) => {
+        if (!get().workspace.floorPlans.some((p) => p.id === floorPlanId)) return null
+        const id = generateId()
+        set((state) => ({ workspace: floorPlanOps.duplicateFloorPlan(state.workspace, floorPlanId, id, title, nowIso()) }))
+        return id
+      },
+
+      renameFloorPlan: (floorPlanId, title) => {
+        set((state) => ({ workspace: floorPlanOps.renameFloorPlan(state.workspace, floorPlanId, title, nowIso()) }))
+      },
+
+      deleteFloorPlan: (floorPlanId) => {
+        set((state) => ({ workspace: floorPlanOps.deleteFloorPlan(state.workspace, floorPlanId) }))
+      },
+
+      setFloorPlanContent: (floorPlanId, content) => {
+        set((state) => ({ workspace: floorPlanOps.setFloorPlanContent(state.workspace, floorPlanId, content, nowIso()) }))
+      },
+
+      addGuests: (weddingId, guests) => {
+        set((state) => ({ workspace: floorPlanOps.addGuests(state.workspace, weddingId, guests, generateId, nowIso()) }))
+      },
+
+      updateGuest: (guestId, patch) => {
+        set((state) => ({ workspace: floorPlanOps.updateGuest(state.workspace, guestId, patch) }))
+      },
+
+      deleteGuest: (guestId) => {
+        set((state) => ({ workspace: floorPlanOps.deleteGuest(state.workspace, guestId) }))
       },
 
       updateClientFeedback: (weddingId, patch) => {

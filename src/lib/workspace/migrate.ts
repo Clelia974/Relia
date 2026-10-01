@@ -259,6 +259,26 @@ const migrations: Record<number, (data: Record<string, unknown>) => Record<strin
       documentCounters: { ...(typeof data.documentCounters === 'object' && data.documentCounters !== null ? (data.documentCounters as Record<string, number>) : {}), ...counters },
     }
   },
+  /**
+   * v12 → v13 (moodboards) : ajout purement additif — liste de moodboards
+   * vide et onglet Design absent sur chaque mariage. Aucune donnée existante
+   * n'est transformée.
+   */
+  12: (data) => ({
+    ...data,
+    schemaVersion: 13,
+    moodboards: Array.isArray(data.moodboards) ? data.moodboards : [],
+  }),
+  /**
+   * v13 → v14 (plan de salle + plan de table) : ajout purement additif —
+   * liste d'invités et versions de plan vides.
+   */
+  13: (data) => ({
+    ...data,
+    schemaVersion: 14,
+    guests: Array.isArray(data.guests) ? data.guests : [],
+    floorPlans: Array.isArray(data.floorPlans) ? data.floorPlans : [],
+  }),
 }
 
 /**

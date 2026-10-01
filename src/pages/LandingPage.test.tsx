@@ -53,7 +53,7 @@ describe('LandingPage', () => {
     setup()
     const h1 = screen.getAllByRole('heading', { level: 1 })
     expect(h1).toHaveLength(1)
-    expect(h1[0].textContent).toBe('Ton travail a une place. Ta vie aussi. Enfin de l’air.')
+    expect(h1[0].textContent).toBe('Ton travail a une place. Ta vie aussi. Ferme ton ordi sans arrière-pensée.')
   })
 
   it("sans compte : le bouton principal mène à l'inscription", () => {
@@ -96,15 +96,13 @@ describe('LandingPage', () => {
     setup()
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
-      'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
-      'Ton travail a une place. Ta vie aussi.',
       'Tu connais déjà ces moments',
       'À quel moment ta journée finit vraiment ?',
-      'SilkyPlace, c’est quoi ?',
       'Chaque fonctionnalité part d’un problème réel',
+      'Commence en trois étapes',
+      'Quelle est la date du mariage ?', // widget interactif (essayer sans compte), à côté des 3 étapes
       'Et le temps que tu récupères, tu en fais quoi ?',
       'Avant SilkyPlace. Avec SilkyPlace.',
-      'On ne va pas te raconter que SilkyPlace va régler toute ton activité.',
       'SilkyPlace est fait pour toi si…',
       '14 jours pour essayer SilkyPlace',
       'Tout ce que tu te demandes avant de commencer',
@@ -154,6 +152,23 @@ describe('LandingPage', () => {
     setup()
     expect(screen.getByRole('button', { name: "Aller à mon application" })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Menu du compte' })).toBeInTheDocument()
+  })
+
+  it('la frise de la journée se parcourt au clic, et la conclusion n’apparaît qu’à 21h', () => {
+    setup()
+    expect(screen.getByText('Tu regardes tes messages avant même ton café.')).toBeInTheDocument()
+    expect(screen.queryByText(/Il réduit ce que tu dois garder en tête/)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Et ensuite ?' }))
+    expect(screen.getByText('Une cliente demande où en est son devis.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '21h00' }))
+    expect(screen.getByText(/Il réduit ce que tu dois garder en tête/)).toBeInTheDocument()
+  })
+
+  it('un clic sur une carte de fonctionnalité ouvre la capture réelle de l’écran', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: /Désinstallation et retour/ }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByRole('img', { name: /désinstallation/i })).toHaveAttribute('src', '/landing/desinstallation.jpg')
   })
 
   it('toutes les images ont un texte alternatif et des dimensions', () => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createEmptyWorkspace } from '@/lib/workspace/factories'
 import { migrateWorkspace } from '@/lib/workspace/migrate'
+import { CURRENT_SCHEMA_VERSION } from '@/schemas/workspace'
 
 /** Migration v11 -> v12 : numérotation automatique des devis et des factures. */
 describe('migration v11 -> v12 (numéros de devis et de facture)', () => {
@@ -66,7 +67,7 @@ describe('migration v11 -> v12 (numéros de devis et de facture)', () => {
     )
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.workspace.schemaVersion).toBe(12)
+    expect(result.workspace.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.workspace.proposals.map((p) => [p.id, p.proposalNumber])).toEqual([
       ['b', 'DEV-2026-0002'],
       ['a', 'DEV-2026-0001'],

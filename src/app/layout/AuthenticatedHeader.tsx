@@ -27,13 +27,13 @@ export function AuthenticatedHeader() {
 
   return (
     <header className="no-print sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" aria-label="SilkyPlace — retour à l'accueil">
-          <SilkyPlaceWordmark className="font-heading text-lg font-semibold" />
+          <SilkyPlaceWordmark className="text-[26px] sm:text-[32px]" />
         </Link>
 
         <div className="flex items-center gap-3">
-          <Button onClick={() => navigate('/aujourdhui')}>Aller à mon application</Button>
+          <Button className="rounded-full px-5" onClick={() => navigate('/aujourdhui')}>Aller à mon application</Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

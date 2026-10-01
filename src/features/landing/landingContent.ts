@@ -38,9 +38,16 @@ export const LAUNCH_OFFER_ANNUAL_FREE_MONTHS = Math.round(
  * et tourne depuis l'Étape 2, même si elle n'est pas encore réellement
  * réservée au Pro dans le code (Gratuit y a accès aussi aujourd'hui).
  */
-export const GRATUIT_FEATURES = ['3 mariages', 'Tâches, planning, prestataires et matériel', 'Export de tes données en JSON']
+export const GRATUIT_FEATURES = [
+  '3 mariages',
+  'Tâches, planning, prestataires et matériel',
+  'Plan de salle et plan de table',
+  '1 moodboard par mariage',
+  'Export de tes données en JSON',
+]
 export const PRO_FEATURES = [
   'Mariages illimités',
+  'Moodboards illimités',
   'Devis et factures indicatifs',
   'Finances et rentabilité',
   'Bilan post-mariage',
@@ -80,14 +87,7 @@ export const PAIN_MOMENTS = [
   },
 ]
 
-export const PAIN_CLOSING = {
-  quote: 'Tu regardes ton téléphone alors que ta journée est déjà terminée.',
-  lines: ['Pas parce que tu veux travailler.', 'Parce que tu veux être sûre de ne rien avoir oublié.'],
-}
 
-/** Ce que SilkyPlace est concrètement — liste de pilotage, pas de discours. */
-export const SILKYPLACE_FEATURE_LIST = ['Tâches', 'Planning', 'Matériel', 'Prestataires', 'Budget', 'Devis', 'Jour J', 'Bilan']
-export const SILKYPLACE_NOT_LIST = ['Pas pour remplacer ton métier.', 'Pas pour créer à ta place.', 'Pas pour décider à ta place.']
 
 /** "Avant / Avec SilkyPlace" — 3 groupes de chaque côté, mêmes verbes qui structurent la comparaison. */
 export const BEFORE_GROUPS = [

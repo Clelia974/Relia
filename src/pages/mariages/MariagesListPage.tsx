@@ -19,6 +19,8 @@ import { FilterPills } from '@/components/FilterPills'
 import { MariageCard } from '@/features/weddings/components/MariageCard'
 import { WeddingLimitDialog } from '@/features/payment/components/WeddingLimitDialog'
 import { useWeddingLimit } from '@/features/payment/useWeddingLimit'
+import { deleteImageAssets } from '@/features/assets/assetStorage'
+import { orphanImagePaths } from '@/features/moodboard/moodboardOps'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 import type { Wedding } from '@/types/entities'
 
@@ -85,7 +87,10 @@ export function MariagesListPage() {
   }
   const confirmDelete = () => {
     if (!pendingDelete) return
+    const before = useWorkspaceStore.getState().workspace
     deleteWedding(pendingDelete.id)
+    // Images des moodboards et du portfolio de ce mariage : supprimées du stockage (sans bloquer si hors ligne).
+    void deleteImageAssets(orphanImagePaths(before, useWorkspaceStore.getState().workspace))
     setPendingDelete(null)
     toast.success('Mariage supprimé.')
   }

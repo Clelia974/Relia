@@ -27,9 +27,9 @@ interface TabGroup {
 const overviewTab: TabItem = { to: '', label: "Vue d'ensemble" }
 
 /**
- * 11 sous-pages à plat était trop pour une seule rangée d'onglets — regroupées
- * ici par intention (organiser / suivre l'argent / exécuter le jour J) pour
- * que la nav desktop tienne sur 4 repères au lieu de 11.
+ * 13 sous-pages à plat était trop pour une seule rangée d'onglets — regroupées
+ * ici par intention (organiser / créer / suivre l'argent / exécuter le jour J) pour
+ * que la nav desktop tienne sur 5 repères au lieu de 13.
  */
 const groups: TabGroup[] = [
   {
@@ -42,9 +42,16 @@ const groups: TabGroup[] = [
     ],
   },
   {
-    label: 'Argent',
+    label: 'Création',
     items: [
-      { to: 'finances', label: 'Finances' },
+      { to: 'design', label: 'Design & moodboards' },
+      { to: 'plan', label: 'Plan de salle & tables' },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      { to: 'finances', label: 'Budget' },
       { to: 'prestations', label: 'Prestations vendues' },
     ],
   },
