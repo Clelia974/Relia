@@ -28,7 +28,7 @@ export function SilkyPlaceWaitlistForm({ id, className, inverted, submitLabel = 
 
   if (sent) {
     return (
-      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-[#F7EFE6]' : 'text-success', className)}>
+      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-[#DDE6EF]' : 'text-success', className)}>
         <Check className="size-5 shrink-0" aria-hidden="true" />
         Merci ! Tu seras informée dès que SilkyPlace avance.
       </div>

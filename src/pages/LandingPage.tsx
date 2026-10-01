@@ -79,10 +79,10 @@ export function LandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#F7EFE6] text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#F7EFE6]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
       >
         Aller au contenu
       </a>
@@ -371,15 +371,15 @@ export function LandingPage() {
         </section>
 
         {/* 14 — APPEL FINAL */}
-        <section className="bg-[#520C0C] py-20 text-[#F7EFE6] sm:py-28" aria-labelledby="final">
+        <section className="bg-[#520C0C] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <div className="flex flex-col gap-1">
               <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
                 Tu as un mariage à organiser ?
               </h2>
-              <p className="mt-2 text-lg text-[#F7EFE6]/85">Commence par celui-là.</p>
+              <p className="mt-2 text-lg text-[#DDE6EF]/85">Commence par celui-là.</p>
             </div>
-            <p className="max-w-xl text-lg font-medium leading-relaxed text-[#F7EFE6]">
+            <p className="max-w-xl text-lg font-medium leading-relaxed text-[#DDE6EF]">
               Pas besoin de tout changer, tout importer ou tout comprendre avant de commencer. Crée ton espace,
               ajoute ton mariage, et regarde si SilkyPlace peut te faire respirer un peu plus.
             </p>
@@ -393,7 +393,7 @@ export function LandingPage() {
             >
               {ctaLabel}
             </Button>
-            <p className="text-sm text-[#F7EFE6]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
+            <p className="text-sm text-[#DDE6EF]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
           </div>
         </section>
       </main>

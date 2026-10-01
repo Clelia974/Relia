@@ -24,7 +24,7 @@ import { SilkyPlaceTimeCalculator } from '@/features/silkyplace-landing/SilkyPla
 import { SilkyPlaceWaitlistForm } from '@/features/silkyplace-landing/SilkyPlaceWaitlistForm'
 import { cn } from '@/lib/utils'
 
-// Couleurs de marque SilkyPlace, écrites en dur ci-dessous à chaque usage (#F7EFE6 fond,
+// Couleurs de marque SilkyPlace, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
 // #520C0C primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
 // distinctes des tokens --primary/--thread de l'app existante, laissés intacts ailleurs
 // dans le produit tant que le rebrand complet n'est pas décidé.
@@ -140,10 +140,10 @@ export function SilkyPlaceLandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#F7EFE6] text-foreground">
+    <div className="min-h-dvh bg-[#DDE6EF] text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#F7EFE6]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
       >
         Aller au contenu
       </a>
@@ -163,7 +163,7 @@ export function SilkyPlaceLandingPage() {
           <button
             type="button"
             onClick={scrollToInscription}
-            className="rounded-lg bg-[#520C0C] px-4 py-2 text-sm font-medium text-[#F7EFE6] transition-colors hover:bg-[#520C0C]/90"
+            className="rounded-lg bg-[#520C0C] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#520C0C]/90"
           >
             Je veux rejoindre SilkyPlace
           </button>
@@ -275,7 +275,7 @@ export function SilkyPlaceLandingPage() {
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {TIME_RECOVERED.map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-card p-6">
+                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
                   <p className={CARD_KICKER}>
                     <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
                     {item.title}
@@ -305,7 +305,7 @@ export function SilkyPlaceLandingPage() {
                 { icon: Repeat, title: 'Suivre', text: 'Qui relancer, sans compter sur ta mémoire.' },
                 { icon: Power, title: 'Décrocher', text: 'Fermer l’ordinateur en sachant où tu en es.' },
               ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-card p-6">
+                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
                   <p className={CARD_KICKER}>
                     <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
                     {item.title}
@@ -494,18 +494,18 @@ export function SilkyPlaceLandingPage() {
         </section>
 
         {/* 18 — APPEL FINAL */}
-        <section className="bg-[#520C0C] py-20 text-[#F7EFE6] sm:py-28" aria-labelledby="final">
+        <section className="bg-[#520C0C] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
               Ton travail a une place. Ta vie aussi.
             </h2>
-            <p className="max-w-xl text-lg leading-relaxed text-[#F7EFE6]/85">
+            <p className="max-w-xl text-lg leading-relaxed text-[#DDE6EF]/85">
               SilkyPlace est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
               <SilkyPlaceWaitlistForm inverted submitLabel="Je veux rejoindre SilkyPlace" />
             </div>
-            <p className="text-sm text-[#F7EFE6]/80">
+            <p className="text-sm text-[#DDE6EF]/80">
               Pas de spam. Juste les nouvelles importantes concernant SilkyPlace. Une question ?{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-4">
                 {CONTACT_EMAIL}

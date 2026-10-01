@@ -5,7 +5,7 @@
   "start_url": "/aujourdhui",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#F7EFE6",
+  "background_color": "#DDE6EF",
   "theme_color": "#520C0C",
   "lang": "fr",
   "icons": [

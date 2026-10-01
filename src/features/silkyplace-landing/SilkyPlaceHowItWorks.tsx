@@ -7,7 +7,7 @@ const AUTOPLAY_MS = 3500
 type Tone = 'new' | 'pending' | 'progress' | 'done' | 'muted'
 
 const TONE_CLASSES: Record<Tone, string> = {
-  new: 'bg-[#520C0C] text-[#F7EFE6]',
+  new: 'bg-[#520C0C] text-[#DDE6EF]',
   pending: 'bg-warning-bg text-warning',
   progress: 'bg-[#A9B08F]/20 text-[#5F6B4C]',
   done: 'bg-success/15 text-success',
@@ -130,7 +130,7 @@ export function SilkyPlaceHowItWorks() {
               <span
                 className={cn(
                   'flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors',
-                  active === i ? 'bg-[#520C0C] text-[#F7EFE6]' : 'bg-muted text-muted-foreground',
+                  active === i ? 'bg-[#520C0C] text-[#DDE6EF]' : 'bg-muted text-muted-foreground',
                 )}
               >
                 {i + 1}

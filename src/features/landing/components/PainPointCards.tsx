@@ -6,9 +6,9 @@ export function PainPointCards() {
     <div className="flex flex-col gap-6">
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {PAIN_MOMENTS.map((moment) => (
-          <li key={moment.quote} className="rounded-xl bg-[#520C0C] p-6 text-[#F7EFE6]">
+          <li key={moment.quote} className="rounded-xl bg-[#520C0C] p-6 text-[#DDE6EF]">
             <p className="font-heading text-lg font-semibold">{moment.quote}</p>
-            <ul className="mt-3 flex flex-col gap-1 text-sm text-[#F7EFE6]/80">
+            <ul className="mt-3 flex flex-col gap-1 text-sm text-[#DDE6EF]/80">
               {moment.lines.map((line) => (
                 <li key={line}>{line}</li>
               ))}

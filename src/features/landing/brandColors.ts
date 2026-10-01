@@ -12,7 +12,7 @@ export const SP_TEXT = 'text-[#520C0C]'
 export const SP_BG = 'bg-[#520C0C]'
 export const SP_BORDER = 'border-[#520C0C]'
 export const SP_RING = 'ring-[#520C0C]'
-export const SP_ON_PRIMARY_TEXT = 'text-[#F7EFE6]'
+export const SP_ON_PRIMARY_TEXT = 'text-[#DDE6EF]'
 export const SP_SAGE_TEXT = 'text-[#5F6B4C]'
 export const SP_SAGE_BG = 'bg-[#A9B08F]'
 
@@ -25,4 +25,4 @@ export const SP_SAGE_BG = 'bg-[#A9B08F]'
  * correctement bg-primary/bg-[#520C0C] au profit du dernier, donc cette surcharge
  * fonctionne de façon fiable.
  */
-export const SP_BUTTON = 'bg-[#520C0C] text-[#F7EFE6] hover:bg-[#520C0C]/92'
+export const SP_BUTTON = 'bg-[#520C0C] text-[#DDE6EF] hover:bg-[#520C0C]/92'
