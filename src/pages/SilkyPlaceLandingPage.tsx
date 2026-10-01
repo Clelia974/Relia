@@ -466,8 +466,9 @@ export function SilkyPlaceLandingPage() {
                 amenée à réfléchir à SilkyPlace.
               </p>
               <p>
-                Le nom vient de là aussi : « SilkyPlace », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
-                journée qu’on a sous les yeux, celle qu’on peut refermer le soir sans y penser jusqu’au lendemain.
+                Le nom vient de là aussi. <em>Silky</em>, c’est la soie : ce qui glisse, sans accroc. <em>Place</em>,
+                c’est un lieu. SilkyPlace, c’est l’endroit où tes projets s’enchaînent en douceur et où chaque pièce
+                trouve sa place, pour que tu retrouves l’esprit libre, et du temps.
               </p>
               <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où SilkyPlace ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
