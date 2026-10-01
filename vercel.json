@@ -7,36 +7,36 @@
   ],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "relia.evenementscles.com"
         }
       ],
-      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "destination": "https://silkyplace.evenementscles.com/$1",
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "zordi.evenementscles.com"
         }
       ],
-      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "destination": "https://silkyplace.evenementscles.com/$1",
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "jordu.evenementscles.com"
         }
       ],
-      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "destination": "https://silkyplace.evenementscles.com/$1",
       "permanent": true
     }
   ]
