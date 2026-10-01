@@ -97,7 +97,6 @@ describe('LandingPage', () => {
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
       'Quelle est la date du mariage ?', // widget interactif du hero (essayer sans compte), pas une section à part entière
-      'Tout ton mariage. Au même endroit.',
       'Ton travail a une place. Ta vie aussi.',
       'Tu connais déjà ces moments',
       'À quel moment ta journée finit vraiment ?',
@@ -108,8 +107,6 @@ describe('LandingPage', () => {
       'On ne va pas te raconter que ZORDI va régler toute ton activité.',
       'ZORDI est fait pour toi si…',
       '14 jours pour essayer ZORDI',
-      'Tarifs simples, pas de piège',
-      'Tes données restent les tiennes.',
       'Tout ce que tu te demandes avant de commencer',
       'Tu as un mariage à organiser ?',
     ])
@@ -128,7 +125,7 @@ describe('LandingPage', () => {
 
   it('les tarifs suivent le choix mensuel / annuel, avec le bon calcul de l’économie', () => {
     setup()
-    const pricing = within(screen.getByRole('heading', { name: 'Tarifs simples, pas de piège' }).closest('section')!)
+    const pricing = within(screen.getByRole('heading', { name: '14 jours pour essayer ZORDI' }).closest('section')!)
     expect(pricing.getByText(`${PRICE_MONTHLY} €`)).toBeTruthy()
     fireEvent.click(pricing.getByRole('button', { name: /Annuel/ }))
     expect(pricing.getByText(`${PRICE_ANNUAL} €`)).toBeTruthy()

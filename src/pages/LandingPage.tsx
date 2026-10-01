@@ -161,40 +161,29 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 2 — TOUT TON MARIAGE, AU MÊME ENDROIT — bloc couleur */}
+        {/* 2 — MANIFESTE — bloc couleur (fusion de "Tout ton mariage au même endroit" + "Ton travail a une place" : même sujet, une seule section) */}
         <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>Tout ton mariage. Au même endroit.</h2>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">
-              Un mariage, ce n’est pas qu’un joli décor : une date, des tâches, du matériel, des prestataires, des
-              horaires, des devis, des coûts, des imprévus — et des dizaines de petites informations à retrouver au
-              bon moment.
-            </p>
-            <p className="mt-3 font-heading text-xl font-semibold text-[#680808]">
-              ZORDI rassemble tout ça, pour que tu saches où tu en es sans chercher partout.
-            </p>
-          </div>
-        </section>
-
-        {/* 3 — MANIFESTE */}
-        <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
             <h2 className={H2}>Ton travail a une place. Ta vie aussi.</h2>
             <p className="mt-4 text-base leading-relaxed text-foreground/80">
+              Un mariage, ce n’est pas qu’un joli décor : l’installation, le démontage, le mobilier, les arches, le
+              nappage, l’inventaire, le retour matériel, les prestataires déco, les devis — et des dizaines de
+              petites informations à retrouver au bon moment.
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-foreground/80">
               Tu peux aimer créer, imaginer un décor, voir une salle prendre vie — et pourtant ne pas avoir envie de
               répondre à des messages à 22h30. Être à ton compte ne devrait pas vouloir dire être disponible tout le
               temps.
             </p>
             <p className="mt-3 font-heading text-xl font-semibold text-[#680808]">
               Le problème, ce n’est pas que tu ne sais pas t’organiser : c’est que les informations dont tu as besoin
-              sont souvent éparpillées.
+              sont souvent éparpillées, et c’est ta tête qui fait le lien.
             </p>
-            <p className="mt-2 text-base leading-relaxed text-foreground/80">Et quand tout est éparpillé, c’est ta tête qui fait le lien.</p>
           </div>
         </section>
 
-        {/* 4 — PROBLÈME — bloc couleur */}
-        <section id="probleme" className={cn(SECTION, 'bg-card')}>
+        {/* 3 — PROBLÈME */}
+        <section id="probleme" className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Le problème</p>
@@ -206,7 +195,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 5 — LA JOURNÉE QUI DÉBORDE */}
+        {/* 4 — LA JOURNÉE QUI DÉBORDE */}
         <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -226,15 +215,16 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 6 — SOLUTION — bloc couleur */}
+        {/* 5 — SOLUTION — bloc couleur */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La solution</p>
               <h2 className={cn(H2, 'mt-2')}>ZORDI, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">
-                Un espace pensé pour les décoratrices et décorateurs de mariage indépendants. Un seul endroit pour piloter
-                chaque mariage :
+                Un espace pensé pour les décoratrices et décorateurs de mariage indépendants. Installation, décoration
+                cérémonie, réception, démontage, inventaire, retour matériel, prestataires déco : un seul endroit
+                pour piloter chaque mariage :
               </p>
             </div>
             <div className="mt-10">
@@ -243,7 +233,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 7 — FONCTIONNALITÉS (carrousel, une grande fenêtre à la fois) */}
+        {/* 6 — FONCTIONNALITÉS (carrousel, une grande fenêtre à la fois) */}
         <section id="fonctionnalites" className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -259,7 +249,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 8 — TÉMOIGNAGES (affichés uniquement s'il y en a de vrais) — bloc couleur */}
+        {/* 7 — TÉMOIGNAGES (affichés uniquement s'il y en a de vrais) — bloc couleur */}
         {TESTIMONIALS.length > 0 && (
           <section className={cn(SECTION, 'bg-card')} aria-labelledby="temoignages">
             <div className={CONTAINER}>
@@ -278,7 +268,7 @@ export function LandingPage() {
           </section>
         )}
 
-        {/* 9 — LE TEMPS RÉCUPÉRÉ */}
+        {/* 8 — LE TEMPS RÉCUPÉRÉ */}
         <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -303,7 +293,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 10 — AVANT / AVEC ZORDI — bloc couleur */}
+        {/* 9 — AVANT / AVEC ZORDI — bloc couleur */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -313,21 +303,14 @@ export function LandingPage() {
             <div className="mt-10">
               <BeforeAfterSection />
             </div>
-          </div>
-        </section>
-
-        {/* 11 — UNE PHRASE RÉSUME ZORDI */}
-        <section className={SECTION} aria-labelledby="phrase-resume">
-          <div className={cn(CONTAINER, 'max-w-3xl text-center')}>
-            <p className={KICKER}>Une phrase résume ZORDI</p>
-            <blockquote id="phrase-resume" className="mt-4 text-balance font-heading text-3xl font-semibold leading-snug text-[#680808] sm:text-4xl">
+            <blockquote className="mt-10 max-w-2xl text-balance font-heading text-2xl font-semibold leading-snug text-[#680808] sm:text-3xl">
               ZORDI ne réduit pas le nombre de mariages à gérer — il réduit ce que tu dois garder en tête pour les gérer.
             </blockquote>
           </div>
         </section>
 
-        {/* 12 — CE QUE ZORDI NE PROMET PAS — bloc couleur */}
-        <section className={cn(SECTION, 'bg-card')}>
+        {/* 10 — CE QUE ZORDI NE PROMET PAS */}
+        <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
             <h2 className={H2}>On ne va pas te raconter que ZORDI va régler toute ton activité.</h2>
             <p className="mt-4 text-muted-foreground">ZORDI ne va pas :</p>
@@ -346,7 +329,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 13 — POUR QUI */}
+        {/* 11 — POUR QUI */}
         <section className={SECTION}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
@@ -359,40 +342,16 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 14 — COMMENCER EST SIMPLE — bloc couleur */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'mx-auto max-w-2xl text-center')}>
-            <p className={KICKER}>Commencer est simple</p>
-            <h2 className={cn(H2, 'mt-2')}>14 jours pour essayer ZORDI</h2>
-            <p className="mt-4 text-muted-foreground">
-              Pendant 14 jours, tu débloques les fonctionnalités Solo. Sans carte bancaire. Teste avec ton prochain
-              mariage, ou avec un mariage fictif. Vois si ZORDI correspond réellement à ta façon de travailler.
-            </p>
-            <div className="mt-8 grid gap-4 text-left sm:grid-cols-2">
-              <div className="rounded-xl border border-border bg-background p-5">
-                <p className="font-heading text-base font-semibold text-foreground">Tu peux rester gratuitement</p>
-                <p className="mt-1 text-sm text-muted-foreground">Avec jusqu’à 3 mariages et les fonctionnalités essentielles.</p>
-              </div>
-              <div className="rounded-xl border border-border bg-background p-5">
-                <p className="font-heading text-base font-semibold text-foreground">Ou passer à Solo</p>
-                <p className="mt-1 text-sm text-muted-foreground">Pour débloquer les fonctionnalités avancées et les mariages illimités.</p>
-              </div>
-            </div>
-            <div className="mt-8 flex flex-col items-center gap-2">
-              <Button size="lg" className={cn('h-12 px-7 text-base', Z_BUTTON)} onClick={start}>
-                {ctaLabel}
-              </Button>
-              <p className="text-sm text-muted-foreground">1 minute pour commencer · Sans carte bancaire</p>
-            </div>
-          </div>
-        </section>
-
-        {/* 15 — TARIFS */}
-        <section id="tarifs" className={SECTION}>
+        {/* 12 — TARIFS — bloc couleur (fusion de "Commencer est simple" + "Tarifs" : l'explication de l'essai mène directement aux cartes, pas besoin de deux sections) */}
+        <section id="tarifs" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>
-              <h2 className={cn(H2, 'mt-2')}>Tarifs simples, pas de piège</h2>
+              <h2 className={cn(H2, 'mt-2')}>14 jours pour essayer ZORDI</h2>
+              <p className="mt-4 text-muted-foreground">
+                Sans carte bancaire. Teste avec ton prochain mariage ou un mariage fictif. À la fin de l’essai : reste
+                gratuite jusqu’à 3 mariages, ou passe à Solo pour les mariages illimités.
+              </p>
             </div>
             <div className="mt-10">
               <PricingSection ctaLabel={ctaLabel} onStart={start} />
@@ -400,19 +359,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 16 — TES DONNÉES RESTENT LES TIENNES — bloc couleur */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>Tes données restent les tiennes.</h2>
-            <p className="mt-4 text-base leading-relaxed text-foreground/80">
-              Aujourd’hui, tes données de travail sont stockées dans ton navigateur. Ton compte — email et mot de
-              passe — est géré séparément, et tu peux exporter tes données à tout moment.
-            </p>
-            <p className="mt-3 font-heading text-lg font-semibold text-[#680808]">Pas de verrouillage volontaire de tes données.</p>
-          </div>
-        </section>
-
-        {/* 17 — FAQ */}
+        {/* 13 — FAQ */}
         <section id="questions" className={SECTION} aria-labelledby="faq">
           <div className={cn(CONTAINER, 'max-w-3xl')}>
             <p className={KICKER}>Les questions que tu te poses probablement</p>
@@ -423,7 +370,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 18 — APPEL FINAL */}
+        {/* 14 — APPEL FINAL */}
         <section className="bg-[#680808] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <div className="flex flex-col gap-1">

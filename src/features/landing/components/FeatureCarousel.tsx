@@ -55,7 +55,7 @@ const STEPS: Step[] = [
     icon: Package,
     label: 'Matériel',
     quote: 'Il manque quoi déjà ?',
-    text: 'Liste ton matériel par mariage. Quantités, statut, dégâts éventuels et destination au retour.',
+    text: 'Mobilier, arches, nappage : liste tout ton matériel par mariage. Quantités, statut, dégâts éventuels et destination au retour.',
     takeaway: 'Avant de partir, tu sais ce qui doit être dans le camion.',
     image: '/landing/materiel.jpg',
     alt: 'La checklist Matériel de ZORDI',
