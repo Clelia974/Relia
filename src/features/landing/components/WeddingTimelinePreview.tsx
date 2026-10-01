@@ -5,7 +5,7 @@ import { ArrowRight, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Z_BUTTON } from '@/features/landing/zordiColors'
+import { SP_BUTTON } from '@/features/landing/brandColors'
 import { DAY_PHASE_LABELS } from '@/lib/dayPhase'
 
 /**
@@ -59,7 +59,7 @@ export function WeddingTimelinePreview({ ctaLabel, onStart }: WeddingTimelinePre
           <Label htmlFor="preview-date">Date du mariage</Label>
           <Input id="preview-date" type="date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
         </div>
-        <Button size="lg" className={Z_BUTTON} disabled={!dateInput} onClick={handleGenerate}>
+        <Button size="lg" className={SP_BUTTON} disabled={!dateInput} onClick={handleGenerate}>
           Générer mon déroulé
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>

@@ -18,7 +18,7 @@ interface Step {
  * visible à la fois (comme gbcrea.com), pas plusieurs cartes qui se
  * chevauchent. `scroll-snap-stop: always` (CSS standard, pas de lib)
  * empêche de sauter une fenêtre sur un swipe rapide. Chaque fonctionnalité
- * part d'un problème réel (quote) → ce que fait ZORDI (text) → la conséquence
+ * part d'un problème réel (quote) → ce que fait SilkyPlace (text) → la conséquence
  * concrète (takeaway) — repris tel quel du copywriting de Clélia. Les 7
  * étapes montrent de vrais écrans (captures prises depuis l'app avec des
  * données réelles, pas la démo "Bonjour Démonstration").
@@ -31,7 +31,7 @@ const STEPS: Step[] = [
     text: 'Non. Importe tes mariages, prestataires et budgets depuis ton fichier Excel.',
     takeaway: 'Tu continues là où tu t’es arrêtée, sans tout ressaisir.',
     image: '/landing/import.jpg',
-    alt: 'Aperçu de l’import d’un mariage et d’un prestataire depuis un fichier Excel dans ZORDI',
+    alt: 'Aperçu de l’import d’un mariage et d’un prestataire depuis un fichier Excel dans SilkyPlace',
   },
   {
     icon: ClipboardCheck,
@@ -40,16 +40,16 @@ const STEPS: Step[] = [
     text: 'Toutes tes tâches au même endroit. Priorités, dates limites, tâches reportées et calendrier filtrable par mariage ou par prestataire.',
     takeaway: 'Chaque matin, tu sais ce qui mérite ton attention.',
     image: '/landing/tableau-de-bord.jpg',
-    alt: 'Liste des tâches du jour dans ZORDI, avec priorités et dates',
+    alt: 'Liste des tâches du jour dans SilkyPlace, avec priorités et dates',
   },
   {
     icon: Clock,
     label: 'Jour J',
     quote: 'Qui doit être où, et à quelle heure ?',
-    text: 'ZORDI transforme ton planning en déroulé minute par minute. Installation, cérémonie, réception, démontage… Tu peux filtrer, appeler un prestataire directement et exporter ton déroulé en PDF.',
+    text: 'SilkyPlace transforme ton planning en déroulé minute par minute. Installation, cérémonie, réception, démontage… Tu peux filtrer, appeler un prestataire directement et exporter ton déroulé en PDF.',
     takeaway: 'Tu vois les chevauchements avant qu’ils ne deviennent un problème le Jour J.',
     image: '/landing/jour-j.jpg',
-    alt: 'Le déroulé du Jour J dans ZORDI',
+    alt: 'Le déroulé du Jour J dans SilkyPlace',
   },
   {
     icon: Package,
@@ -58,7 +58,7 @@ const STEPS: Step[] = [
     text: 'Mobilier, arches, nappage : liste tout ton matériel par mariage. Quantités, statut, dégâts éventuels et destination au retour.',
     takeaway: 'Avant de partir, tu sais ce qui doit être dans le camion.',
     image: '/landing/materiel.jpg',
-    alt: 'La checklist Matériel de ZORDI',
+    alt: 'La checklist Matériel de SilkyPlace',
   },
   {
     icon: Users,
@@ -67,7 +67,7 @@ const STEPS: Step[] = [
     text: 'Retrouve au même endroit les coordonnées, horaires, coûts et statut de chaque prestataire.',
     takeaway: 'Tu sais qui intervient, quand et où.',
     image: '/landing/prestataires.jpg',
-    alt: 'La liste des prestataires d’un mariage dans ZORDI',
+    alt: 'La liste des prestataires d’un mariage dans SilkyPlace',
   },
   {
     icon: Wallet,
@@ -77,7 +77,7 @@ const STEPS: Step[] = [
     takeaway: 'Tu ne découvres pas ta rentabilité à la fin du mariage.',
     note: 'Les documents générés sont indicatifs. Vérifie tes obligations légales avant émission.',
     image: '/landing/finances.jpg',
-    alt: 'L’onglet Finances de ZORDI',
+    alt: 'L’onglet Finances de SilkyPlace',
   },
   {
     icon: ClipboardCheck,
@@ -86,7 +86,7 @@ const STEPS: Step[] = [
     text: 'À la fin de chaque mariage, retrouve au même endroit : le bilan financier, les retours client, les éléments importants, et ton portfolio avant / après.',
     takeaway: 'Chaque mariage terminé devient une information utile pour le suivant.',
     image: '/landing/bilan.jpg',
-    alt: 'Le bilan de clôture d’un mariage dans ZORDI',
+    alt: 'Le bilan de clôture d’un mariage dans SilkyPlace',
   },
 ]
 
@@ -166,7 +166,7 @@ export function FeatureCarousel() {
             aria-selected={activeIndex === i}
             aria-label={s.label}
             onClick={() => goTo(i)}
-            className={cn('h-1.5 rounded-full transition-all duration-300', activeIndex === i ? 'w-6 bg-[#680808]' : 'w-1.5 bg-border')}
+            className={cn('h-1.5 rounded-full transition-all duration-300', activeIndex === i ? 'w-6 bg-[#520C0C]' : 'w-1.5 bg-border')}
           />
         ))}
       </div>

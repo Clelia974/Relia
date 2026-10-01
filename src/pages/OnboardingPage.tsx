@@ -108,7 +108,7 @@ export function OnboardingPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="flex items-center justify-between px-4 py-6 sm:px-6">
-        <span className="font-heading text-lg font-semibold text-primary">Zordi</span>
+        <span className="font-heading text-lg font-semibold text-primary">SilkyPlace</span>
         <button type="button" onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground hover:underline">
           Passer l'onboarding
         </button>
@@ -182,7 +182,7 @@ export function OnboardingPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Charger des données de démonstration ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Nous allons remplir votre espace avec des mariages fictifs pour que vous puissiez explorer Zordi.
+              Nous allons remplir votre espace avec des mariages fictifs pour que vous puissiez explorer SilkyPlace.
               Aucune donnée réelle n'existe encore, rien ne sera perdu.
             </AlertDialogDescription>
           </AlertDialogHeader>

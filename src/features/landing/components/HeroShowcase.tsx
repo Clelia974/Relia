@@ -4,7 +4,7 @@ import { TRIAL_DAYS } from '@/features/landing/landingContent'
 /**
  * Visuel du hero (colonne droite) — vrais mockups photo (MacBook Pro 16",
  * iPhone 16) depuis webmobilefirst.com (licence : usage commercial libre,
- * sans attribution — public/mockups/*.png), avec les VRAIS écrans Zordi
+ * sans attribution — public/mockups/*.png), avec les VRAIS écrans SilkyPlace
  * déjà utilisés ailleurs sur le site composités dedans à la génération
  * (script Python, pas de rendu à la volée) — aucun chiffre d'usage inventé,
  * aucune UI mobile dédiée qui n'existe pas : c'est la même interface
@@ -29,7 +29,7 @@ export function HeroShowcase() {
 
       <img
         src="/mockups/hero-macbook.png"
-        alt="Déroulé du Jour J dans l'application Zordi, sur MacBook"
+        alt="Déroulé du Jour J dans l'application SilkyPlace, sur MacBook"
         width={800}
         height={489}
         className="animate-notice-in hero-float block w-full drop-shadow-[0_18px_32px_rgba(31,45,61,0.25)]"
@@ -38,7 +38,7 @@ export function HeroShowcase() {
 
       <img
         src="/mockups/hero-iphone.png"
-        alt="Tableau de bord du jour dans l'application Zordi, sur iPhone"
+        alt="Tableau de bord du jour dans l'application SilkyPlace, sur iPhone"
         width={393}
         height={800}
         className="animate-notice-in hero-float-alt absolute -right-4 bottom-[-3.5rem] z-10 w-[22%] drop-shadow-[0_14px_24px_rgba(31,45,61,0.28)] sm:-right-8 sm:w-[24%]"

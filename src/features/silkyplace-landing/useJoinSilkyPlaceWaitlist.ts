@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-interface UseJoinZordiWaitlistResult {
+interface UseJoinSilkyPlaceWaitlistResult {
   join: (email: string) => Promise<boolean>
   isLoading: boolean
   error: string | null
@@ -10,7 +10,7 @@ interface UseJoinZordiWaitlistResult {
  * Envoie une adresse email depuis la landing /zordi vers api/waitlist.ts,
  * seule porte d'écriture sur `zordi_waitlist` (clé service_role, rate limitée).
  */
-export function useJoinZordiWaitlist(): UseJoinZordiWaitlistResult {
+export function useJoinSilkyPlaceWaitlist(): UseJoinSilkyPlaceWaitlistResult {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

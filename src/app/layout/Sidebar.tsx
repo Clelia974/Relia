@@ -2,7 +2,7 @@ import { CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, Log
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InitialsBadge } from '@/components/InitialsBadge'
-import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
+import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
@@ -45,8 +45,8 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center justify-between px-6 pb-4 pt-7">
-        <NavLink to="/aujourdhui" aria-label="Zordi — Aujourd'hui">
-          <ZordiWordmark className="font-heading text-xl font-semibold tracking-tight" />
+        <NavLink to="/aujourdhui" aria-label="SilkyPlace — Aujourd'hui">
+          <SilkyPlaceWordmark className="font-heading text-xl font-semibold tracking-tight" />
         </NavLink>
         <ThemeToggle />
       </div>

@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       { onConflict: 'email', ignoreDuplicates: true },
     )
   if (error) {
-    console.error('Erreur inscription liste d’attente Zordi :', error.message)
+    console.error('Erreur inscription liste d’attente SilkyPlace :', error.message)
     res.status(500).json({ error: 'Erreur interne.' })
     return
   }

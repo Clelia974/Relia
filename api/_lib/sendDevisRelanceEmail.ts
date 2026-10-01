@@ -23,7 +23,7 @@ export async function sendDevisRelanceEmail(input: {
 
   const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
   const devisUrl = `${siteUrl}/devis/${input.shareId}`
-  const senderName = input.companyName?.trim() || 'Zordi'
+  const senderName = input.companyName?.trim() || 'SilkyPlace'
 
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {

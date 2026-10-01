@@ -1,7 +1,7 @@
 import { LogOut, Menu, Search } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
+import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
@@ -43,8 +43,8 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
   return (
     <header className="material-chrome no-print sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <NavLink to="/aujourdhui" aria-label="Zordi — Aujourd'hui">
-          <ZordiWordmark className="font-heading text-lg font-semibold" />
+        <NavLink to="/aujourdhui" aria-label="SilkyPlace — Aujourd'hui">
+          <SilkyPlaceWordmark className="font-heading text-lg font-semibold" />
         </NavLink>
 
         <div className="flex items-center gap-1">

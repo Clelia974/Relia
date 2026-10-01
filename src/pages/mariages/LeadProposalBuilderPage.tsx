@@ -105,7 +105,7 @@ export function LeadProposalBuilderPage() {
     else doShare(snapshot)
   }
 
-  const senderName = businessConfig.companyName?.trim() || 'Zordi'
+  const senderName = businessConfig.companyName?.trim() || 'SilkyPlace'
 
   return (
     <>

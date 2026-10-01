@@ -15,7 +15,7 @@ import {
   TRIAL_DAYS,
 } from '@/features/landing/landingContent'
 import { useLaunchOfferAvailability } from '@/features/payment/useLaunchOfferAvailability'
-import { Z_BUTTON } from '@/features/landing/zordiColors'
+import { SP_BUTTON } from '@/features/landing/brandColors'
 import { cn } from '@/lib/utils'
 
 const euro = (n: number) => `${n} €`
@@ -64,7 +64,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
             onClick={() => setBilling(value)}
             className={cn(
               'rounded-full px-4 py-1.5 font-medium transition-[color,background-color] duration-200',
-              billing === value ? 'bg-[#680808] text-[#DDE6EF] shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              billing === value ? 'bg-[#520C0C] text-[#F7EFE6] shadow-sm' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {label}
@@ -88,8 +88,8 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
         </article>
 
         {hasLaunchOffer ? (
-          <article className="relative flex flex-col rounded-2xl border-2 border-[#680808] bg-card p-8 shadow-(--shadow-raised)">
-            <span className="absolute -top-3 left-8 rounded-full bg-[#680808] px-3 py-1 text-xs font-semibold text-[#DDE6EF] shadow-sm">
+          <article className="relative flex flex-col rounded-2xl border-2 border-[#520C0C] bg-card p-8 shadow-(--shadow-raised)">
+            <span className="absolute -top-3 left-8 rounded-full bg-[#520C0C] px-3 py-1 text-xs font-semibold text-[#F7EFE6] shadow-sm">
               🎉 Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes
             </span>
             <h3 className="font-heading text-2xl font-semibold text-foreground">Solo</h3>
@@ -114,7 +114,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 <PlanFeature key={f}>{f}</PlanFeature>
               ))}
             </ul>
-            <Button size="lg" className={cn('mt-8 w-full', Z_BUTTON)} onClick={onStart}>
+            <Button size="lg" className={cn('mt-8 w-full', SP_BUTTON)} onClick={onStart}>
               {ctaLabel}
             </Button>
             <div className="mt-4 flex flex-col gap-1.5">
@@ -131,14 +131,14 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 className="h-2.5 w-full overflow-hidden rounded-full bg-muted"
               >
                 <div
-                  className="h-full rounded-full bg-[#680808] transition-[width] duration-500"
+                  className="h-full rounded-full bg-[#520C0C] transition-[width] duration-500"
                   style={{ width: `${Math.min(100, (launchOffer!.redeemed / LAUNCH_OFFER_LIMIT) * 100)}%` }}
                 />
               </div>
             </div>
           </article>
         ) : (
-          <article className="relative flex flex-col rounded-2xl border-2 border-[#680808] bg-card p-8 shadow-(--shadow-raised)">
+          <article className="relative flex flex-col rounded-2xl border-2 border-[#520C0C] bg-card p-8 shadow-(--shadow-raised)">
             <span className="absolute -top-3 left-8 rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
               Essai gratuit {TRIAL_DAYS} jours
             </span>
@@ -155,7 +155,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
                 <PlanFeature key={f}>{f}</PlanFeature>
               ))}
             </ul>
-            <Button size="lg" className={cn('mt-8 w-full', Z_BUTTON)} onClick={onStart}>
+            <Button size="lg" className={cn('mt-8 w-full', SP_BUTTON)} onClick={onStart}>
               Essai gratuit {TRIAL_DAYS} jours
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">Sans carte bancaire</p>
@@ -165,7 +165,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
 
       <p className="mx-auto max-w-2xl text-center text-sm text-muted-foreground">
         Résilie en un clic, sans justification à donner. Tes mariages, tâches et finances restent stockés sur ton appareil — exportables
-        en un clic à tout moment, même si tu arrêtes ZORDI. Pas de verrouillage volontaire de tes données.
+        en un clic à tout moment, même si tu arrêtes SilkyPlace. Pas de verrouillage volontaire de tes données.
       </p>
     </div>
   )

@@ -7,7 +7,7 @@ const AUTOPLAY_MS = 3500
 type Tone = 'new' | 'pending' | 'progress' | 'done' | 'muted'
 
 const TONE_CLASSES: Record<Tone, string> = {
-  new: 'bg-[#680808] text-[#DDE6EF]',
+  new: 'bg-[#520C0C] text-[#F7EFE6]',
   pending: 'bg-warning-bg text-warning',
   progress: 'bg-[#A9B08F]/20 text-[#5F6B4C]',
   done: 'bg-success/15 text-success',
@@ -92,7 +92,7 @@ const STEPS: Step[] = [
  * au vocabulaire déjà en place sur la page (mêmes 4 demandes fictives à travers
  * les 5 étapes plutôt que 5 illustrations différentes).
  */
-export function ZordiHowItWorks() {
+export function SilkyPlaceHowItWorks() {
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
   const step = STEPS[active]
@@ -124,13 +124,13 @@ export function ZordiHowItWorks() {
               aria-pressed={active === i}
               className={cn(
                 'flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition-colors',
-                active === i ? 'border-[#680808] bg-[#680808]/5' : 'border-border hover:border-[#680808]/40',
+                active === i ? 'border-[#520C0C] bg-[#520C0C]/5' : 'border-border hover:border-[#520C0C]/40',
               )}
             >
               <span
                 className={cn(
                   'flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors',
-                  active === i ? 'bg-[#680808] text-[#DDE6EF]' : 'bg-muted text-muted-foreground',
+                  active === i ? 'bg-[#520C0C] text-[#F7EFE6]' : 'bg-muted text-muted-foreground',
                 )}
               >
                 {i + 1}

@@ -2,11 +2,11 @@ import { type FormEvent, useState } from 'react'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Z_BUTTON } from '@/features/landing/zordiColors'
+import { SP_BUTTON } from '@/features/landing/brandColors'
 import { cn } from '@/lib/utils'
-import { useJoinZordiWaitlist } from '@/features/zordi-landing/useJoinZordiWaitlist'
+import { useJoinSilkyPlaceWaitlist } from '@/features/silkyplace-landing/useJoinSilkyPlaceWaitlist'
 
-interface ZordiWaitlistFormProps {
+interface SilkyPlaceWaitlistFormProps {
   id?: string
   className?: string
   inverted?: boolean
@@ -14,8 +14,8 @@ interface ZordiWaitlistFormProps {
 }
 
 /** Formulaire d'inscription réutilisé partout sur la landing (hero, appel final) — un seul point d'envoi vers api/waitlist.ts. */
-export function ZordiWaitlistForm({ id, className, inverted, submitLabel = 'Je veux rejoindre Zordi' }: ZordiWaitlistFormProps) {
-  const { join, isLoading, error } = useJoinZordiWaitlist()
+export function SilkyPlaceWaitlistForm({ id, className, inverted, submitLabel = 'Je veux rejoindre SilkyPlace' }: SilkyPlaceWaitlistFormProps) {
+  const { join, isLoading, error } = useJoinSilkyPlaceWaitlist()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
@@ -28,20 +28,20 @@ export function ZordiWaitlistForm({ id, className, inverted, submitLabel = 'Je v
 
   if (sent) {
     return (
-      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-[#DDE6EF]' : 'text-success', className)}>
+      <div id={id} className={cn('flex items-center gap-2.5 text-sm font-medium', inverted ? 'text-[#F7EFE6]' : 'text-success', className)}>
         <Check className="size-5 shrink-0" aria-hidden="true" />
-        Merci ! Tu seras informée dès que Zordi avance.
+        Merci ! Tu seras informée dès que SilkyPlace avance.
       </div>
     )
   }
 
   return (
     <form id={id} onSubmit={handleSubmit} className={cn('flex w-full flex-col gap-2 sm:flex-row', className)} noValidate>
-      <label htmlFor={`${id ?? 'zordi'}-email`} className="sr-only">
+      <label htmlFor={`${id ?? 'silkyplace'}-email`} className="sr-only">
         Adresse email
       </label>
       <Input
-        id={`${id ?? 'zordi'}-email`}
+        id={`${id ?? 'silkyplace'}-email`}
         type="email"
         required
         placeholder="ton@email.com"
@@ -54,7 +54,7 @@ export function ZordiWaitlistForm({ id, className, inverted, submitLabel = 'Je v
         type="submit"
         size="lg"
         disabled={isLoading}
-        className={cn('h-12 shrink-0 px-6', inverted ? 'bg-card text-[#680808] hover:bg-card' : Z_BUTTON)}
+        className={cn('h-12 shrink-0 px-6', inverted ? 'bg-card text-[#520C0C] hover:bg-card' : SP_BUTTON)}
       >
         {isLoading ? 'Inscription…' : submitLabel}
       </Button>

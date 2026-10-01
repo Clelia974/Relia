@@ -85,11 +85,11 @@ export const PAIN_CLOSING = {
   lines: ['Pas parce que tu veux travailler.', 'Parce que tu veux être sûre de ne rien avoir oublié.'],
 }
 
-/** Ce que ZORDI est concrètement — liste de pilotage, pas de discours. */
-export const ZORDI_FEATURE_LIST = ['Tâches', 'Planning', 'Matériel', 'Prestataires', 'Budget', 'Devis', 'Jour J', 'Bilan']
-export const ZORDI_NOT_LIST = ['Pas pour remplacer ton métier.', 'Pas pour créer à ta place.', 'Pas pour décider à ta place.']
+/** Ce que SilkyPlace est concrètement — liste de pilotage, pas de discours. */
+export const SILKYPLACE_FEATURE_LIST = ['Tâches', 'Planning', 'Matériel', 'Prestataires', 'Budget', 'Devis', 'Jour J', 'Bilan']
+export const SILKYPLACE_NOT_LIST = ['Pas pour remplacer ton métier.', 'Pas pour créer à ta place.', 'Pas pour décider à ta place.']
 
-/** "Avant / Avec ZORDI" — 3 groupes de chaque côté, mêmes verbes qui structurent la comparaison. */
+/** "Avant / Avec SilkyPlace" — 3 groupes de chaque côté, mêmes verbes qui structurent la comparaison. */
 export const BEFORE_GROUPS = [
   { verb: 'Tu cherches.', items: ['Des mails.', 'Des messages.', 'Des notes.', 'Des fichiers.', 'Des post-it.', 'Ta mémoire.'] },
   { verb: 'Tu vérifies.', items: ['Les prestataires.', 'Le matériel.', 'Les horaires.', 'Les paiements.'] },
@@ -104,31 +104,31 @@ export const AFTER_GROUPS = [
 export const FAQ = [
   {
     q: 'Est-ce difficile à utiliser ?',
-    a: 'Non. ZORDI est pensé pour être utilisé au quotidien par des professionnels de la décoration, sans compétences techniques particulières. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances.',
+    a: 'Non. SilkyPlace est pensé pour être utilisé au quotidien par des professionnels de la décoration, sans compétences techniques particulières. Il n’y a rien à installer ni à paramétrer : tu crées ton espace, tu ajoutes un mariage, tu avances.',
   },
   {
     q: 'Est-ce que je peux importer mes anciens mariages ?',
-    a: 'Oui. Si tes données sont déjà dans Excel, tu peux les importer dans ZORDI. Tu évites ainsi de recommencer toute ta saisie.',
+    a: 'Oui. Si tes données sont déjà dans Excel, tu peux les importer dans SilkyPlace. Tu évites ainsi de recommencer toute ta saisie.',
   },
   {
     q: 'Est-ce que je peux commencer sans payer ?',
     a: `Oui. Tu peux commencer gratuitement et tester les fonctionnalités Solo pendant ${TRIAL_DAYS} jours, sans carte bancaire. Après l’essai, tu peux rester sur l’offre gratuite jusqu’à 3 mariages ou passer à Solo.`,
   },
   {
-    q: 'Est-ce que je peux utiliser ZORDI sans internet ?',
-    a: 'ZORDI a besoin d’une connexion pour s’ouvrir : il n’y a pas encore de mode hors-ligne complet. Bon réflexe, la veille : imprime ou enregistre en PDF ton déroulé du Jour J (bouton « Imprimer / Exporter »). Tu l’as alors avec toi, même sans réseau.',
+    q: 'Est-ce que je peux utiliser SilkyPlace sans internet ?',
+    a: 'SilkyPlace a besoin d’une connexion pour s’ouvrir : il n’y a pas encore de mode hors-ligne complet. Bon réflexe, la veille : imprime ou enregistre en PDF ton déroulé du Jour J (bouton « Imprimer / Exporter »). Tu l’as alors avec toi, même sans réseau.',
   },
   {
     q: 'Où sont stockées mes données ?',
     a: 'Aujourd’hui, tes données de travail (mariages, tâches, prestataires, finances) sont stockées dans ton navigateur, sur ton appareil. Ton compte — email et mot de passe — est géré séparément, par notre prestataire d’authentification. Depuis les Paramètres, un bouton « Sauvegarder maintenant » envoie une copie en ligne à la demande, et tu peux exporter tes données à tout moment.',
   },
   {
-    q: 'Mes clientes ont-elles accès à ZORDI ?',
-    a: 'Non. ZORDI est ton espace de gestion. Tes clientes n’ont pas besoin d’avoir un compte pour que tu utilises l’outil — elles reçoivent les devis et factures que tu leur envoies.',
+    q: 'Mes clientes ont-elles accès à SilkyPlace ?',
+    a: 'Non. SilkyPlace est ton espace de gestion. Tes clientes n’ont pas besoin d’avoir un compte pour que tu utilises l’outil — elles reçoivent les devis et factures que tu leur envoies.',
   },
   {
     q: 'Les devis et factures sont-ils conformes ?',
-    a: 'Les documents générés par ZORDI sont indicatifs. Ils ne remplacent pas tes obligations légales et comptables : vérifie toujours les obligations applicables à ton activité avant émission.',
+    a: 'Les documents générés par SilkyPlace sont indicatifs. Ils ne remplacent pas tes obligations légales et comptables : vérifie toujours les obligations applicables à ton activité avant émission.',
   },
   {
     q: 'Et si je ne veux pas continuer après l’essai ?',

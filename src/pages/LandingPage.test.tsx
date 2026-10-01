@@ -100,13 +100,13 @@ describe('LandingPage', () => {
       'Ton travail a une place. Ta vie aussi.',
       'Tu connais déjà ces moments',
       'À quel moment ta journée finit vraiment ?',
-      'ZORDI, c’est quoi ?',
+      'SilkyPlace, c’est quoi ?',
       'Chaque fonctionnalité part d’un problème réel',
       'Et le temps que tu récupères, tu en fais quoi ?',
-      'Avant ZORDI. Avec ZORDI.',
-      'On ne va pas te raconter que ZORDI va régler toute ton activité.',
-      'ZORDI est fait pour toi si…',
-      '14 jours pour essayer ZORDI',
+      'Avant SilkyPlace. Avec SilkyPlace.',
+      'On ne va pas te raconter que SilkyPlace va régler toute ton activité.',
+      'SilkyPlace est fait pour toi si…',
+      '14 jours pour essayer SilkyPlace',
       'Tout ce que tu te demandes avant de commencer',
       'Tu as un mariage à organiser ?',
     ])
@@ -125,7 +125,7 @@ describe('LandingPage', () => {
 
   it('les tarifs suivent le choix mensuel / annuel, avec le bon calcul de l’économie', () => {
     setup()
-    const pricing = within(screen.getByRole('heading', { name: '14 jours pour essayer ZORDI' }).closest('section')!)
+    const pricing = within(screen.getByRole('heading', { name: '14 jours pour essayer SilkyPlace' }).closest('section')!)
     expect(pricing.getByText(`${PRICE_MONTHLY} €`)).toBeTruthy()
     fireEvent.click(pricing.getByRole('button', { name: /Annuel/ }))
     expect(pricing.getByText(`${PRICE_ANNUAL} €`)).toBeTruthy()

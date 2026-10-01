@@ -231,7 +231,7 @@ function InvoicePreviewInner({ invoiceId }: { invoiceId: string }) {
     else doShareFacture(snapshot)
   }
 
-  const senderName = businessConfig.companyName?.trim() || 'Zordi'
+  const senderName = businessConfig.companyName?.trim() || 'SilkyPlace'
 
   const confirmFinalize = () => {
     updateInvoiceStatus(invoice.id, 'finalisee')

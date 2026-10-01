@@ -57,7 +57,7 @@ export function WeddingBudgetSection({ overview, editBudgetHref }: WeddingBudget
                 <Info className="size-3.5" aria-hidden="true" />
               </button>
             </TooltipTrigger>
-            <TooltipContent>Compare le budget prévu par les couples avec les dépenses et coûts suivis dans ZORDI.</TooltipContent>
+            <TooltipContent>Compare le budget prévu par les couples avec les dépenses et coûts suivis dans SilkyPlace.</TooltipContent>
           </Tooltip>
         </div>
         <BudgetStatusBadge status={status} />

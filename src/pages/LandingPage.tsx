@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
-import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
+import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Button } from '@/components/ui/button'
 import { BeforeAfterSection } from '@/features/landing/components/BeforeAfterSection'
 import { FaqAccordion } from '@/features/landing/components/FaqAccordion'
@@ -14,7 +14,7 @@ import { SolutionSection } from '@/features/landing/components/SolutionSection'
 import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
 import { WhoItsForSection } from '@/features/landing/components/WhoItsForSection'
 import { CONTACT_EMAIL, TESTIMONIALS } from '@/features/landing/landingContent'
-import { Z_BUTTON } from '@/features/landing/zordiColors'
+import { SP_BUTTON } from '@/features/landing/brandColors'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
 import { useAuth } from '@/hooks/useAuth'
@@ -42,7 +42,7 @@ const TIME_RECOVERED = [
   { title: 'Toi', lines: ['Sortir.', 'Lire.', 'Dormir.', 'Faire du sport.', 'Ou ne rien faire.'] },
 ]
 
-const WHAT_ZORDI_DOES_NOT = [
+const WHAT_SILKYPLACE_DOES_NOT = [
   'remplir ton carnet de commandes à ta place.',
   'remplacer ton savoir-faire.',
   'remplacer ta créativité.',
@@ -79,10 +79,10 @@ export function LandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
+    <div className="min-h-dvh bg-[#F7EFE6] text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#680808] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#F7EFE6]"
       >
         Aller au contenu
       </a>
@@ -95,8 +95,8 @@ export function LandingPage() {
       ) : (
         <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
           <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-            <a href="#haut" aria-label="Zordi — haut de page">
-              <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight" />
+            <a href="#haut" aria-label="SilkyPlace — haut de page">
+              <SilkyPlaceWordmark className="font-heading text-2xl font-semibold tracking-tight" />
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
               <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
@@ -105,7 +105,7 @@ export function LandingPage() {
             </nav>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate('/connexion')}>Se connecter</Button>
-              <Button size="sm" className={Z_BUTTON} onClick={start}>{ctaLabel}</Button>
+              <Button size="sm" className={SP_BUTTON} onClick={start}>{ctaLabel}</Button>
             </div>
           </div>
         </header>
@@ -121,12 +121,12 @@ export function LandingPage() {
                   <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
                   Pour les décoratrices et décorateurs de mariage
                 </span>
-                <h1 className="text-balance font-heading text-5xl font-semibold leading-[1.03] tracking-tight text-[#680808] sm:text-6xl">
+                <h1 className="text-balance font-heading text-5xl font-semibold leading-[1.03] tracking-tight text-[#520C0C] sm:text-6xl">
                   Ton travail a une place. Ta vie aussi. <span className="italic text-[#5F6B4C]">Enfin de l’air.</span>
                 </h1>
                 <div className="flex flex-col gap-3">
                   <p className="max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground">
-                    ZORDI rassemble tout ce qu’il faut pour gérer tes mariages au même endroit.
+                    SilkyPlace rassemble tout ce qu’il faut pour gérer tes mariages au même endroit.
                   </p>
                   <p className="max-w-xl text-pretty text-base font-medium leading-relaxed text-[#5F6B4C]">
                     Moins de choses à chercher. Moins de choses à retenir. Plus de place pour créer.
@@ -137,7 +137,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                  <Button size="lg" className={cn('h-12 w-full px-7 text-base sm:w-auto', Z_BUTTON)} onClick={start}>
+                  <Button size="lg" className={cn('h-12 w-full px-7 text-base sm:w-auto', SP_BUTTON)} onClick={start}>
                     {ctaLabel}
                   </Button>
                   {!onboarded && (
@@ -175,7 +175,7 @@ export function LandingPage() {
               répondre à des messages à 22h30. Être à ton compte ne devrait pas vouloir dire être disponible tout le
               temps.
             </p>
-            <p className="mt-3 font-heading text-xl font-semibold text-[#680808]">
+            <p className="mt-3 font-heading text-xl font-semibold text-[#520C0C]">
               Le problème, ce n’est pas que tu ne sais pas t’organiser : c’est que les informations dont tu as besoin
               sont souvent éparpillées, et c’est ta tête qui fait le lien.
             </p>
@@ -204,13 +204,13 @@ export function LandingPage() {
             <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
               {DAY_TIMELINE.map((item) => (
                 <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
-                  <span className="shrink-0 font-heading text-sm font-semibold text-[#680808] sm:w-16">{item.time}</span>
+                  <span className="shrink-0 font-heading text-sm font-semibold text-[#520C0C] sm:w-16">{item.time}</span>
                   <span className="text-foreground/80">{item.text}</span>
                 </li>
               ))}
             </ol>
-            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#680808]">
-              ZORDI ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer.
+            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#520C0C]">
+              SilkyPlace ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer.
             </p>
           </div>
         </section>
@@ -220,7 +220,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La solution</p>
-              <h2 className={cn(H2, 'mt-2')}>ZORDI, c’est quoi ?</h2>
+              <h2 className={cn(H2, 'mt-2')}>SilkyPlace, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">
                 Un espace pensé pour les décoratrices et décorateurs de mariage indépendants. Installation, décoration
                 cérémonie, réception, démontage, inventaire, retour matériel, prestataires déco : un seul endroit
@@ -273,7 +273,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <h2 className={H2}>Et le temps que tu récupères, tu en fais quoi ?</h2>
-              <p className="mt-3 text-muted-foreground">ZORDI ne veut pas remplir ce temps à ta place. Il veut te permettre de choisir.</p>
+              <p className="mt-3 text-muted-foreground">SilkyPlace ne veut pas remplir ce temps à ta place. Il veut te permettre de choisir.</p>
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {TIME_RECOVERED.map((item) => (
@@ -287,44 +287,44 @@ export function LandingPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#680808]">
+            <p className="mt-8 max-w-2xl font-heading text-lg font-semibold text-[#520C0C]">
               Le temps que tu récupères n’a pas besoin d’être productif.
             </p>
           </div>
         </section>
 
-        {/* 9 — AVANT / AVEC ZORDI — bloc couleur */}
+        {/* 9 — AVANT / AVEC SilkyPlace — bloc couleur */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>La différence</p>
-              <h2 className={cn(H2, 'mt-2')}>Avant ZORDI. Avec ZORDI.</h2>
+              <h2 className={cn(H2, 'mt-2')}>Avant SilkyPlace. Avec SilkyPlace.</h2>
             </div>
             <div className="mt-10">
               <BeforeAfterSection />
             </div>
-            <blockquote className="mt-10 max-w-2xl text-balance font-heading text-2xl font-semibold leading-snug text-[#680808] sm:text-3xl">
-              ZORDI ne réduit pas le nombre de mariages à gérer — il réduit ce que tu dois garder en tête pour les gérer.
+            <blockquote className="mt-10 max-w-2xl text-balance font-heading text-2xl font-semibold leading-snug text-[#520C0C] sm:text-3xl">
+              SilkyPlace ne réduit pas le nombre de mariages à gérer — il réduit ce que tu dois garder en tête pour les gérer.
             </blockquote>
           </div>
         </section>
 
-        {/* 10 — CE QUE ZORDI NE PROMET PAS */}
+        {/* 10 — CE QUE SilkyPlace NE PROMET PAS */}
         <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>On ne va pas te raconter que ZORDI va régler toute ton activité.</h2>
-            <p className="mt-4 text-muted-foreground">ZORDI ne va pas :</p>
+            <h2 className={H2}>On ne va pas te raconter que SilkyPlace va régler toute ton activité.</h2>
+            <p className="mt-4 text-muted-foreground">SilkyPlace ne va pas :</p>
             <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
-              {WHAT_ZORDI_DOES_NOT.map((item) => (
+              {WHAT_SILKYPLACE_DOES_NOT.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span aria-hidden="true">❌</span>
                   {item}
                 </li>
               ))}
             </ul>
-            <p className="mt-6 font-heading text-lg font-semibold text-[#680808]">Ce n’est pas son rôle.</p>
+            <p className="mt-6 font-heading text-lg font-semibold text-[#520C0C]">Ce n’est pas son rôle.</p>
             <p className="mt-2 text-muted-foreground">
-              ZORDI s’occupe de ce qui arrive après la demande : comment tout suivre sans tout garder dans ta tête.
+              SilkyPlace s’occupe de ce qui arrive après la demande : comment tout suivre sans tout garder dans ta tête.
             </p>
           </div>
         </section>
@@ -334,7 +334,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>ZORDI est fait pour toi si…</h2>
+              <h2 className={cn(H2, 'mt-2')}>SilkyPlace est fait pour toi si…</h2>
             </div>
             <div className="mt-10">
               <WhoItsForSection />
@@ -347,7 +347,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>
-              <h2 className={cn(H2, 'mt-2')}>14 jours pour essayer ZORDI</h2>
+              <h2 className={cn(H2, 'mt-2')}>14 jours pour essayer SilkyPlace</h2>
               <p className="mt-4 text-muted-foreground">
                 Sans carte bancaire. Teste avec ton prochain mariage ou un mariage fictif. À la fin de l’essai : reste
                 gratuite jusqu’à 3 mariages, ou passe à Solo pour les mariages illimités.
@@ -371,29 +371,29 @@ export function LandingPage() {
         </section>
 
         {/* 14 — APPEL FINAL */}
-        <section className="bg-[#680808] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
+        <section className="bg-[#520C0C] py-20 text-[#F7EFE6] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <div className="flex flex-col gap-1">
               <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
                 Tu as un mariage à organiser ?
               </h2>
-              <p className="mt-2 text-lg text-[#DDE6EF]/85">Commence par celui-là.</p>
+              <p className="mt-2 text-lg text-[#F7EFE6]/85">Commence par celui-là.</p>
             </div>
-            <p className="max-w-xl text-lg font-medium leading-relaxed text-[#DDE6EF]">
+            <p className="max-w-xl text-lg font-medium leading-relaxed text-[#F7EFE6]">
               Pas besoin de tout changer, tout importer ou tout comprendre avant de commencer. Crée ton espace,
-              ajoute ton mariage, et regarde si ZORDI peut te faire respirer un peu plus.
+              ajoute ton mariage, et regarde si SilkyPlace peut te faire respirer un peu plus.
             </p>
             <p className="text-balance font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
               Ton travail a une place. Ta vie aussi.
             </p>
             <Button
               size="lg"
-              className="h-12 bg-card px-7 text-base text-[#680808] shadow-(--shadow-raised) hover:bg-card hover:shadow-(--shadow-raised)"
+              className="h-12 bg-card px-7 text-base text-[#520C0C] shadow-(--shadow-raised) hover:bg-card hover:shadow-(--shadow-raised)"
               onClick={start}
             >
               {ctaLabel}
             </Button>
-            <p className="text-sm text-[#DDE6EF]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
+            <p className="text-sm text-[#F7EFE6]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
           </div>
         </section>
       </main>
@@ -406,10 +406,10 @@ export function LandingPage() {
               {CONTACT_EMAIL}
             </a>
           </p>
-          <p>© {new Date().getFullYear()} ZORDI · Événements Clés</p>
+          <p>© {new Date().getFullYear()} SilkyPlace · Événements Clés</p>
         </div>
         <div className={cn(CONTAINER, 'mt-2 text-sm text-muted-foreground')}>
-          <p>ZORDI — L’organisation pensée pour les décoratrices et décorateurs de mariage indépendants.</p>
+          <p>SilkyPlace — L’organisation pensée pour les décoratrices et décorateurs de mariage indépendants.</p>
           <p className="mt-1">Les devis et factures générés sont indicatifs : vérifie tes obligations légales avant émission.</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>

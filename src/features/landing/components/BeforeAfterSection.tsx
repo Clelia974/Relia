@@ -8,32 +8,32 @@ function GroupedList({ groups, variant }: { groups: typeof BEFORE_GROUPS; varian
     <div
       className={cn(
         'flex flex-col gap-5 rounded-2xl border p-6 sm:p-8',
-        isApres ? 'border-transparent bg-[#680808] text-[#DDE6EF]' : 'border-border bg-card',
+        isApres ? 'border-transparent bg-[#520C0C] text-[#F7EFE6]' : 'border-border bg-card',
       )}
     >
       <span
         className={cn(
           'w-fit rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide',
-          isApres ? 'bg-[#DDE6EF]/15 text-[#DDE6EF]' : 'bg-muted text-muted-foreground',
+          isApres ? 'bg-[#F7EFE6]/15 text-[#F7EFE6]' : 'bg-muted text-muted-foreground',
         )}
       >
-        {isApres ? 'Avec ZORDI' : 'Avant ZORDI'}
+        {isApres ? 'Avec SilkyPlace' : 'Avant SilkyPlace'}
       </span>
       {groups.map((group) => (
         <div key={group.verb} className="flex flex-col gap-2">
-          <p className={cn('font-heading text-base font-semibold', isApres ? 'text-[#DDE6EF]' : 'text-foreground')}>{group.verb}</p>
+          <p className={cn('font-heading text-base font-semibold', isApres ? 'text-[#F7EFE6]' : 'text-foreground')}>{group.verb}</p>
           <ul className="flex flex-col gap-1.5 text-sm">
             {group.items.map((item) => (
               <li key={item} className="flex items-start gap-2.5">
                 <span
                   className={cn(
                     'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full',
-                    isApres ? 'bg-[#DDE6EF]/15 text-[#DDE6EF]' : 'bg-risk-bg text-risk',
+                    isApres ? 'bg-[#F7EFE6]/15 text-[#F7EFE6]' : 'bg-risk-bg text-risk',
                   )}
                 >
                   {isApres ? <Check className="size-2.5" aria-hidden="true" /> : <X className="size-2.5" aria-hidden="true" />}
                 </span>
-                <span className={isApres ? 'text-[#DDE6EF]/90' : 'text-foreground'}>{item}</span>
+                <span className={isApres ? 'text-[#F7EFE6]/90' : 'text-foreground'}>{item}</span>
               </li>
             ))}
           </ul>

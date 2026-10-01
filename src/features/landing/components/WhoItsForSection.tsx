@@ -18,7 +18,7 @@ export function WhoItsForSection() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <p className="font-heading text-lg font-semibold text-foreground">ZORDI est fait pour toi si…</p>
+        <p className="font-heading text-lg font-semibold text-foreground">SilkyPlace est fait pour toi si…</p>
         <ul className="flex flex-col gap-3 text-sm">
           {FOR_YOU.map((item) => (
             <li key={item} className="flex items-start gap-3">
@@ -44,7 +44,7 @@ export function WhoItsForSection() {
           ))}
         </ul>
         <p className="text-sm text-muted-foreground">
-          Et c’est très bien. ZORDI n’a pas vocation à ajouter un outil là où tu n’en as pas besoin.
+          Et c’est très bien. SilkyPlace n’a pas vocation à ajouter un outil là où tu n’en as pas besoin.
         </p>
       </div>
     </div>

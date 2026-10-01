@@ -28,8 +28,8 @@ interface StatFieldProps {
  */
 function StatField({ id, icon: Icon, label, placeholder, value, onChange }: StatFieldProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-[#DDE6EF]/15 bg-[#DDE6EF]/5 p-4 sm:p-5">
-      <Label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#DDE6EF]/70">
+    <div className="flex flex-col gap-2 rounded-xl border border-[#F7EFE6]/15 bg-[#F7EFE6]/5 p-4 sm:p-5">
+      <Label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#F7EFE6]/70">
         <Icon className="size-3.5 shrink-0" aria-hidden="true" />
         {label}
       </Label>
@@ -41,13 +41,13 @@ function StatField({ id, icon: Icon, label, placeholder, value, onChange }: Stat
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-auto rounded-none border-0 border-b-2 border-[#DDE6EF]/20 bg-transparent px-0 py-1 font-heading text-3xl font-semibold text-[#DDE6EF] placeholder:text-[#DDE6EF]/30 focus-visible:border-[#DDE6EF] focus-visible:ring-0"
+        className="h-auto rounded-none border-0 border-b-2 border-[#F7EFE6]/20 bg-transparent px-0 py-1 font-heading text-3xl font-semibold text-[#F7EFE6] placeholder:text-[#F7EFE6]/30 focus-visible:border-[#F7EFE6] focus-visible:ring-0"
       />
     </div>
   )
 }
 
-export function ZordiTimeCalculator() {
+export function SilkyPlaceTimeCalculator() {
   // Champs vides par défaut (pas de valeurs pré-remplies) : le résultat n'apparaît
   // qu'une fois que la décoratrice a saisi ses propres chiffres — effet de révélation
   // plutôt qu'un calcul déjà affiché avant toute interaction.
@@ -62,24 +62,24 @@ export function ZordiTimeCalculator() {
   const hasResult = hours > 0
 
   return (
-    <div className="rounded-2xl bg-[#680808] p-6 text-[#DDE6EF] shadow-(--shadow-raised) sm:p-8">
+    <div className="rounded-2xl bg-[#520C0C] p-6 text-[#F7EFE6] shadow-(--shadow-raised) sm:p-8">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatField id="zordi-calc-count" icon={Inbox} label="Demandes reçues" placeholder="50" value={count} onChange={setCount} />
-        <StatField id="zordi-calc-minutes" icon={Clock} label="Minutes par demande" placeholder="15" value={avgMinutes} onChange={setAvgMinutes} />
-        <StatField id="zordi-calc-repeats" icon={RotateCcw} label="Relances par demande" placeholder="2" value={repeats} onChange={setRepeats} />
+        <StatField id="silkyplace-calc-count" icon={Inbox} label="Demandes reçues" placeholder="50" value={count} onChange={setCount} />
+        <StatField id="silkyplace-calc-minutes" icon={Clock} label="Minutes par demande" placeholder="15" value={avgMinutes} onChange={setAvgMinutes} />
+        <StatField id="silkyplace-calc-repeats" icon={RotateCcw} label="Relances par demande" placeholder="2" value={repeats} onChange={setRepeats} />
       </div>
 
       {hasResult ? (
-        <div key={hours} className="animate-notice-in mt-8 flex flex-col items-center gap-1 border-t border-[#DDE6EF]/20 pt-8 text-center">
+        <div key={hours} className="animate-notice-in mt-8 flex flex-col items-center gap-1 border-t border-[#F7EFE6]/20 pt-8 text-center">
           <p className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">≈ {hours} h</p>
-          <p className="text-sm text-[#DDE6EF]/80">par mois consacrées à ces tâches de suivi.</p>
-          <p className="mt-3 text-xs text-[#DDE6EF]/70">
+          <p className="text-sm text-[#F7EFE6]/80">par mois consacrées à ces tâches de suivi.</p>
+          <p className="mt-3 text-xs text-[#F7EFE6]/70">
             Cette estimation est indicative et dépend uniquement des informations que tu renseignes — elle ne mesure
             pas réellement ton activité.
           </p>
         </div>
       ) : (
-        <p className="mt-8 border-t border-[#DDE6EF]/20 pt-8 text-center text-sm text-[#DDE6EF]/70">
+        <p className="mt-8 border-t border-[#F7EFE6]/20 pt-8 text-center text-sm text-[#F7EFE6]/70">
           Renseigne tes chiffres pour voir ton estimation.
         </p>
       )}

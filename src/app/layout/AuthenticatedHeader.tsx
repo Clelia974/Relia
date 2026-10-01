@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { InitialsBadge } from '@/components/InitialsBadge'
-import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
+import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { useAuth } from '@/hooks/useAuth'
 
 /**
@@ -28,8 +28,8 @@ export function AuthenticatedHeader() {
   return (
     <header className="no-print sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link to="/" aria-label="Zordi — retour à l'accueil">
-          <ZordiWordmark className="font-heading text-lg font-semibold" />
+        <Link to="/" aria-label="SilkyPlace — retour à l'accueil">
+          <SilkyPlaceWordmark className="font-heading text-lg font-semibold" />
         </Link>
 
         <div className="flex items-center gap-3">

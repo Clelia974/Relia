@@ -17,11 +17,11 @@ import { useSubmitLead } from '@/features/leads/useSubmitLead'
 
 /**
  * Formulaire public (jamais authentifié) : une prospect n'a pas de compte
- * Zordi — lien propre à chaque décoratrice (/lead/new/:userId), à
+ * SilkyPlace — lien propre à chaque décoratrice (/lead/new/:userId), à
  * partager elle-même (bio Instagram, réponse WhatsApp…) ou à intégrer
  * directement sur son propre site (lien classique ou iframe).
  *
- * `?embed=1` : sans en-tête Zordi ni fond de page — pensé pour un
+ * `?embed=1` : sans en-tête SilkyPlace ni fond de page — pensé pour un
  * <iframe> encastré dans une autre page, qui a déjà son propre habillage.
  */
 export function LeadFormPage() {

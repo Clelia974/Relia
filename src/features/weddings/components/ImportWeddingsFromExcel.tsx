@@ -11,7 +11,7 @@ import { useWorkspaceStore } from '@/store/workspaceStore'
 
 /**
  * Import de mariages (+ prestataires, facultatif) depuis le modèle Excel
- * ZORDI (Paramètres). Tâches et matériel restent hors périmètre : une
+ * SilkyPlace (Paramètres). Tâches et matériel restent hors périmètre : une
  * cliente n'a presque jamais déjà ces données sous forme de tableur (cf.
  * décision prise avec l'utilisatrice), et le formulaire de l'app (menus
  * déroulants) est plus rapide et plus fiable pour ça qu'une saisie Excel.

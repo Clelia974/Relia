@@ -58,7 +58,7 @@ export function ProposalDocumentPreview({
             />
           )}
           <div>
-            <p className="font-heading text-lg font-semibold text-foreground">{businessConfig.companyName || 'Zordi'}</p>
+            <p className="font-heading text-lg font-semibold text-foreground">{businessConfig.companyName || 'SilkyPlace'}</p>
             {businessConfig.address && <p className="text-xs text-muted-foreground">{businessConfig.address}</p>}
             {businessConfig.email && <p className="text-xs text-muted-foreground">{businessConfig.email}</p>}
             {businessConfig.phone && <p className="text-xs text-muted-foreground">{businessConfig.phone}</p>}

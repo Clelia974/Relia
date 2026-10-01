@@ -18,14 +18,14 @@ import {
 } from 'lucide-react'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { LegalLinks } from '@/features/legal/LegalLinks'
-import { ZordiWordmark } from '@/components/brand/ZordiWordmark'
-import { ZordiHowItWorks } from '@/features/zordi-landing/ZordiHowItWorks'
-import { ZordiTimeCalculator } from '@/features/zordi-landing/ZordiTimeCalculator'
-import { ZordiWaitlistForm } from '@/features/zordi-landing/ZordiWaitlistForm'
+import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
+import { SilkyPlaceHowItWorks } from '@/features/silkyplace-landing/SilkyPlaceHowItWorks'
+import { SilkyPlaceTimeCalculator } from '@/features/silkyplace-landing/SilkyPlaceTimeCalculator'
+import { SilkyPlaceWaitlistForm } from '@/features/silkyplace-landing/SilkyPlaceWaitlistForm'
 import { cn } from '@/lib/utils'
 
-// Couleurs de marque Zordi, écrites en dur ci-dessous à chaque usage (#DDE6EF fond,
-// #680808 primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
+// Couleurs de marque SilkyPlace, écrites en dur ci-dessous à chaque usage (#F7EFE6 fond,
+// #520C0C primaire, #A9B08F accent, #5F6B4C = accent assombri pour le texte) — volontairement
 // distinctes des tokens --primary/--thread de l'app existante, laissés intacts ailleurs
 // dans le produit tant que le rebrand complet n'est pas décidé.
 const CONTAINER = 'mx-auto w-full max-w-4xl px-5 sm:px-8'
@@ -33,7 +33,7 @@ const SECTION = 'scroll-mt-20 py-14 sm:py-20'
 // Note : classes Tailwind écrites en toutes lettres (jamais interpolées via les constantes
 // ci-dessus) — le scanner de Tailwind lit le texte source tel quel, une valeur injectée par
 // template literal ne serait pas détectée et la règle CSS ne serait jamais générée.
-const H2 = 'font-heading text-2xl font-semibold tracking-tight text-[#680808] sm:text-3xl'
+const H2 = 'font-heading text-2xl font-semibold tracking-tight text-[#520C0C] sm:text-3xl'
 const KICKER = 'text-xs font-medium uppercase tracking-[0.14em] text-[#5F6B4C]'
 const CARD_KICKER = 'flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#5F6B4C]'
 const CONTACT_EMAIL = 'contact@evenementscles.com'
@@ -73,7 +73,7 @@ const BEFORE_AFTER = [
   { before: '« Je continue après le dîner. »', after: '« Je sais où reprendre demain. »' },
 ]
 
-const WHAT_ZORDI_DOES_NOT = [
+const WHAT_SILKYPLACE_DOES_NOT = [
   'faire venir des clientes à ta place ;',
   'remplacer ton Instagram ;',
   'remplacer ton savoir-faire ;',
@@ -99,12 +99,12 @@ const NOT_FOR_YOU = [
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: 'Zordi est-il déjà disponible ?',
+    q: 'SilkyPlace est-il déjà disponible ?',
     a: 'Pas encore, c’est en construction. En t’inscrivant, tu seras informée des prochaines étapes et de l’ouverture des premiers tests.',
   },
   {
-    q: 'Est-ce que Zordi va m’apporter plus de clientes ?',
-    a: 'Non. Zordi ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
+    q: 'Est-ce que SilkyPlace va m’apporter plus de clientes ?',
+    a: 'Non. SilkyPlace ne remplace pas ton marketing — il s’intéresse à la gestion des demandes que tu reçois déjà.',
   },
   {
     q: 'Est-ce uniquement pour les mariages ?',
@@ -115,17 +115,17 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Non. L’idée est de t’aider à gérer les demandes qui arrivent de différents endroits, pas de choisir un seul canal.',
   },
   {
-    q: 'Quand pourrai-je tester Zordi ?',
+    q: 'Quand pourrai-je tester SilkyPlace ?',
     a: 'Les premières personnes inscrites seront informées dès l’ouverture des premiers tests.',
   },
 ]
 
 /**
  * Landing "bis" — /zordi : uniquement une collecte d'emails en attendant que
- * le MVP Zordi soit prêt, distincte de la vraie landing "lancement" (RootGate /).
+ * le MVP SilkyPlace soit prêt, distincte de la vraie landing "lancement" (RootGate /).
  * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
  */
-export function ZordiLandingPage() {
+export function SilkyPlaceLandingPage() {
   useEffect(() => {
     const root = document.documentElement
     const wasDark = root.classList.contains('dark')
@@ -140,10 +140,10 @@ export function ZordiLandingPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#DDE6EF] text-foreground">
+    <div className="min-h-dvh bg-[#F7EFE6] text-foreground">
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#680808] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#DDE6EF]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[#520C0C] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[#F7EFE6]"
       >
         Aller au contenu
       </a>
@@ -151,21 +151,21 @@ export function ZordiLandingPage() {
       {/* 1 — HEADER */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/95 backdrop-blur">
         <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-4')}>
-          <a href="#haut" aria-label="Zordi — haut de page">
-            <ZordiWordmark className="font-heading text-2xl font-semibold tracking-tight" />
+          <a href="#haut" aria-label="SilkyPlace — haut de page">
+            <SilkyPlaceWordmark className="font-heading text-2xl font-semibold tracking-tight" />
           </a>
           <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#probleme" className="transition-colors hover:text-foreground">Le problème</a>
             <a href="#comment-ca-marche" className="transition-colors hover:text-foreground">Comment ça marche</a>
-            <a href="#pourquoi-zordi" className="transition-colors hover:text-foreground">Pourquoi Zordi</a>
+            <a href="#pourquoi-silkyplace" className="transition-colors hover:text-foreground">Pourquoi SilkyPlace</a>
             <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
           </nav>
           <button
             type="button"
             onClick={scrollToInscription}
-            className="rounded-lg bg-[#680808] px-4 py-2 text-sm font-medium text-[#DDE6EF] transition-colors hover:bg-[#680808]/90"
+            className="rounded-lg bg-[#520C0C] px-4 py-2 text-sm font-medium text-[#F7EFE6] transition-colors hover:bg-[#520C0C]/90"
           >
-            Je veux rejoindre Zordi
+            Je veux rejoindre SilkyPlace
           </button>
         </div>
       </header>
@@ -176,23 +176,23 @@ export function ZordiLandingPage() {
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center animate-page-in')}>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.1em] text-[#5F6B4C]">
               <span className="size-1.5 rounded-full bg-[#A9B08F]" aria-hidden="true" />
-              Zordi — en construction
+              SilkyPlace — en construction
             </span>
-            <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#680808] sm:text-5xl">
+            <h1 className="text-balance font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-[#520C0C] sm:text-5xl">
               Et si tu pouvais vraiment fermer ton ordinateur à 18h ?
             </h1>
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-foreground/80">
               Tu as créé ton activité pour décorer, créer, imaginer — pas pour répondre à WhatsApp à 21h ou chercher
-              un devis pendant que ta famille t’attend. Zordi t’aide à mieux gérer tes demandes, pour que ton travail
+              un devis pendant que ta famille t’attend. SilkyPlace t’aide à mieux gérer tes demandes, pour que ton travail
               reprenne sa place.
             </p>
 
             <div className="mt-2 w-full max-w-md">
-              <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre Zordi →</p>
-              <ZordiWaitlistForm id="inscription" submitLabel="Je veux rejoindre Zordi" />
+              <p className="mb-3 text-sm font-medium text-foreground">Je veux rejoindre SilkyPlace →</p>
+              <SilkyPlaceWaitlistForm id="inscription" submitLabel="Je veux rejoindre SilkyPlace" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Zordi est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
+              SilkyPlace est encore en construction. Rejoins les premières décoratrices qui veulent suivre l’aventure.
             </p>
           </div>
         </section>
@@ -242,7 +242,7 @@ export function ZordiLandingPage() {
             <ol className="mt-10 flex flex-col divide-y divide-border border-y border-border">
               {DAY_TIMELINE.map((item) => (
                 <li key={item.time} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
-                  <span className="shrink-0 font-heading text-sm font-semibold text-[#680808] sm:w-16">{item.time}</span>
+                  <span className="shrink-0 font-heading text-sm font-semibold text-[#520C0C] sm:w-16">{item.time}</span>
                   <span className="text-foreground/80">{item.text}</span>
                 </li>
               ))}
@@ -275,7 +275,7 @@ export function ZordiLandingPage() {
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {TIME_RECOVERED.map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
+                <div key={item.title} className="rounded-xl border border-border bg-card p-6">
                   <p className={CARD_KICKER}>
                     <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
                     {item.title}
@@ -285,17 +285,17 @@ export function ZordiLandingPage() {
               ))}
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Zordi ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
+              SilkyPlace ne veut pas remplir ce temps. Il veut te permettre de choisir ce que tu en fais.
             </p>
           </div>
         </section>
 
-        {/* 9 — ZORDI, C'EST QUOI ? */}
+        {/* 9 — SilkyPlace, C'EST QUOI ? */}
         <section id="comment-ca-marche" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Comment ça marche</p>
-              <h2 className={cn(H2, 'mt-2')}>Zordi, c’est quoi ?</h2>
+              <h2 className={cn(H2, 'mt-2')}>SilkyPlace, c’est quoi ?</h2>
               <p className="mt-3 text-muted-foreground">Une idée simple : une demande devrait avoir un endroit où aller.</p>
             </div>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -305,7 +305,7 @@ export function ZordiLandingPage() {
                 { icon: Repeat, title: 'Suivre', text: 'Qui relancer, sans compter sur ta mémoire.' },
                 { icon: Power, title: 'Décrocher', text: 'Fermer l’ordinateur en sachant où tu en es.' },
               ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-background p-6">
+                <div key={item.title} className="rounded-xl border border-border bg-card p-6">
                   <p className={CARD_KICKER}>
                     <item.icon className="size-3.5 shrink-0" aria-hidden="true" />
                     {item.title}
@@ -338,9 +338,9 @@ export function ZordiLandingPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-[#680808]/30 bg-[#680808]/5 p-6">
-                <p className="text-sm font-semibold text-[#680808]">Avec une organisation claire</p>
-                <ul className="mt-4 flex flex-col divide-y divide-[#680808]/15">
+              <div className="rounded-2xl border border-[#520C0C]/30 bg-[#520C0C]/5 p-6">
+                <p className="text-sm font-semibold text-[#520C0C]">Avec une organisation claire</p>
+                <ul className="mt-4 flex flex-col divide-y divide-[#520C0C]/15">
                   {BEFORE_AFTER.map((row) => (
                     <li key={row.after} className="py-2.5 text-sm text-foreground first:pt-0 last:pb-0">
                       {row.after}
@@ -363,18 +363,18 @@ export function ZordiLandingPage() {
               </p>
             </div>
             <div className="mt-10">
-              <ZordiTimeCalculator />
+              <SilkyPlaceTimeCalculator />
             </div>
           </div>
         </section>
 
-        {/* 12 — CE QUE ZORDI NE PROMET PAS */}
+        {/* 12 — CE QUE SilkyPlace NE PROMET PAS */}
         <section className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <h2 className={H2}>On ne va pas te raconter que Zordi va régler toute ton activité.</h2>
-            <p className="mt-4 text-muted-foreground">Zordi ne va pas :</p>
+            <h2 className={H2}>On ne va pas te raconter que SilkyPlace va régler toute ton activité.</h2>
+            <p className="mt-4 text-muted-foreground">SilkyPlace ne va pas :</p>
             <ul className="mt-3 flex flex-col gap-2 text-foreground/80">
-              {WHAT_ZORDI_DOES_NOT.map((item) => (
+              {WHAT_SILKYPLACE_DOES_NOT.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" aria-hidden="true" />
                   {item}
@@ -382,7 +382,7 @@ export function ZordiLandingPage() {
               ))}
             </ul>
             <p className="mt-6 text-muted-foreground">
-              Ce n’est pas son rôle. Zordi s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
+              Ce n’est pas son rôle. SilkyPlace s’intéresse à ce qui arrive après — comment suivre tes demandes sans tout
               garder dans ta tête.
             </p>
           </div>
@@ -391,7 +391,7 @@ export function ZordiLandingPage() {
         {/* 13 — CONSTRUCTION */}
         <section className={cn(SECTION, 'bg-card')}>
           <div className={cn(CONTAINER, 'max-w-2xl text-center')}>
-            <h2 className={H2}>Zordi est encore en construction.</h2>
+            <h2 className={H2}>SilkyPlace est encore en construction.</h2>
             <p className="mt-3 font-heading text-lg text-foreground">On teste. On réfléchit. On construit. On écoute. On recommence.</p>
             <p className="mt-4 text-muted-foreground">
               Le but : quelque chose que les décoratrices auront réellement envie d’utiliser.
@@ -404,11 +404,11 @@ export function ZordiLandingPage() {
           <div className={CONTAINER}>
             <div className="max-w-2xl">
               <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-2')}>Zordi est pour toi si…</h2>
+              <h2 className={cn(H2, 'mt-2')}>SilkyPlace est pour toi si…</h2>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:items-start">
               <div className="rounded-2xl border border-success/30 bg-success/5 p-6">
-                <p className="text-sm font-semibold text-success">Zordi est pour toi si…</p>
+                <p className="text-sm font-semibold text-success">SilkyPlace est pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-foreground/80">
@@ -419,7 +419,7 @@ export function ZordiLandingPage() {
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-sm font-semibold text-muted-foreground">Zordi n’est probablement pas pour toi si…</p>
+                <p className="text-sm font-semibold text-muted-foreground">SilkyPlace n’est probablement pas pour toi si…</p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {NOT_FOR_YOU.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-muted-foreground">
@@ -431,7 +431,7 @@ export function ZordiLandingPage() {
               </div>
             </div>
             <p className="mt-8 max-w-2xl text-muted-foreground">
-              Zordi ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
+              SilkyPlace ne cherche pas à remplir ton agenda. Il cherche à t’aider à mieux vivre avec celui que tu as.
             </p>
           </div>
         </section>
@@ -444,16 +444,16 @@ export function ZordiLandingPage() {
               <p className="mt-3 text-muted-foreground">Clique sur une étape pour la voir en action.</p>
             </div>
             <div className="mt-8">
-              <ZordiHowItWorks />
+              <SilkyPlaceHowItWorks />
             </div>
           </div>
         </section>
 
-        {/* 16 — POURQUOI ZORDI ? (portrait) */}
-        <section id="pourquoi-zordi" className={SECTION}>
+        {/* 16 — POURQUOI SilkyPlace ? (portrait) */}
+        <section id="pourquoi-silkyplace" className={SECTION}>
           <div className={cn(CONTAINER, 'max-w-2xl')}>
-            <p className={KICKER}>Pourquoi Zordi</p>
-            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé Zordi parce que j’avais toutes les réponses.</h2>
+            <p className={KICKER}>Pourquoi SilkyPlace</p>
+            <h2 className={cn(H2, 'mt-2')}>Je n’ai pas créé SilkyPlace parce que j’avais toutes les réponses.</h2>
             <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-foreground/80">
               <p>
                 J’ai été comptable, avant décoratrice — et mon activité de décoratrice n’a pas fonctionné comme je
@@ -463,13 +463,13 @@ export function ZordiLandingPage() {
                 En regardant ce qui se passait autour de moi, j’ai remarqué autre chose : pendant les grosses
                 périodes, des décoratrices parlaient de messages qui s’accumulaient, de devis en retard. Je me suis
                 demandé : « Si un jour j’en arrive là, comment je vais gérer tout ça ? » C’est cette question qui m’a
-                amenée à réfléchir à Zordi.
+                amenée à réfléchir à SilkyPlace.
               </p>
               <p>
-                Le nom vient de là aussi : « Zordi », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
+                Le nom vient de là aussi : « SilkyPlace », ça veut dire <em>aujourd’hui</em> en créole réunionnais — la
                 journée qu’on a sous les yeux, celle qu’on peut refermer le soir sans y penser jusqu’au lendemain.
               </p>
-              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où Zordi ira. Mais je sais pourquoi j’ai commencé.</p>
+              <p className="font-medium text-foreground">Je ne sais pas encore jusqu’où SilkyPlace ira. Mais je sais pourquoi j’ai commencé.</p>
             </div>
           </div>
         </section>
@@ -494,19 +494,19 @@ export function ZordiLandingPage() {
         </section>
 
         {/* 18 — APPEL FINAL */}
-        <section className="bg-[#680808] py-20 text-[#DDE6EF] sm:py-28" aria-labelledby="final">
+        <section className="bg-[#520C0C] py-20 text-[#F7EFE6] sm:py-28" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <h2 id="final" className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
               Ton travail a une place. Ta vie aussi.
             </h2>
-            <p className="max-w-xl text-lg leading-relaxed text-[#DDE6EF]/85">
-              Zordi est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
+            <p className="max-w-xl text-lg leading-relaxed text-[#F7EFE6]/85">
+              SilkyPlace est en construction — j’ai envie de le faire avec les décoratrices concernées par ce problème.
             </p>
             <div className="w-full max-w-md">
-              <ZordiWaitlistForm inverted submitLabel="Je veux rejoindre Zordi" />
+              <SilkyPlaceWaitlistForm inverted submitLabel="Je veux rejoindre SilkyPlace" />
             </div>
-            <p className="text-sm text-[#DDE6EF]/80">
-              Pas de spam. Juste les nouvelles importantes concernant Zordi. Une question ?{' '}
+            <p className="text-sm text-[#F7EFE6]/80">
+              Pas de spam. Juste les nouvelles importantes concernant SilkyPlace. Une question ?{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-4">
                 {CONTACT_EMAIL}
               </a>
@@ -519,16 +519,16 @@ export function ZordiLandingPage() {
       <footer className="border-t border-border py-8">
         <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
           <div className="flex items-center gap-3">
-            <ZordiWordmark className="font-heading text-base font-semibold" />
+            <SilkyPlaceWordmark className="font-heading text-base font-semibold" />
             <p>L’organisation pensée pour les décoratrices événementielles.</p>
           </div>
-          <p>© {new Date().getFullYear()} Zordi</p>
+          <p>© {new Date().getFullYear()} SilkyPlace</p>
         </div>
         <div className={cn(CONTAINER, 'mt-4')}>
           <LegalLinks />
         </div>
       </footer>
-      <CookieNotice brand="Zordi" />
+      <CookieNotice brand="SilkyPlace" />
     </div>
   )
 }

@@ -62,7 +62,7 @@ export function InvoiceDocumentPreview({
             />
           )}
           <div>
-            <p className="font-heading text-lg font-semibold text-foreground">{businessConfig.companyName || 'Zordi'}</p>
+            <p className="font-heading text-lg font-semibold text-foreground">{businessConfig.companyName || 'SilkyPlace'}</p>
             {businessConfig.address && <p className="text-xs text-muted-foreground">{businessConfig.address}</p>}
             {businessConfig.siret && <p className="text-xs text-muted-foreground">SIRET : {businessConfig.siret}</p>}
             {businessConfig.phone && <p className="text-xs text-muted-foreground">{businessConfig.phone}</p>}
