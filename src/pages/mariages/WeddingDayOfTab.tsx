@@ -9,6 +9,9 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EmptyState } from '@/components/EmptyState'
 import { DayOfItemCard } from '@/features/dayof/components/DayOfItemCard'
 import { DayOfVendorSection } from '@/features/dayof/components/DayOfVendorSection'
+import { DayOfSeatingSection } from '@/features/floorplan/components/DayOfSeatingSection'
+import { guestsByTable } from '@/features/floorplan/floorPlanOps'
+import { isTable } from '@/features/floorplan/floorPlanGeometry'
 import { buildDayOfTimeline, filterDayOfTimelineByPhase, findMismatchedDayOfEvents, type DayOfItem } from '@/features/dayof/dayOfTimeline'
 import { TimelineConflictAlert } from '@/features/timeline/components/TimelineConflictAlert'
 import { TimelineConflictDialog } from '@/features/timeline/components/TimelineConflictDialog'
@@ -57,6 +60,8 @@ export function WeddingDayOfTab() {
   const updateTaskStatus = useWorkspaceStore((s) => s.updateTaskStatus)
   const updateTimelineEvent = useWorkspaceStore((s) => s.updateTimelineEvent)
   const ignoreTimelineConflict = useWorkspaceStore((s) => s.ignoreTimelineConflict)
+  const allFloorPlans = useWorkspaceStore((s) => s.workspace.floorPlans)
+  const allGuests = useWorkspaceStore((s) => s.workspace.guests)
 
   const tasks = allTasks.filter((t) => t.weddingId === wedding.id)
   const events = allEvents.filter((e) => e.weddingId === wedding.id)
@@ -73,6 +78,15 @@ export function WeddingDayOfTab() {
   /** Périmètre strict jour J — mêmes tableaux utilisés par la liste et le Gantt, jamais deux filtres qui pourraient diverger. */
   const dayEvents = useMemo(() => events.filter((e) => e.date.slice(0, 10) === weddingDay), [events, weddingDay])
   const dayTasks = useMemo(() => tasks.filter((t) => t.dueDate && t.dueDate.slice(0, 10) === weddingDay), [tasks, weddingDay])
+
+  /** Versions du plan qui contiennent au moins une table — la plus ancienne (« Principal ») par défaut. */
+  const seatingPlans = useMemo(
+    () => allFloorPlans.filter((p) => p.weddingId === wedding.id && p.elements.some(isTable)).sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+    [allFloorPlans, wedding.id],
+  )
+  const guests = useMemo(() => allGuests.filter((g) => g.weddingId === wedding.id), [allGuests, wedding.id])
+  const [seatingPlanId, setSeatingPlanId] = useState<string | null>(null)
+  const seatingPlan = seatingPlans.find((p) => p.id === seatingPlanId) ?? seatingPlans[0]
 
   const [view, setView] = useState<DayOfView>('liste')
   const [activePhases, setActivePhases] = useState<Set<DayPhase>>(() => new Set(DAY_PHASE_OPTIONS))
@@ -219,6 +233,16 @@ export function WeddingDayOfTab() {
         )}
 
         <DayOfVendorSection assignments={vendorAssignments} />
+
+        {seatingPlan && (
+          <DayOfSeatingSection
+            weddingId={wedding.id}
+            plans={seatingPlans}
+            guests={guests}
+            planId={seatingPlan.id}
+            onPlanChange={setSeatingPlanId}
+          />
+        )}
       </div>
 
       <div data-testid="dayof-print" className="print-only print-area flex flex-col gap-4">
@@ -273,6 +297,30 @@ export function WeddingDayOfTab() {
                     <td className="py-1">{vendor.phone ?? '—'}</td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {seatingPlan && seatingPlan.assignments.length > 0 && (
+          <>
+            <h2 className="text-base font-semibold">Plan de table{seatingPlans.length > 1 ? ` — ${seatingPlan.title}` : ''}</h2>
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-black/30 text-left">
+                  <th className="py-1 pr-3">Table</th>
+                  <th className="py-1">Invités</th>
+                </tr>
+              </thead>
+              <tbody>
+                {guestsByTable(seatingPlan.elements, seatingPlan.assignments, guests)
+                  .filter((t) => t.guests.length > 0)
+                  .map(({ table, guests: seated }) => (
+                    <tr key={table.id} className="border-b border-black/10 align-top">
+                      <td className="py-1 pr-3 whitespace-nowrap">{table.label ?? 'Table'}</td>
+                      <td className="py-1">{seated.map((g) => (g.notes ? `${g.name} (${g.notes})` : g.name)).join(', ')}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </>
