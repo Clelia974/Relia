@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AujourdHuiPage } from '@/pages/AujourdHuiPage'
@@ -117,7 +117,9 @@ export function AppRouter() {
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
-      <Route path="/zordi" element={<SilkyPlaceLandingPage />} />
+      <Route path="/liste-attente" element={<SilkyPlaceLandingPage />} />
+      {/* Ancienne adresse de la liste d'attente, gardée pour les liens déjà partagés. */}
+      <Route path="/zordi" element={<Navigate to="/liste-attente" replace />} />
       <Route path="/devis/:shareId" element={<DevisPartagePage />} />
       <Route path="/facture/:shareId" element={<FacturePartageePage />} />
       <Route path="/contrat/:shareId" element={<ContratPartagePage />} />

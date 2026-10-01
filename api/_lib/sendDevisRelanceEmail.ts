@@ -21,7 +21,7 @@ export async function sendDevisRelanceEmail(input: {
     return false
   }
 
-  const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
+  const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
   const devisUrl = `${siteUrl}/devis/${input.shareId}`
   const senderName = input.companyName?.trim() || 'SilkyPlace'
 

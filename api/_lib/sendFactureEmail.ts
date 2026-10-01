@@ -23,7 +23,7 @@ export async function sendFactureEmail(input: {
     return
   }
 
-  const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
+  const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
   const factureUrl = `${siteUrl}/facture/${input.shareId}`
   const senderName = input.companyName?.trim() || 'SilkyPlace'
 

@@ -33,13 +33,13 @@ function renderAt(hostname: string) {
 }
 
 describe('RootGate', () => {
-  it('affiche la landing "lancement" quel que soit l’hôte (zordi.evenementscles.com)', () => {
-    renderAt('zordi.evenementscles.com')
+  it('affiche la landing "lancement" sur le domaine principal (silkyplace.evenementscles.com)', () => {
+    renderAt('silkyplace.evenementscles.com')
     expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
   })
 
-  it('affiche la landing "lancement" quel que soit l’hôte (relia.evenementscles.com)', () => {
-    renderAt('relia.evenementscles.com')
+  it('affiche la landing "lancement" sur l’adresse Vercel technique (relia-app.vercel.app)', () => {
+    renderAt('relia-app.vercel.app')
     expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
   })
 

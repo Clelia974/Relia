@@ -141,6 +141,6 @@ export const LEGAL = {
   name: 'EI Clélia Blard — Evenements Clés',
   country: 'France',
   address: '15 Impasse François Saint-Amand, 97430, La Réunion',
-  siteUrl: 'https://relia.evenementscles.com',
+  siteUrl: 'https://silkyplace.evenementscles.com',
   updatedOn: '20 septembre 2026',
 } as const

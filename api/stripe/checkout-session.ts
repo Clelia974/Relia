@@ -101,7 +101,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
+  const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
 
   try {
     const session = await stripe.checkout.sessions.create({

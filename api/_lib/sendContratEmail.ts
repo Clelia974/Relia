@@ -23,7 +23,7 @@ export async function sendContratEmail(input: {
     return
   }
 
-  const siteUrl = process.env.VITE_SITE_URL ?? 'https://relia-app.vercel.app'
+  const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
   const contratUrl = `${siteUrl}/contrat/${input.shareId}`
   const senderName = input.companyName?.trim() || 'SilkyPlace'
 

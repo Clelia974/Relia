@@ -7,7 +7,7 @@ interface UseJoinSilkyPlaceWaitlistResult {
 }
 
 /**
- * Envoie une adresse email depuis la landing /zordi vers api/waitlist.ts,
+ * Envoie une adresse email depuis la landing /liste-attente vers api/waitlist.ts,
  * seule porte d'écriture sur `zordi_waitlist` (clé service_role, rate limitée).
  */
 export function useJoinSilkyPlaceWaitlist(): UseJoinSilkyPlaceWaitlistResult {

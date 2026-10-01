@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://relia-app.vercel.app/sitemap.xml
+Sitemap: https://silkyplace.evenementscles.com/sitemap.xml

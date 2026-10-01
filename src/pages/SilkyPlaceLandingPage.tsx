@@ -121,7 +121,7 @@ const FAQ: { q: string; a: string }[] = [
 ]
 
 /**
- * Landing "bis" — /zordi : uniquement une collecte d'emails en attendant que
+ * Landing "bis" — /liste-attente : uniquement une collecte d'emails en attendant que
  * le MVP SilkyPlace soit prêt, distincte de la vraie landing "lancement" (RootGate /).
  * Jamais liée à un compte, jamais d'auth — juste api/waitlist.ts.
  */

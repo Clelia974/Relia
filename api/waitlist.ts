@@ -12,7 +12,7 @@ const WaitlistSchema = z.object({
 })
 
 /**
- * Point d'accès public (landing /zordi, jamais authentifiée) : seule porte
+ * Point d'accès public (landing /liste-attente, jamais authentifiée) : seule porte
  * d'écriture sur `zordi_waitlist`, même logique que api/leads.ts — rate
  * limiting + validation avant insertion avec la clé service_role.
  */

@@ -1,5 +1,43 @@
 {
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "relia.evenementscles.com"
+        }
+      ],
+      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "zordi.evenementscles.com"
+        }
+      ],
+      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "jordu.evenementscles.com"
+        }
+      ],
+      "destination": "https://silkyplace.evenementscles.com/:path*",
+      "permanent": true
+    }
   ]
 }

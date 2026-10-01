@@ -18,15 +18,18 @@ interface SilkyPlaceWordmarkProps {
  * différente). `color`, s'il est fourni, passe en style inline et l'emporte
  * donc sur toute classe `text-*`. La police est imposée inline pour
  * neutraliser le `font-heading` que les appelants passent encore.
+ *
+ * Taille ×1,25 et graisse 600 : le Cormorant a une hauteur d'x bien plus petite
+ * que les polices de l'app, à taille égale il paraissait chétif (retour de Clélia).
  */
 export function SilkyPlaceWordmark({ className, color }: SilkyPlaceWordmarkProps) {
   return (
     <span
       className={cn('inline-flex shrink-0 items-baseline whitespace-nowrap', !color && 'text-[#520C0C] dark:text-[#F7EFE6]', className)}
-      style={{ color, lineHeight: 1, fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontWeight: 500 }}
+      style={{ color, lineHeight: 1, fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontWeight: 600 }}
     >
       <span className="sr-only">SilkyPlace</span>
-      <span aria-hidden="true" style={{ letterSpacing: '0' }}>
+      <span aria-hidden="true" style={{ fontSize: '1.25em', letterSpacing: '0' }}>
         Silky Place
       </span>
     </span>
