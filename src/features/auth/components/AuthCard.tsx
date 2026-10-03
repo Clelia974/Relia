@@ -7,11 +7,18 @@ import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 export function AuthCard({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
   return (
     <div className="landing-airy relative isolate flex min-h-dvh flex-col overflow-hidden bg-background text-foreground">
-      {/* Même dégradé que la landing, beige et bleu pâle : le passage landing → inscription reste doux. */}
-      <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[44rem] rounded-full bg-[#F6D9C4] opacity-70 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-10 -z-10 size-[40rem] rounded-full bg-[#DDE6EF] opacity-90 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 left-1/4 -z-10 size-[36rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-24 -z-10 size-[28rem] rounded-full bg-[#E9E4CF] opacity-70 blur-3xl" />
+      {/* Même famille de couleurs que la landing : beige pêche qui s'adoucit en crème, avec une trace de bleu pâle seulement dans un coin. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          backgroundImage: [
+            'radial-gradient(90rem 70rem at 0% 0%, rgb(246 217 196 / 0.75) 0%, rgb(246 224 207 / 0.45) 35%, rgb(250 240 230 / 0.15) 60%, transparent 80%)',
+            'radial-gradient(80rem 60rem at 100% 100%, rgb(233 228 207 / 0.60) 0%, rgb(240 236 220 / 0.30) 40%, transparent 75%)',
+            'radial-gradient(70rem 50rem at 100% 0%, rgb(221 230 239 / 0.40) 0%, rgb(232 238 244 / 0.18) 40%, transparent 75%)',
+          ].join(','),
+        }}
+      />
       <header className="border-b border-border/60 bg-card/60 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center px-5 sm:px-8">
           <Link to="/" aria-label="SilkyPlace — retour à l'accueil">
