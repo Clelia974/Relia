@@ -56,7 +56,13 @@ describe('ProductPage', () => {
     expect(titles).toEqual([
       'Ce que tu gagnes',
       'Dans SilkyPlace, tu as :',
+      'À quel moment ta journée finit vraiment ?',
       'Chaque fonctionnalité part d’un problème réel',
+      'Commence en trois étapes',
+      'Quelle est la date du mariage ?',
+      'Avant SilkyPlace. Avec SilkyPlace.',
+      'Et le temps que tu récupères, tu en fais quoi ?',
+      'SilkyPlace est fait pour toi si…',
       '14 jours pour essayer SilkyPlace',
       'Tout ce que tu te demandes avant de commencer',
       'Tu as un mariage à organiser ?',

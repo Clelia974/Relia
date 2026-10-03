@@ -4,10 +4,15 @@ import { Check, Pin } from 'lucide-react'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Button } from '@/components/ui/button'
+import { BeforeAfterSection } from '@/features/landing/components/BeforeAfterSection'
+import { DayTimeline } from '@/features/landing/components/DayTimeline'
 import { FaqAccordion } from '@/features/landing/components/FaqAccordion'
 import { FeatureCardsGrid } from '@/features/landing/components/FeatureCardsGrid'
+import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { PricingSection } from '@/features/landing/components/PricingSection'
+import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
+import { WhoItsForSection } from '@/features/landing/components/WhoItsForSection'
 import { SP_BUTTON } from '@/features/landing/brandColors'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
@@ -37,6 +42,28 @@ const WHATS_INSIDE = [
   'Un plan de salle et de table, prêt sans refaire la veille.',
   'Un moodboard : palette, matières et ambiance à envoyer aux mariés.',
   'Tes finances et ton bilan : ta marge, mariage par mariage.',
+]
+
+const DAY_TIMELINE = [
+  { time: '8h00', text: 'Tu regardes tes messages avant même ton café.' },
+  { time: '11h00', text: 'Une cliente demande où en est son devis.' },
+  { time: '14h30', text: 'Tu cherches le numéro d’un prestataire dans tes mails.' },
+  { time: '18h00', text: 'Tu voudrais t’arrêter. Mais tu penses à ce qu’il reste à faire.' },
+  { time: '21h00', text: 'Tu reprends ton téléphone. « Juste pour vérifier. » Et demain, il faudra recommencer.' },
+]
+
+/** 3 étapes ; la 3e (« Profite de ta soirée ») choisie par Clélia le 2026-10-01 — remplace « Respire », qui sonnait traduit de l'anglais. */
+const STEPS = [
+  { title: 'Crée ton espace', text: 'Installation en 1 minute, sans carte bancaire.' },
+  { title: 'Ajoute ton mariage', text: 'Ou importe ceux que tu as déjà dans ton fichier Excel.' },
+  { title: 'Profite de ta soirée', text: 'Demain matin, tu sais exactement par quoi commencer.' },
+]
+
+const TIME_RECOVERED = [
+  { title: 'Ta créativité', lines: ['Créer.', 'Chercher une idée.', 'Tester une nouvelle ambiance.', 'Avoir à nouveau envie de créer.'] },
+  { title: 'Ta famille', lines: ['Être vraiment présente.', 'Sans une tâche qui tourne dans un coin de ta tête.'] },
+  { title: 'Ton couple', lines: ['Dîner sans : « Attends, je réponds juste à ça. »'] },
+  { title: 'Toi', lines: ['Sortir.', 'Lire.', 'Dormir.', 'Faire du sport.', 'Ou ne rien faire.'] },
 ]
 
 const FINAL_CTA = 'Commencer mon premier mariage'
@@ -81,16 +108,22 @@ export function ProductPage() {
       )}
 
       <main id="contenu" className="flex flex-col">
-        {/* POUR QUI — un paragraphe émotionnel : valide, enlève la honte, nomme la frustration. */}
-        <section className={SECTION}>
-          <div className={cn(CONTAINER, 'max-w-3xl text-center')}>
-            <p className={KICKER}>Pour qui</p>
-            <h1 className={cn(H2, 'mt-3')}>Pour les décoratrices de mariage qui jonglent avec tout</h1>
-            <p className="mt-8 text-pretty text-lg leading-relaxed text-foreground/80 sm:text-xl">
-              WhatsApp, mails, Excel, post-it, et le reste dans ta tête. Ce n’est pas que tu t’organises mal : c’est que
-              tout est éparpillé, et c’est toi qui fais le lien, à chaque fois. Tu n’as pas à en avoir honte. SilkyPlace
-              remet tout au même endroit, pour que tu puisses enfin souffler.
-            </p>
+        {/* POUR QUI — un paragraphe émotionnel + le produit en vrai, sur le dégradé beige. */}
+        <section className="relative isolate overflow-hidden py-16 sm:py-24">
+          <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[42rem] rounded-full bg-[#F6D9C4] opacity-60 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-20 -z-10 size-[36rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/3 -z-10 size-[28rem] rounded-full bg-[#E9E4CF] opacity-60 blur-3xl" />
+          <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
+            <div className="mx-auto max-w-2xl text-left lg:mx-0">
+              <p className={KICKER}>Pour qui</p>
+              <h1 className={cn(H2, 'mt-3')}>Pour les décoratrices de mariage qui jonglent avec tout</h1>
+              <p className="mt-8 text-pretty text-lg leading-relaxed text-foreground/80">
+                WhatsApp, mails, Excel, post-it, et le reste dans ta tête. Ce n’est pas que tu t’organises mal : c’est que
+                tout est éparpillé, et c’est toi qui fais le lien, à chaque fois. Tu n’as pas à en avoir honte. SilkyPlace
+                remet tout au même endroit, pour que tu puisses enfin souffler.
+              </p>
+            </div>
+            <HeroShowcase />
           </div>
         </section>
 
@@ -130,8 +163,24 @@ export function ProductPage() {
           </div>
         </section>
 
+        {/* LA JOURNÉE QUI DÉBORDE — frise interactive. */}
+        <section className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
+            </div>
+            <p className="mt-4 text-center text-muted-foreground">Clique sur une heure.</p>
+            <div className="mt-12">
+              <DayTimeline
+                moments={DAY_TIMELINE}
+                conclusion="SilkyPlace ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer."
+              />
+            </div>
+          </div>
+        </section>
+
         {/* LES ÉCRANS — cartes cliquables existantes. */}
-        <section id="fonctionnalites" className={SECTION}>
+        <section id="fonctionnalites" className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tout au même endroit</p>
@@ -140,6 +189,71 @@ export function ProductPage() {
             </div>
             <div className="mt-14">
               <FeatureCardsGrid />
+            </div>
+          </div>
+        </section>
+
+        {/* EN 3 ÉTAPES + essai sans compte. */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
+              <div>
+                <p className={KICKER}>Simple</p>
+                <h2 className={cn(H2, 'mt-3')}>Commence en trois étapes</h2>
+                <ol className="mt-10 flex flex-col gap-8">
+                  {STEPS.map((step, i) => (
+                    <li key={step.title} className="flex gap-5">
+                      <span className="font-heading text-3xl font-semibold leading-none text-[#520C0C]/30">{String(i + 1).padStart(2, '0')}</span>
+                      <div>
+                        <p className="font-heading text-lg font-semibold text-foreground">{step.title}</p>
+                        <p className="mt-1 text-muted-foreground">{step.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <WeddingTimelinePreview ctaLabel={ctaLabel} onStart={start} />
+            </div>
+          </div>
+        </section>
+
+        <section className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>La différence</p>
+              <h2 className={cn(H2, 'mt-3')}>Avant SilkyPlace. Avec SilkyPlace.</h2>
+            </div>
+            <div className="mt-14">
+              <BeforeAfterSection />
+            </div>
+          </div>
+        </section>
+
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className={H2}>Et le temps que tu récupères, tu en fais quoi ?</h2>
+              <p className="mt-5 text-lg text-muted-foreground">Le temps que tu récupères n’a pas besoin d’être productif.</p>
+            </div>
+            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {TIME_RECOVERED.map((item) => (
+                <div key={item.title} className="rounded-2xl border border-border bg-card p-7 shadow-(--shadow-card)">
+                  <p className="font-heading text-lg font-semibold text-[#520C0C]">{item.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.lines.join(' ')}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Pour qui</p>
+              <h2 className={cn(H2, 'mt-3')}>SilkyPlace est fait pour toi si…</h2>
+            </div>
+            <div className="mt-14">
+              <WhoItsForSection ctaLabel={ctaLabel} onStart={start} />
             </div>
           </div>
         </section>
