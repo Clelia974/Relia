@@ -15,7 +15,8 @@ export function AuthCard({ title, description, children }: { title: string; desc
           backgroundImage: [
             'radial-gradient(90rem 70rem at 0% 0%, rgb(246 217 196 / 0.75) 0%, rgb(246 224 207 / 0.45) 35%, rgb(250 240 230 / 0.15) 60%, transparent 80%)',
             'radial-gradient(80rem 60rem at 100% 100%, rgb(233 228 207 / 0.60) 0%, rgb(240 236 220 / 0.30) 40%, transparent 75%)',
-            'radial-gradient(70rem 50rem at 100% 0%, rgb(221 230 239 / 0.40) 0%, rgb(232 238 244 / 0.18) 40%, transparent 75%)',
+            'radial-gradient(80rem 60rem at 100% 0%, rgb(221 230 239 / 0.80) 0%, rgb(226 234 242 / 0.50) 35%, rgb(235 241 247 / 0.20) 60%, transparent 80%)',
+            'radial-gradient(70rem 50rem at 0% 100%, rgb(221 230 239 / 0.40) 0%, rgb(232 238 244 / 0.15) 45%, transparent 75%)',
           ].join(','),
         }}
       />
