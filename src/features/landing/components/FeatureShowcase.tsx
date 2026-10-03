@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { FEATURE_CARDS } from '@/features/landing/components/FeatureCardsGrid'
+import { track } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
 /**
@@ -17,7 +18,11 @@ export function FeatureShowcase() {
   const card = FEATURE_CARDS[active]
   const Icon = card.icon
 
-  const go = (index: number) => setActive((index + total) % total)
+  const go = (index: number) => {
+    const next = (index + total) % total
+    setActive(next)
+    track('Feature View', { name: FEATURE_CARDS[next].title })
+  }
 
   const onTouchEnd = (x: number) => {
     if (touchStartX.current === null) return

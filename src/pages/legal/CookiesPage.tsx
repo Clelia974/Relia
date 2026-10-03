@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ANALYTICS_ENABLED } from '@/lib/analytics'
 import { CONTACT_EMAIL } from '@/features/landing/landingContent'
 import { LegalLayout } from '@/features/legal/LegalLayout'
 
@@ -20,7 +21,9 @@ export function CookiesPage() {
         },
         {
           title: 'Ce qui ne l’est pas',
-          body: <p>Aucun outil d'analyse, aucune publicité, aucun pixel de réseau social, aucun cookie tiers. Ces éléments strictement nécessaires ne demandent pas de consentement selon la réglementation.</p>,
+          body: <p>{ANALYTICS_ENABLED
+            ? 'Aucune publicité, aucun pixel de réseau social, aucun cookie tiers. La mesure d’audience (Plausible Analytics) fonctionne sans cookie et sans donnée personnelle : elle compte les visites et les clics, sans te suivre.'
+            : 'Aucun outil d’analyse, aucune publicité, aucun pixel de réseau social, aucun cookie tiers. Ces éléments strictement nécessaires ne demandent pas de consentement selon la réglementation.'}</p>,
         },
         {
           title: 'Les supprimer ou les désactiver',
@@ -33,7 +36,7 @@ export function CookiesPage() {
         },
         {
           title: 'Si cela change',
-          body: <p>Si nous ajoutons un jour un outil de mesure d'audience ou un service tiers utilisant des cookies, nous te demanderons ton accord avant, avec un refus aussi simple que l'acceptation, et cette page sera mise à jour.</p>,
+          body: <p>{ANALYTICS_ENABLED ? 'Si nous ajoutons un jour un service tiers utilisant des cookies' : 'Si nous ajoutons un jour un outil de mesure d’audience ou un service tiers utilisant des cookies'}, nous te demanderons ton accord avant, avec un refus aussi simple que l'acceptation, et cette page sera mise à jour.</p>,
         },
         {
           title: 'En savoir plus',

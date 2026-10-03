@@ -6,6 +6,7 @@ import { AuthCard } from '@/features/auth/components/AuthCard'
 import { AuthErrorMessage } from '@/features/auth/components/AuthErrorMessage'
 import { Field } from '@/features/auth/components/Field'
 import { emptySignupFormValues, SignupFormSchema, type SignupFormValues } from '@/features/auth/authForm.schema'
+import { track } from '@/lib/analytics'
 import { supabase } from '@/lib/supabase'
 
 export function SignupPage() {
@@ -34,6 +35,7 @@ export function SignupPage() {
     }
     setErrors({})
     setLoading(true)
+    track('Signup Submit')
     const { error } = await supabase.auth.signUp({
       email: result.data.email,
       password: result.data.password,
@@ -44,6 +46,7 @@ export function SignupPage() {
       setFormError(error.message)
       return
     }
+    track('Signup Success')
     setConfirmationSentTo(result.data.email)
   }
 

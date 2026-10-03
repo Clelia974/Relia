@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CalendarPlus, Check, CircleCheck, Copy, LayoutDashboard, Mail, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CONTACT_EMAIL, LAUNCH_OFFER_ANNUAL_FREE_MONTHS } from '@/features/landing/landingContent'
+import { track } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
 /** URL d'une courte vidéo de prise en main (YouTube/Vimeo « embed »). Vide tant qu'elle n'existe pas : le bloc est alors masqué. */
@@ -29,7 +30,14 @@ export function ThankYouPage() {
   // Posé par api/stripe/checkout-session.ts selon le prix choisi : l'upsell annuel n'a de sens que pour le mensuel.
   const isMonthly = searchParams.get('formule') === 'mensuel'
 
+  // Objectif de conversion « achat » : la cliente arrive ici depuis Stripe, une fois le paiement validé.
+  useEffect(() => {
+    track('Payment Success', { formule: searchParams.get('formule') ?? 'inconnue' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const copyLink = async () => {
+    track('Share Click', { network: 'lien' })
     try {
       await navigator.clipboard.writeText(SITE_URL)
       setCopied(true)
@@ -108,7 +116,7 @@ export function ThankYouPage() {
         <div className="flex flex-wrap gap-2">
           {SHARE_LINKS.map((s) => (
             <Button key={s.label} asChild variant="outline" className="rounded-full">
-              <a href={s.href} target="_blank" rel="noopener noreferrer">{s.label}</a>
+              <a href={s.href} target="_blank" rel="noopener noreferrer" onClick={() => track('Share Click', { network: s.label })}>{s.label}</a>
             </Button>
           ))}
           <Button variant="outline" className={cn('rounded-full')} onClick={copyLink}>

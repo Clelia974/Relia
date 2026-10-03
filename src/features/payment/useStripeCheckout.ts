@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { track } from '@/lib/analytics'
 import { supabase } from '@/lib/supabase'
 
 interface UseStripeCheckoutResult {
@@ -39,6 +40,7 @@ export function useStripeCheckout(): UseStripeCheckoutResult {
       })
       const data = (await response.json()) as { url?: string; error?: string }
       if (!response.ok || !data.url) throw new Error(data.error ?? 'Impossible de créer la session de paiement.')
+      track('Checkout Start')
       window.location.href = data.url
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la préparation du paiement.')

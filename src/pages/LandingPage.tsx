@@ -15,6 +15,7 @@ import { SP_BUTTON } from '@/features/landing/brandColors'
 import { TESTIMONIALS } from '@/features/landing/landingContent'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
+import { track } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
@@ -61,12 +62,16 @@ export function LandingPage() {
 
   /** Compte requis pour tout le reste de l'app (cf. ProtectedRoute sur AppLayout/onboarding) : la landing doit d'abord faire créer un compte avant de proposer onboarding/app. */
   const ctaLabel = !isAuthenticated ? 'Commencer mon premier mariage' : onboarded ? "Ouvrir l'application" : 'Continuer'
-  const start = () => {
-    if (!isAuthenticated) navigate('/inscription')
-    else navigate(onboarded ? '/aujourdhui' : '/onboarding')
+  /** `where` : l'endroit de la page d'où part le clic (hero, header, étapes, tarifs, final) — pour savoir quel bouton convertit. */
+  const start = (where: string) => {
+    if (!isAuthenticated) {
+      track('CTA Click', { location: where })
+      navigate('/inscription')
+    } else navigate(onboarded ? '/aujourdhui' : '/onboarding')
   }
   /** Proposée uniquement tant que l'espace n'a jamais été configuré : charger la démo n'écrase ainsi aucune donnée. */
   const openDemo = () => {
+    track('Demo Click')
     resetWorkspace('demo')
     navigate(isAuthenticated ? '/aujourdhui' : '/inscription')
   }
@@ -98,7 +103,7 @@ export function LandingPage() {
             </nav>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" className={PILL} onClick={() => navigate('/connexion')}>Se connecter</Button>
-              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={start}>{ctaLabel}</Button>
+              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={() => start('header')}>{ctaLabel}</Button>
             </div>
           </div>
         </header>
@@ -134,7 +139,7 @@ export function LandingPage() {
                   <p>Tu peux même importer tes mariages depuis Excel.</p>
                 </div>
                 <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                  <Button size="lg" className={cn('h-13 w-full px-8 text-base sm:w-auto', SP_BUTTON, PILL, 'shadow-(--shadow-raised)')} onClick={start}>
+                  <Button size="lg" className={cn('h-13 w-full px-8 text-base sm:w-auto', SP_BUTTON, PILL, 'shadow-(--shadow-raised)')} onClick={() => start('hero')}>
                     {ctaLabel}
                   </Button>
                   {!onboarded && (
@@ -236,7 +241,7 @@ export function LandingPage() {
                   ))}
                 </ol>
               </div>
-              <WeddingTimelinePreview ctaLabel={ctaLabel} onStart={start} />
+              <WeddingTimelinePreview ctaLabel={ctaLabel} onStart={() => start('etapes')} />
             </div>
           </div>
         </section>
@@ -271,7 +276,7 @@ export function LandingPage() {
               </p>
             </div>
             <div className="mt-14">
-              <PricingSection ctaLabel={ctaLabel} onStart={start} />
+              <PricingSection ctaLabel={ctaLabel} onStart={() => start('tarifs')} />
             </div>
             <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <li>14 jours gratuits pour tout essayer</li>
@@ -304,7 +309,7 @@ export function LandingPage() {
             <Button
               size="lg"
               className="mt-4 h-13 rounded-full bg-card px-8 text-base text-[#520C0C] shadow-(--shadow-raised) hover:bg-card hover:shadow-(--shadow-raised)"
-              onClick={start}
+              onClick={() => start('final')}
             >
               {ctaLabel}
             </Button>

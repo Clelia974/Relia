@@ -1,3 +1,4 @@
+import { ANALYTICS_ENABLED } from '@/lib/analytics'
 import { Link } from 'react-router-dom'
 import { CONTACT_EMAIL, LEGAL } from '@/features/landing/landingContent'
 import { LegalLayout } from '@/features/legal/LegalLayout'
@@ -32,7 +33,11 @@ export function PrivacyPage() {
         },
         {
           title: 'Cookies et mesure d’audience',
-          body: <p>SilkyPlace n'utilise aucun cookie de suivi, aucune publicité et aucun outil de mesure d'audience. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>,
+          body: ANALYTICS_ENABLED ? (
+            <p>SilkyPlace n'utilise aucun cookie de suivi et aucune publicité. Nous mesurons l'audience du site avec Plausible Analytics, un outil européen sans cookie qui ne collecte aucune donnée personnelle : nous voyons combien de personnes visitent chaque page et sur quels boutons elles cliquent, sans jamais te suivre d'un site à l'autre. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>
+          ) : (
+            <p>SilkyPlace n'utilise aucun cookie de suivi, aucune publicité et aucun outil de mesure d'audience. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>
+          ),
         },
         {
           title: 'Ce que nous ne faisons pas',
