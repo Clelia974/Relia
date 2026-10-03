@@ -182,6 +182,17 @@ describe('PaymentPage', () => {
     expect(screen.queryByText('390 €')).not.toBeInTheDocument()
   })
 
+  it("l'offre de lancement affiche aussi la barre de décompte des places dans l'app", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 63, remaining: 37, available: true }, isLoading: false })
+
+    renderPage()
+
+    const bar = screen.getByRole('progressbar', { name: /places prises/i })
+    expect(bar).toHaveAttribute('aria-valuenow', '63')
+    expect(bar).toHaveAttribute('aria-valuemax', '100')
+  })
+
   it("une fois les 100 places prises, le tarif standard (39 €) apparaît et l'offre de lancement disparaît", () => {
     useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
     useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })

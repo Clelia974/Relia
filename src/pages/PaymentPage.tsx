@@ -180,10 +180,25 @@ export function PaymentPage() {
               </p>
             )}
 
-            <p className="text-sm text-muted-foreground">
-              {launchOffer!.remaining} place{launchOffer!.remaining > 1 ? 's' : ''} restante{launchOffer!.remaining > 1 ? 's' : ''} sur{' '}
-              {LAUNCH_OFFER_LIMIT}.
-            </p>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-semibold text-foreground">
+                {launchOffer!.remaining} place{launchOffer!.remaining > 1 ? 's' : ''} restante{launchOffer!.remaining > 1 ? 's' : ''} sur{' '}
+                {LAUNCH_OFFER_LIMIT}
+              </p>
+              <div
+                role="progressbar"
+                aria-label="Places prises sur l'offre de lancement"
+                aria-valuenow={launchOffer!.redeemed}
+                aria-valuemin={0}
+                aria-valuemax={LAUNCH_OFFER_LIMIT}
+                className="h-2.5 w-full max-w-sm overflow-hidden rounded-full bg-muted"
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-500"
+                  style={{ width: `${Math.min(100, (launchOffer!.redeemed / LAUNCH_OFFER_LIMIT) * 100)}%` }}
+                />
+              </div>
+            </div>
 
             <Button size="lg" className="w-fit" loading={isCheckoutLoading} onClick={handleLaunchOffer}>
               {!isCheckoutLoading && "Profiter de l'offre de lancement"}
