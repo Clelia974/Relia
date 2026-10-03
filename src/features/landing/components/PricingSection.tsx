@@ -100,7 +100,8 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''} en plus de l’essai, puis {euro(LAUNCH_OFFER_PRICE_MONTHLY)}/mois
-              verrouillé à vie pour toi, même si le tarif augmente un jour.
+              verrouillé à vie pour toi. Une fois les {LAUNCH_OFFER_LIMIT} places prises, le tarif standard passe à {euro(PRICE_MONTHLY)}/mois
+              pour les nouvelles inscriptions.
             </p>
             {billing === 'year' && (
               <p className="mt-2 text-xs text-muted-foreground">

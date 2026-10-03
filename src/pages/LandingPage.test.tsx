@@ -153,7 +153,7 @@ describe('LandingPage', () => {
     useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 5, remaining: 95, available: true }, isLoading: false })
     setup()
     expect(screen.getByText(/Moins d’un euro par jour/)).toBeInTheDocument()
-    expect(document.body.textContent).not.toMatch(/passe à 39/)
+    expect(document.body.textContent).toMatch(/le tarif standard passe à 39 €\/mois/)
     cleanup()
     useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
     setup()
