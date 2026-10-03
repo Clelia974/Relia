@@ -7,17 +7,14 @@ import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 export function AuthCard({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
   return (
     <div className="landing-airy relative isolate flex min-h-dvh flex-col overflow-hidden bg-background text-foreground">
-      {/* Même famille de couleurs que la landing : beige pêche qui s'adoucit en crème, avec une trace de bleu pâle seulement dans un coin. */}
+      {/* Même famille de couleurs que la landing : beige d'un côté, bleu pâle de l'autre, fondu par le crème. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
-          backgroundImage: [
-            'radial-gradient(90rem 70rem at 0% 0%, rgb(246 217 196 / 0.75) 0%, rgb(246 224 207 / 0.45) 35%, rgb(250 240 230 / 0.15) 60%, transparent 80%)',
-            'radial-gradient(80rem 60rem at 100% 100%, rgb(233 228 207 / 0.60) 0%, rgb(240 236 220 / 0.30) 40%, transparent 75%)',
-            'radial-gradient(80rem 60rem at 100% 0%, rgb(221 230 239 / 0.80) 0%, rgb(226 234 242 / 0.50) 35%, rgb(235 241 247 / 0.20) 60%, transparent 80%)',
-            'radial-gradient(70rem 50rem at 0% 100%, rgb(221 230 239 / 0.40) 0%, rgb(232 238 244 / 0.15) 45%, transparent 75%)',
-          ].join(','),
+          // Beige d'un côté, bleu très pâle de l'autre, fondu continu par le crème au milieu.
+          backgroundImage:
+            'linear-gradient(105deg, rgb(246 222 202) 0%, rgb(249 234 220) 22%, rgb(251 247 241) 50%, rgb(240 244 249) 78%, rgb(228 236 245) 100%)',
         }}
       />
       <header className="border-b border-border/60 bg-card/60 backdrop-blur-md">
