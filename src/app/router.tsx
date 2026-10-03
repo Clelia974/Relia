@@ -12,6 +12,7 @@ import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
+import { ThankYouPage } from '@/pages/ThankYouPage'
 import { ProductPage } from '@/pages/ProductPage'
 import { SilkyPlaceLandingPage } from '@/pages/SilkyPlaceLandingPage'
 import { RootGate } from '@/pages/RootGate'
@@ -177,6 +178,7 @@ export function AppRouter() {
         <Route path="finances" element={<FinancesGlobalPage />} />
         <Route path="parametres" element={<ParametresPage />} />
         <Route path="paiement" element={<PaymentPage />} />
+        <Route path="merci" element={<ThankYouPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -101,6 +101,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
+  const annualPriceIds = [process.env.VITE_STRIPE_PRICE_SOLO_YEARLY, process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL]
+  const isAnnualPrice = annualPriceIds.includes(priceId)
+
   const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
 
   try {
@@ -110,7 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Seul champ qui relie la session à notre utilisateur Supabase — lu dans le webhook checkout.session.completed.
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${siteUrl}/paiement?paiement=succes`,
+      success_url: `${siteUrl}/merci?formule=${isAnnualPrice ? 'annuel' : 'mensuel'}`,
       cancel_url: `${siteUrl}/paiement?paiement=annule`,
       // Explicite plutôt que de compter sur le défaut Stripe : la carte est toujours collectée pendant le
       // Checkout, y compris avec un essai (trial_period_days) — jamais un "essai" qui ne débiterait personne
