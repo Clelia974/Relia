@@ -12,6 +12,7 @@ export interface UserRow {
   cancelled_at: string | null
   billing_interval: 'month' | 'year' | null
   is_launch_offer: boolean
+  cancellation_reason?: string | null
 }
 
 export interface EventRow {
@@ -105,6 +106,7 @@ export function computeUserKpis(users: UserRow[], now: Date, launchRedeemed: num
     cancelled30: cancelled30.length,
     avgDaysToCancel,
     cancelBuckets,
+    cancelReasons: countBy(cancelled, (u) => u.cancellation_reason ?? 'non_precise'),
     avgDaysToFirstPayment,
     mrr: Math.round(mrr),
     launchOffer: { redeemed: launchRedeemed, limit: 100 },

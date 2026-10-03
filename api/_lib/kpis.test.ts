@@ -51,6 +51,24 @@ describe('computeUserKpis', () => {
     ])
   })
 
+  it('compte les motifs de résiliation, « non précisé » quand la cliente n’a rien choisi', () => {
+    const k = computeUserKpis(
+      [
+        user({ subscription_status: 'cancelled', cancellation_reason: 'too_expensive' }),
+        user({ subscription_status: 'cancelled', cancellation_reason: 'too_expensive' }),
+        user({ subscription_status: 'cancelled', cancellation_reason: 'missing_features' }),
+        user({ subscription_status: 'cancelled' }),
+      ],
+      NOW,
+      0,
+    )
+    expect(k.cancelReasons).toEqual([
+      { label: 'too_expensive', count: 2 },
+      { label: 'missing_features', count: 1 },
+      { label: 'non_precise', count: 1 },
+    ])
+  })
+
   it('estime le revenu mensuel selon l’offre et la périodicité', () => {
     const k = computeUserKpis(
       [

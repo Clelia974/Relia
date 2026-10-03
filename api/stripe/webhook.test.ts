@@ -119,6 +119,24 @@ describe('POST /api/stripe/webhook', () => {
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
   })
 
+  it('customer.subscription.deleted : enregistre le motif et le commentaire donnés dans le portail Stripe', async () => {
+    constructEventMock.mockReturnValue({
+      type: 'customer.subscription.deleted',
+      data: { object: { customer: 'cus_123', cancellation_details: { feedback: 'too_expensive', comment: 'x'.repeat(600) } } },
+    })
+    maybeSingleMock.mockResolvedValue({ data: { id: 'u1' }, error: null })
+    const res = mockRes()
+
+    await handler(mockReq('{}', 'sig_valide'), res)
+
+    expect(updateMock).toHaveBeenCalledWith({
+      subscription_status: 'cancelled',
+      cancelled_at: expect.any(String),
+      cancellation_reason: 'too_expensive',
+      cancellation_comment: 'x'.repeat(500),
+    })
+  })
+
   it("checkout.session.completed avec metadata.offer = launch_100 : marque is_launch_offer (compté par l'offre de lancement)", async () => {
     constructEventMock.mockReturnValue({
       type: 'checkout.session.completed',
@@ -186,7 +204,12 @@ describe('POST /api/stripe/webhook', () => {
 
     expect(res.statusCode).toBe(200)
     expect(eqSelectMock).toHaveBeenCalledWith('stripe_customer_id', 'cus_123')
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'cancelled', cancelled_at: expect.any(String) })
+    expect(updateMock).toHaveBeenCalledWith({
+      subscription_status: 'cancelled',
+      cancelled_at: expect.any(String),
+      cancellation_reason: null,
+      cancellation_comment: null,
+    })
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
   })
 

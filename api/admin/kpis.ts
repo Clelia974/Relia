@@ -82,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { data: users, error: usersError } = await supabaseAdmin
       .from('users')
-      .select('email, subscription_status, created_at, trial_end_date, subscribed_at, cancelled_at, billing_interval, is_launch_offer')
+      .select('email, subscription_status, created_at, trial_end_date, subscribed_at, cancelled_at, billing_interval, is_launch_offer, cancellation_reason')
       .limit(MAX_ROWS)
     if (usersError) throw usersError
 

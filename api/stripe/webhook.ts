@@ -110,7 +110,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
         const userId = await findUserIdByStripeCustomerId(customerId)
         if (userId) {
-          const { error } = await supabaseAdmin.from('users').update({ subscription_status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', userId)
+          const { error } = await supabaseAdmin.from('users').update({
+              subscription_status: 'cancelled',
+              cancelled_at: new Date().toISOString(),
+              // Posé par la cliente dans le portail Stripe (liste de choix + commentaire facultatif) ; vide si elle ne répond pas.
+              cancellation_reason: subscription.cancellation_details?.feedback ?? null,
+              cancellation_comment: subscription.cancellation_details?.comment?.slice(0, 500) ?? null,
+            }).eq('id', userId)
           if (error) throw error
         }
         break

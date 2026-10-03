@@ -23,6 +23,7 @@ interface Kpis {
     cancelled30: number
     avgDaysToCancel: number | null
     cancelBuckets: Row[]
+    cancelReasons: Row[]
     avgDaysToFirstPayment: number | null
     mrr: number
     launchOffer: { redeemed: number; limit: number }
@@ -43,6 +44,17 @@ interface Kpis {
 const SECTION_LABELS: Record<string, string> = {
   hero: 'Accroche', probleme: 'Problème', solution: 'Solution (frise)', demo: 'Vidéo démo', fonctionnalites: 'Fonctionnalités',
   etapes: '3 étapes', temoignages: 'Avis', tarifs: 'Tarifs', faq: 'FAQ', 'appel-final': 'Appel final',
+}
+const REASON_LABELS: Record<string, string> = {
+  too_expensive: 'Trop cher',
+  missing_features: 'Il manque une fonctionnalité',
+  too_complex: 'Trop compliqué',
+  unused: 'Je ne l’utilise pas assez',
+  low_quality: 'Qualité insuffisante',
+  switched_service: 'Je passe à un autre outil',
+  customer_service: 'Service client',
+  other: 'Autre raison',
+  non_precise: 'Non précisé',
 }
 const CTA_LABELS: Record<string, string> = { header: 'En-tête', hero: 'Accroche', etapes: '3 étapes', tarifs: 'Tarifs', final: 'Appel final' }
 
@@ -162,6 +174,10 @@ export function AdminPage() {
           <Bars rows={u.cancelBuckets} empty="Aucune résiliation pour l’instant." />
         </Panel>
       </div>
+
+      <Panel title="Pourquoi elles résilient" description="Motif choisi dans le portail Stripe au moment de partir">
+        <Bars rows={u.cancelReasons} labels={REASON_LABELS} empty="Aucune résiliation pour l’instant." />
+      </Panel>
 
       <Panel title="Essais qui se terminent dans 3 jours ou moins" description="Les clientes à relancer">
         {u.expiringSoon.length === 0 ? (
