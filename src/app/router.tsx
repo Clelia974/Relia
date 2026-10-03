@@ -105,6 +105,7 @@ const PropositionsGlobalPage = lazy(() =>
 const ParametresPage = lazy(() =>
   import('@/pages/ParametresPage').then((m) => ({ default: m.ParametresPage })),
 )
+const AdminPage = lazy(() => import('@/pages/AdminPage').then((m) => ({ default: m.AdminPage })))
 const PaymentPage = lazy(() => import('@/pages/PaymentPage').then((m) => ({ default: m.PaymentPage })))
 
 export function AppRouter() {
@@ -179,6 +180,7 @@ export function AppRouter() {
         <Route path="parametres" element={<ParametresPage />} />
         <Route path="paiement" element={<PaymentPage />} />
         <Route path="merci" element={<ThankYouPage />} />
+        <Route path="admin" element={<AdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
