@@ -65,6 +65,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return
   }
 
+  // Vérification légère (sert à afficher le lien « Tableau de bord » dans le menu) : aucune requête de données.
+  if (req.query?.check === '1') {
+    res.status(200).json({ admin: true })
+    return
+  }
+
   try {
     const now = new Date()
 
@@ -90,7 +96,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       events: computeEventKpis(events),
     })
   } catch (err) {
-    console.error('Erreur calcul des indicateurs :', err instanceof Error ? err.message : err)
-    res.status(500).json({ error: 'Erreur interne.' })
+    // Les erreurs Supabase sont des objets simples (pas des Error) : on lit leur message pour le journal.
+    const detail = err instanceof Error ? err.message : typeof err === 'object' && err !== null && 'message' in err ? String((err as { message: unknown }).message) : 'inconnue'
+    console.error('Erreur calcul des indicateurs :', detail)
+    // Détail renvoyé seulement ici : la personne a déjà été vérifiée comme administratrice.
+    res.status(500).json({ error: 'Erreur interne.', detail })
   }
 }

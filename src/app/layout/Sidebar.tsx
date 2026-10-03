@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, LogOut, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
+import { BarChart3, CalendarDays, ChevronDown, CreditCard, FileText, Heart, ListChecks, LogOut, Search, Settings, Sun, Users, Wallet } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { InitialsBadge } from '@/components/InitialsBadge'
@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useIsAdmin } from '@/features/admin/useIsAdmin'
 import { useAuth } from '@/hooks/useAuth'
 import { useNewLeadsBadge } from '@/features/leads/useNewLeadsBadge'
 import { useSubscriptionCheck } from '@/features/payment/useSubscriptionCheck'
@@ -41,6 +42,7 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
   const planLabel = status === 'active' ? 'Solo' : 'Gratuit'
   const navigate = useNavigate()
   const newLeadsCount = useNewLeadsBadge()
+  const isAdmin = useIsAdmin()
 
   return (
     <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
@@ -76,6 +78,12 @@ export function Sidebar({ onSearch }: { onSearch: () => void }) {
             )}
           </NavLink>
         ))}
+        {isAdmin && (
+          <NavLink to="/admin" className={linkClass}>
+            <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
+            <span className="flex-1">Tableau de bord</span>
+          </NavLink>
+        )}
       </nav>
 
       <div className="border-t border-sidebar-border px-4 py-3">

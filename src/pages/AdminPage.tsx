@@ -104,7 +104,10 @@ export function AdminPage() {
         if (!session) throw new Error('Connecte-toi pour ouvrir le tableau de bord.')
         const response = await fetch('/api/admin/kpis', { headers: { Authorization: `Bearer ${session.access_token}` } })
         if (response.status === 403) throw new Error('Accès réservé à l’administratrice.')
-        if (!response.ok) throw new Error('Impossible de charger les indicateurs.')
+        if (!response.ok) {
+          const body = (await response.json().catch(() => null)) as { detail?: string } | null
+          throw new Error(`Impossible de charger les indicateurs${body?.detail ? ` (${body.detail})` : ` (code ${response.status})`}.`)
+        }
         const json = (await response.json()) as Kpis
         if (!cancelled) setData(json)
       } catch (err) {

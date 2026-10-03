@@ -39,8 +39,8 @@ function mockRes() {
   return res
 }
 
-const req = (headers: Record<string, string> = {}, method = 'GET') =>
-  ({ method, headers: { 'x-forwarded-for': '203.0.113.1', ...headers } }) as unknown as VercelRequest
+const req = (headers: Record<string, string> = {}, method = 'GET', query: Record<string, string> = {}) =>
+  ({ method, query, headers: { 'x-forwarded-for': '203.0.113.1', ...headers } }) as unknown as VercelRequest
 
 describe('GET /api/admin/kpis', () => {
   beforeEach(() => {
@@ -81,6 +81,21 @@ describe('GET /api/admin/kpis', () => {
     await handler(req({ authorization: 'Bearer ok' }), res)
     expect(res.statusCode).toBe(200)
     expect(res.body).toMatchObject({ users: { total: 0, launchOffer: { redeemed: 4, limit: 100 } }, events: { totalEvents: 0 } })
+  })
+
+  it('?check=1 : répond seulement { admin: true } à l’administratrice, sans requête de données', async () => {
+    getUserMock.mockResolvedValue({ data: { user: { email: 'cleliadrouman@gmail.com' } }, error: null })
+    const res = mockRes()
+    await handler(req({ authorization: 'Bearer ok' }, 'GET', { check: '1' }), res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({ admin: true })
+  })
+
+  it('?check=1 : 403 pour une cliente', async () => {
+    getUserMock.mockResolvedValue({ data: { user: { email: 'cliente@example.com' } }, error: null })
+    const res = mockRes()
+    await handler(req({ authorization: 'Bearer ok' }, 'GET', { check: '1' }), res)
+    expect(res.statusCode).toBe(403)
   })
 
   it('ADMIN_EMAILS remplace l’adresse par défaut', async () => {

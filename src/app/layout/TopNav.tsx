@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useIsAdmin } from '@/features/admin/useIsAdmin'
 import { useAuth } from '@/hooks/useAuth'
 import { useNewLeadsBadge } from '@/features/leads/useNewLeadsBadge'
 import { cn } from '@/lib/utils'
@@ -38,6 +39,7 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
 /** En-tête léger — logo + menu, affiché uniquement en dessous de `lg` (la navigation principale vit dans la Sidebar). */
 export function TopNav({ onSearch }: { onSearch: () => void }) {
   const { logout } = useAuth()
+  const isAdmin = useIsAdmin()
   const newLeadsCount = useNewLeadsBadge()
 
   return (
@@ -102,6 +104,13 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
                   </NavLink>
                 </DropdownMenuItem>
               ))}
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <NavLink to="/admin" className={mobileNavLinkClass}>
+                    Tableau de bord
+                  </NavLink>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem variant="destructive" onSelect={logout}>
                 <LogOut className="size-4" aria-hidden="true" />
                 Déconnexion
