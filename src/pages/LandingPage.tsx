@@ -1,12 +1,18 @@
 import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Button } from '@/components/ui/button'
+import { DayTimeline } from '@/features/landing/components/DayTimeline'
+import { FaqAccordion } from '@/features/landing/components/FaqAccordion'
+import { FeatureShowcase } from '@/features/landing/components/FeatureShowcase'
+import { PricingSection } from '@/features/landing/components/PricingSection'
+import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
 import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { PainPointCards } from '@/features/landing/components/PainPointCards'
 import { SP_BUTTON } from '@/features/landing/brandColors'
+import { TESTIMONIALS } from '@/features/landing/landingContent'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -18,6 +24,25 @@ const H2 = 'text-balance font-heading text-4xl font-semibold leading-[1.1] track
 const KICKER = 'inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#5F6B4C]'
 /** Boutons en pilule, comme le reste de la landing aérienne. */
 const PILL = 'rounded-full'
+
+/** « Ta journée avec SilkyPlace » — les mêmes heures que la frise du problème, vues après : ce que la décoratrice gagne, au fil de la journée. */
+const DAY_WITH_SILKYPLACE = [
+  { time: '8h00', text: 'Tu ouvres SilkyPlace : ce qui est confirmé, ce qui reste à faire, ce qui doit être payé. Tout est là.' },
+  { time: '11h00', text: 'Une cliente demande où en est son devis : tu le retrouves tout de suite, sans fouiller tes mails.' },
+  { time: '14h30', text: 'Il te faut le numéro d’un prestataire ? Il est dans la fiche du mariage, avec son horaire.' },
+  { time: '18h00', text: 'Tu fermes ton ordi. Tu sais exactement par quoi commencer demain.' },
+  { time: '21h00', text: 'Tu dînes sans « juste vérifier ». Ton déroulé, ton plan de table et ta marge sont déjà rangés.' },
+]
+
+const STEPS = [
+  { title: 'Crée ton espace', text: 'Installation en 1 minute, sans carte bancaire.' },
+  { title: 'Ajoute ton mariage', text: 'Ou importe ceux que tu as déjà dans ton fichier Excel.' },
+  { title: 'Profite de ta soirée', text: 'Demain matin, tu sais exactement par quoi commencer.' },
+]
+
+/** Lien « embed » de la démo de 60-90 s (YouTube non répertorié, Vimeo ou Loom). Vide tant que la vidéo n'existe pas : la section est alors masquée. */
+const DEMO_VIDEO_URL = ''
+
 
 export function LandingPage() {
   const navigate = useNavigate()
@@ -35,9 +60,9 @@ export function LandingPage() {
   }, [])
 
   /** Compte requis pour tout le reste de l'app (cf. ProtectedRoute sur AppLayout/onboarding) : la landing doit d'abord faire créer un compte avant de proposer onboarding/app. */
-  const ctaLabel = !isAuthenticated ? 'Voir comment ça marche en 1 minute' : onboarded ? "Ouvrir l'application" : 'Continuer'
+  const ctaLabel = !isAuthenticated ? 'Commencer mon premier mariage' : onboarded ? "Ouvrir l'application" : 'Continuer'
   const start = () => {
-    if (!isAuthenticated) navigate('/produit')
+    if (!isAuthenticated) navigate('/inscription')
     else navigate(onboarded ? '/aujourdhui' : '/onboarding')
   }
   /** Proposée uniquement tant que l'espace n'a jamais été configuré : charger la démo n'écrase ainsi aucune donnée. */
@@ -67,12 +92,13 @@ export function LandingPage() {
               <SilkyPlaceWordmark className="text-[26px] sm:text-[32px]" />
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-              <Link to="/produit#tarifs" className="transition-colors hover:text-foreground">Tarifs</Link>
-              <Link to="/produit#questions" className="transition-colors hover:text-foreground">Questions</Link>
+              <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
+              <a href="#tarifs" className="transition-colors hover:text-foreground">Tarifs</a>
+              <a href="#questions" className="transition-colors hover:text-foreground">Questions</a>
             </nav>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" className={PILL} onClick={() => navigate('/connexion')}>Se connecter</Button>
-              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={start}>{isAuthenticated ? ctaLabel : 'Comment ça marche'}</Button>
+              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={start}>{ctaLabel}</Button>
             </div>
           </div>
         </header>
@@ -139,6 +165,132 @@ export function LandingPage() {
               Le problème, ce n’est pas que tu ne sais pas t’organiser : c’est que les informations sont éparpillées,
               et c’est ta tête qui fait le lien.
             </p>
+          </div>
+        </section>
+
+        {/* LA SOLUTION — ta journée avec SilkyPlace : ce que tu gagnes, au fil des heures. */}
+        <section className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Ce que tu gagnes</p>
+              <h2 className={H2}>Ta journée avec SilkyPlace</h2>
+            </div>
+            <p className="mt-4 text-center text-muted-foreground">Clique sur une heure.</p>
+            <div className="mt-12">
+              <DayTimeline
+                moments={DAY_WITH_SILKYPLACE}
+                conclusion="Rien à installer, rien à paramétrer. Tu peux même importer tes mariages depuis Excel : tu avances pas à pas, sans tout garder en tête."
+              />
+            </div>
+          </div>
+        </section>
+
+        {DEMO_VIDEO_URL && (
+          <section className={SECTION} aria-labelledby="demo">
+            <div className={cn(CONTAINER, 'max-w-4xl text-center')}>
+              <h2 id="demo" className={H2}>SilkyPlace en 90 secondes</h2>
+              <div className="mt-10 aspect-video overflow-hidden rounded-2xl border border-border shadow-(--shadow-raised)">
+                <iframe
+                  src={DEMO_VIDEO_URL}
+                  title="Démo de SilkyPlace"
+                  className="size-full"
+                  allow="accelerometer; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* LES FONCTIONNALITÉS — la vraie capture de chaque écran, dans un portable. */}
+        <section id="fonctionnalites" className={SECTION}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Tout au même endroit</p>
+              <h2 className={cn(H2, 'mt-3')}>Chaque fonctionnalité part d’un problème réel</h2>
+              <p className="mt-5 text-lg text-muted-foreground">Choisis un écran pour le voir tel qu’il est dans SilkyPlace.</p>
+            </div>
+            <div className="mt-14">
+              <FeatureShowcase />
+            </div>
+          </div>
+        </section>
+
+        {/* EN 3 ÉTAPES + essai sans compte. */}
+        <section className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
+              <div>
+                <p className={KICKER}>Simple</p>
+                <h2 className={cn(H2, 'mt-3')}>Commence en trois étapes</h2>
+                <ol className="mt-10 flex flex-col gap-8">
+                  {STEPS.map((step, i) => (
+                    <li key={step.title} className="flex gap-5">
+                      <span className="font-heading text-3xl font-semibold leading-none text-[#520C0C]/30">{String(i + 1).padStart(2, '0')}</span>
+                      <div>
+                        <p className="font-heading text-lg font-semibold text-foreground">{step.title}</p>
+                        <p className="mt-1 text-muted-foreground">{step.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <WeddingTimelinePreview ctaLabel={ctaLabel} onStart={start} />
+            </div>
+          </div>
+        </section>
+
+        {/* PREUVE SOCIALE — uniquement de vrais avis, jamais inventés : la section n'existe pas tant qu'il n'y en a pas. */}
+        {TESTIMONIALS.length > 0 && (
+          <section className={SECTION} aria-labelledby="temoignages">
+            <div className={CONTAINER}>
+              <h2 id="temoignages" className={H2}>Ce que disent les décoratrices et décorateurs</h2>
+              <ul className="mt-12 grid gap-6 md:grid-cols-3">
+                {TESTIMONIALS.map((t) => (
+                  <li key={t.author} className="rounded-2xl border border-border bg-card p-7 shadow-(--shadow-card)">
+                    <p className="font-heading text-xl font-semibold text-foreground">{t.headline}</p>
+                    <blockquote className="mt-3 leading-relaxed text-muted-foreground">{t.quote}</blockquote>
+                    <p className="mt-5 text-sm font-medium text-foreground">{t.author}</p>
+                    <p className="text-sm text-muted-foreground">{t.role}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        {/* TARIFS — phrase de prix, un seul bouton, risque réduit. */}
+        <section id="tarifs" className={cn(SECTION, 'bg-card')}>
+          <div className={CONTAINER}>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className={KICKER}>Tarifs</p>
+              <h2 className={cn(H2, 'mt-3')}>14 jours pour essayer SilkyPlace</h2>
+              <p className="mt-5 text-lg text-muted-foreground">
+                Moins d’un euro par jour, pour ne plus rien garder en tête.
+              </p>
+            </div>
+            <div className="mt-14">
+              <PricingSection ctaLabel={ctaLabel} onStart={start} />
+            </div>
+            <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <li>14 jours gratuits pour tout essayer</li>
+              <li>Aucune carte bancaire demandée</li>
+              <li>Tu importes tes mariages depuis Excel</li>
+              <li>Gratuite jusqu’à 3 mariages si tu ne continues pas</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="questions" className={SECTION} aria-labelledby="faq">
+          <div className={cn(CONTAINER, 'max-w-3xl')}>
+            <div className="text-center">
+              <p className={KICKER}>Questions</p>
+              <h2 id="faq" className={cn(H2, 'mt-3')}>Tout ce que tu te demandes avant de commencer</h2>
+            </div>
+            <div className="mt-12">
+              <FaqAccordion />
+            </div>
           </div>
         </section>
 
