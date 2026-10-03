@@ -40,7 +40,7 @@ describe('PaymentPage', () => {
 
     expect(screen.getByText('Essai Pro en cours')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Passer au Pro' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Passer à Solo' })).toBeInTheDocument()
   })
 
   it('essai expiré (zéro blocage) : badge Gratuit, message informatif, CTA Pro toujours proposé', () => {
@@ -49,17 +49,17 @@ describe('PaymentPage', () => {
     renderPage()
 
     expect(screen.getByText('Version Gratuite')).toBeInTheDocument()
-    expect(screen.getByText(/vous restez sur la version Gratuite/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Passer au Pro' })).toBeInTheDocument()
+    expect(screen.getByText(/tu restes sur la version Gratuite/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Passer à Solo' })).toBeInTheDocument()
   })
 
-  it('abonnement actif : pas de carte "Passer au Pro" ni de tableau comparatif', () => {
+  it('abonnement actif : pas de carte "Passer à Solo" ni de tableau comparatif', () => {
     useSubscriptionCheckMock.mockReturnValue({ status: 'active', hasAccess: true, daysLeftInTrial: null, isLoading: false })
 
     renderPage()
 
     expect(screen.getByText('Pro actif')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Passer au Pro' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Passer à Solo' })).not.toBeInTheDocument()
     expect(screen.queryByText('Comparer les offres')).not.toBeInTheDocument()
   })
 
@@ -99,11 +99,11 @@ describe('PaymentPage', () => {
     for (const feature of PRO_FEATURES) expect(screen.getByText(feature)).toBeInTheDocument()
   })
 
-  it('clic sur "Passer au Pro" appelle createCheckoutSession avec le prix mensuel par défaut', () => {
+  it('clic sur "Passer à Solo" appelle createCheckoutSession avec le prix mensuel par défaut', () => {
     useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
 
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: 'Passer au Pro' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Passer à Solo' }))
 
     expect(createCheckoutSessionMock).toHaveBeenCalledWith(import.meta.env.VITE_STRIPE_PRICE_SOLO_MONTHLY)
   })
@@ -113,7 +113,7 @@ describe('PaymentPage', () => {
 
     renderPage()
     fireEvent.click(screen.getByRole('button', { name: /Annuel/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Passer au Pro' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Passer à Solo' }))
 
     expect(createCheckoutSessionMock).toHaveBeenCalledWith(import.meta.env.VITE_STRIPE_PRICE_SOLO_YEARLY)
   })

@@ -28,11 +28,11 @@ import { cn } from '@/lib/utils'
 const euro = (n: number) => `${n} €`
 
 const STATUS_MESSAGE: Record<string, string> = {
-  trial: "Vous profitez de l'essai Pro complet — aucune carte bancaire requise.",
-  grace: "Votre essai Pro (14 jours) est terminé. Vous continuez à utiliser SilkyPlace normalement — passez au Pro dès que vous êtes prête pour continuer à en profiter.",
-  expired: "Votre essai Pro est terminé. Vous restez sur la version Gratuite — passez au Pro dès que vous êtes prête.",
-  active: 'Merci ! Votre abonnement Pro est actif.',
-  cancelled: 'Votre abonnement a été annulé. Réabonnez-vous pour retrouver le Pro.',
+  trial: "Tu profites de l'essai Solo complet — aucune carte bancaire requise.",
+  grace: "Ton essai Solo (14 jours) est terminé. Tu continues à utiliser SilkyPlace normalement — passe à Solo dès que tu es prête pour continuer à en profiter.",
+  expired: "Ton essai Solo est terminé. Tu restes sur la version Gratuite — passe à Solo dès que tu es prête.",
+  active: 'Merci ! Ton abonnement Solo est actif.',
+  cancelled: 'Ton abonnement a été annulé. Réabonne-toi pour retrouver Solo.',
 }
 
 export function PaymentPage() {
@@ -50,8 +50,8 @@ export function PaymentPage() {
   useEffect(() => {
     const result = searchParams.get('paiement')
     if (!result) return
-    if (result === 'succes') toast.success('Paiement en cours de confirmation — votre abonnement sera actif dans quelques instants.')
-    if (result === 'annule') toast.info('Paiement annulé — vous pouvez réessayer à tout moment.')
+    if (result === 'succes') toast.success('Paiement en cours de confirmation — ton abonnement sera actif dans quelques instants.')
+    if (result === 'annule') toast.info('Paiement annulé — tu peux réessayer à tout moment.')
     const next = new URLSearchParams(searchParams)
     next.delete('paiement')
     setSearchParams(next, { replace: true })
@@ -83,13 +83,13 @@ export function PaymentPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold text-foreground">Abonnement</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Passez au Pro quand vous êtes prête — jamais d'accès coupé entre-temps.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Passe à Solo quand tu es prête — jamais d'accès coupé entre-temps.</p>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <CardTitle>Votre statut</CardTitle>
+            <CardTitle>Ton statut</CardTitle>
             {!isLoading && status && <SubscriptionStatusBadge status={status} />}
           </div>
           {!isLoading && status && <CardDescription>{STATUS_MESSAGE[status]}</CardDescription>}
@@ -98,7 +98,7 @@ export function PaymentPage() {
           <CardContent className="flex flex-col gap-2">
             {status === 'trial' && daysLeftInTrial !== null && daysLeftInTrial !== undefined && (
               <p className="text-sm text-foreground">
-                <strong>{daysLeftInTrial}</strong> jour{daysLeftInTrial > 1 ? 's' : ''} restant{daysLeftInTrial > 1 ? 's' : ''} sur votre essai de {TRIAL_DAYS} jours.
+                <strong>{daysLeftInTrial}</strong> jour{daysLeftInTrial > 1 ? 's' : ''} restant{daysLeftInTrial > 1 ? 's' : ''} sur ton essai de {TRIAL_DAYS} jours.
               </p>
             )}
             {weddingLimitReached && (
@@ -133,7 +133,7 @@ export function PaymentPage() {
             <CardTitle>Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes</CardTitle>
             <CardDescription>
               {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis ce tarif verrouillé — même si le tarif
-              standard augmente plus tard, il reste le vôtre tant que vous restez abonnée.
+              standard augmente plus tard, il reste le tien tant que tu restes abonnée.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
@@ -206,7 +206,7 @@ export function PaymentPage() {
               </ul>
             </div>
             <div>
-              <p className="font-heading text-lg font-semibold text-foreground">Pro</p>
+              <p className="font-heading text-lg font-semibold text-foreground">Solo</p>
               <ul className="mt-4 flex flex-col gap-2.5 text-sm">
                 {PRO_FEATURES.map((f) => (
                   <PlanFeature key={f}>{f}</PlanFeature>
@@ -220,7 +220,7 @@ export function PaymentPage() {
       {status !== 'active' && (
         <Card>
           <CardHeader>
-            <CardTitle>Passer au Pro</CardTitle>
+            <CardTitle>Passer à Solo</CardTitle>
             <CardDescription>Accès complet, sans engagement, annulable à tout moment.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
@@ -256,7 +256,7 @@ export function PaymentPage() {
             </p>
 
             <Button size="lg" className="w-fit" loading={isCheckoutLoading} onClick={handleUpgrade}>
-              {!isCheckoutLoading && 'Passer au Pro'}
+              {!isCheckoutLoading && 'Passer à Solo'}
             </Button>
 
             {checkoutError && <p className="text-sm text-risk">{checkoutError}</p>}

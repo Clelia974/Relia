@@ -67,7 +67,7 @@ export function LandingPage() {
   }, [])
 
   /** Compte requis pour tout le reste de l'app (cf. ProtectedRoute sur AppLayout/onboarding) : la landing doit d'abord faire créer un compte avant de proposer onboarding/app. */
-  const ctaLabel = !isAuthenticated ? 'Créer mon espace gratuitement' : onboarded ? "Ouvrir l'application" : 'Continuer'
+  const ctaLabel = !isAuthenticated ? 'Commencer mon premier mariage' : onboarded ? "Ouvrir l'application" : 'Continuer'
   const start = () => {
     if (!isAuthenticated) navigate('/inscription')
     else navigate(onboarded ? '/aujourdhui' : '/onboarding')
@@ -125,11 +125,10 @@ export function LandingPage() {
                   Pour les décoratrices et décorateurs de mariage
                 </span>
                 <h1 className="text-balance font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-[#520C0C] sm:text-7xl">
-                  Ton travail a une place. Ta vie aussi. <span className="mt-3 block text-[0.72em] italic leading-[1.08] text-[#5F6B4C]">Ferme ton ordi sans arrière-pensée.</span>
+                  Tu sais où tu en es, sur chaque mariage. <span className="mt-3 block text-[0.72em] italic leading-[1.08] text-[#5F6B4C]">Ferme ton ordi sans arrière-pensée.</span>
                 </h1>
                 <p className="max-w-xl text-pretty text-lg leading-relaxed text-foreground/80">
-                  SilkyPlace rassemble tout ce qu’il faut pour gérer tes mariages au même endroit. Moins de choses à
-                  chercher, moins de choses à retenir. Plus de place pour créer.
+                  Ce qui est confirmé, ce qui reste à faire, ce qui doit être payé : tout est au même endroit, sans rien garder en tête.
                 </p>
                 <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                   <Button size="lg" className={cn('h-13 w-full px-8 text-base sm:w-auto', SP_BUTTON, PILL, 'shadow-(--shadow-raised)')} onClick={start}>

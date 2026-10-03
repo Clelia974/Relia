@@ -53,12 +53,12 @@ describe('LandingPage', () => {
     setup()
     const h1 = screen.getAllByRole('heading', { level: 1 })
     expect(h1).toHaveLength(1)
-    expect(h1[0].textContent).toBe('Ton travail a une place. Ta vie aussi. Ferme ton ordi sans arrière-pensée.')
+    expect(h1[0].textContent).toBe('Tu sais où tu en es, sur chaque mariage. Ferme ton ordi sans arrière-pensée.')
   })
 
   it("sans compte : le bouton principal mène à l'inscription", () => {
     setup()
-    fireEvent.click(screen.getAllByRole('button', { name: /Créer mon espace gratuitement/ })[0])
+    fireEvent.click(screen.getAllByRole('button', { name: /Commencer mon premier mariage/ })[0])
     expect(screen.getByTestId('where').textContent).toBe('/inscription')
   })
 

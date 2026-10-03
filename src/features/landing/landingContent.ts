@@ -34,9 +34,8 @@ export const LAUNCH_OFFER_ANNUAL_FREE_MONTHS = Math.round(
 /**
  * Listes reprises telles quelles par la landing (Tarifs) et la page
  * Abonnement (/paiement) — une seule source pour rester cohérent entre
- * les deux. "Sauvegarde en ligne" n'a plus le "(bientôt)" : elle existe
- * et tourne depuis l'Étape 2, même si elle n'est pas encore réellement
- * réservée au Pro dans le code (Gratuit y a accès aussi aujourd'hui).
+ * les deux. "Sauvegarde en ligne" n'est pas listée : elle est disponible
+ * aussi en Gratuit, donc ce n'est pas un avantage réservé à Solo.
  */
 export const GRATUIT_FEATURES = [
   '3 mariages',
@@ -52,7 +51,6 @@ export const PRO_FEATURES = [
   'Finances et rentabilité',
   'Bilan post-mariage',
   'Support prioritaire',
-  'Sauvegarde en ligne',
 ]
 
 export const CONTACT_EMAIL = 'contact@evenementscles.com'

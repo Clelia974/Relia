@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
 const euro = (n: number) => `${n} €`
 
 interface PricingSectionProps {
-  /** Auth-aware : "Créer mon espace gratuitement" tant qu'il n'y a pas de compte, "Ouvrir l'application"/"Continuer" ensuite. */
+  /** Auth-aware : "Commencer mon premier mariage" tant qu'il n'y a pas de compte, "Ouvrir l'application"/"Continuer" ensuite. */
   ctaLabel: string
   onStart: () => void
 }
