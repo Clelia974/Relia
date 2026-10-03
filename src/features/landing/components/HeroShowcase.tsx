@@ -29,7 +29,7 @@ export function HeroShowcase() {
 
       <img
         src="/mockups/hero-macbook.png"
-        alt="Déroulé du Jour J dans l'application SilkyPlace, sur MacBook"
+        alt="Moodboard d'un mariage dans l'application SilkyPlace, sur MacBook"
         width={800}
         height={489}
         className="animate-notice-in hero-float block w-full drop-shadow-[0_18px_32px_rgba(31,45,61,0.25)]"
