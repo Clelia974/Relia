@@ -108,7 +108,14 @@ describe('POST /api/stripe/webhook', () => {
     expect(res.statusCode).toBe(200)
     expect(fromMock).toHaveBeenCalledWith('users')
     expect(rpcMock).not.toHaveBeenCalled()
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: false })
+    expect(updateMock).toHaveBeenCalledWith({
+      subscription_status: 'active',
+      stripe_customer_id: 'cus_123',
+      is_launch_offer: false,
+      subscribed_at: expect.any(String),
+      cancelled_at: null,
+      billing_interval: null,
+    })
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
   })
 
@@ -123,7 +130,14 @@ describe('POST /api/stripe/webhook', () => {
 
     expect(res.statusCode).toBe(200)
     expect(rpcMock).toHaveBeenCalledWith('claim_launch_offer_slot')
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: true })
+    expect(updateMock).toHaveBeenCalledWith({
+      subscription_status: 'active',
+      stripe_customer_id: 'cus_123',
+      is_launch_offer: true,
+      subscribed_at: expect.any(String),
+      cancelled_at: null,
+      billing_interval: null,
+    })
   })
 
   it("offre de lancement déjà à 100 places (claim_launch_offer_slot ne renvoie aucune ligne) : active quand même l'abonnement déjà payé, mais ne le compte pas", async () => {
@@ -137,7 +151,14 @@ describe('POST /api/stripe/webhook', () => {
     await handler(mockReq('{}', 'sig_valide'), res)
 
     expect(res.statusCode).toBe(200)
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'active', stripe_customer_id: 'cus_123', is_launch_offer: false })
+    expect(updateMock).toHaveBeenCalledWith({
+      subscription_status: 'active',
+      stripe_customer_id: 'cus_123',
+      is_launch_offer: false,
+      subscribed_at: expect.any(String),
+      cancelled_at: null,
+      billing_interval: null,
+    })
   })
 
   it("claim_launch_offer_slot est appelée pour chaque webhook simultané : jamais plus de 100 réussites même sous concurrence (garanti par l'UPDATE atomique en base, pas par ce test — vérifié ici juste que l'appel a bien lieu par événement)", async () => {
@@ -165,7 +186,7 @@ describe('POST /api/stripe/webhook', () => {
 
     expect(res.statusCode).toBe(200)
     expect(eqSelectMock).toHaveBeenCalledWith('stripe_customer_id', 'cus_123')
-    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'cancelled' })
+    expect(updateMock).toHaveBeenCalledWith({ subscription_status: 'cancelled', cancelled_at: expect.any(String) })
     expect(eqUpdateMock).toHaveBeenCalledWith('id', 'u1')
   })
 

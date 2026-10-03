@@ -12,6 +12,7 @@ import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
+import { usePageTracking } from '@/lib/useAnalytics'
 import { ThankYouPage } from '@/pages/ThankYouPage'
 import { SilkyPlaceLandingPage } from '@/pages/SilkyPlaceLandingPage'
 import { RootGate } from '@/pages/RootGate'
@@ -107,6 +108,7 @@ const ParametresPage = lazy(() =>
 const PaymentPage = lazy(() => import('@/pages/PaymentPage').then((m) => ({ default: m.PaymentPage })))
 
 export function AppRouter() {
+  usePageTracking()
   return (
     <Routes>
       <Route path="/" element={<RootGate />} />

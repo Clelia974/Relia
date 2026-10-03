@@ -1,52 +1,67 @@
 /**
- * Mesure d'audience Plausible — sans cookie, sans donnée personnelle, hébergée en Europe.
+ * Mesure d'audience maison — anonyme, sans cookie, sans service tiers, gratuite.
  *
- * Désactivée tant que `VITE_PLAUSIBLE_DOMAIN` n'est pas défini (Vercel > Settings > Environment Variables) :
- * aucun script chargé, aucun appel réseau, et les pages légales gardent leur texte « aucune mesure d'audience »
- * (cf. ANALYTICS_ENABLED). `track()` ne fait alors rien et ne casse jamais l'application.
+ * Ce qui est enregistré (api/track.ts → table analytics_events) : le nom d'un évènement (page vue, clic sur un
+ * bouton, section affichée, durée passée sur une page), le chemin de la page SANS identifiant ni paramètre, et
+ * quelques propriétés simples (ex. l'endroit du bouton cliqué). Jamais : adresse IP, user-agent, compte,
+ * identifiant de session ou de navigateur — rien ne permet de reconnaître une personne d'une visite à l'autre.
+ * Conservation : 13 mois maximum.
  *
- * Pages vues et durée de la visite : comptées automatiquement par le script (navigation interne comprise).
- * Évènements personnalisés : voir `track()` aux endroits clés (boutons d'appel à l'action, formulaires, paiement).
- * Objectifs de conversion à déclarer dans Plausible (Settings > Goals > Custom event) :
- * « Signup Success », « Checkout Start », « Payment Success ».
+ * Respect du choix de la personne : rien n'est envoyé si le navigateur envoie « Do Not Track » ou « Global
+ * Privacy Control », ni si elle a coché « Ne pas me compter » sur la page Cookies.
+ * Rien n'est envoyé non plus en développement local (localhost).
+ *
+ * Objectifs de conversion suivis : Signup Success (compte créé), Checkout Start (paiement commencé),
+ * Payment Success (paiement validé, page /merci).
  */
 type EventProps = Record<string, string | number | boolean>
 
-type PlausibleFn = ((event: string, options?: { props?: EventProps }) => void) & { q?: unknown[] }
+const OPT_OUT_KEY = 'silkyplace-no-analytics'
+const ENDPOINT = '/api/track'
 
-declare global {
-  interface Window {
-    plausible?: PlausibleFn
+/** La mesure existe toujours côté produit ; les pages légales en parlent donc en permanence. */
+export const ANALYTICS_ENABLED = true
+
+function isLocalDev() {
+  return typeof window === 'undefined' || ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
+}
+
+/** « Ne pas me compter » coché sur la page Cookies. */
+export function hasOptedOut(): boolean {
+  try {
+    return window.localStorage.getItem(OPT_OUT_KEY) === '1'
+  } catch {
+    return false
   }
 }
 
-const DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN as string | undefined
-
-export const ANALYTICS_ENABLED = Boolean(DOMAIN)
-
-/** Charge le script Plausible (une seule fois). À appeler au démarrage de l'application. */
-export function initAnalytics() {
-  if (!DOMAIN || typeof document === 'undefined') return
-  if (document.querySelector('script[data-plausible]')) return
-  // File d'attente officielle : les évènements émis avant le chargement du script ne sont pas perdus.
-  window.plausible =
-    window.plausible ??
-    (function (...args: unknown[]) {
-      ;(window.plausible!.q = window.plausible!.q ?? []).push(args)
-    } as PlausibleFn)
-  const script = document.createElement('script')
-  script.defer = true
-  script.src = 'https://plausible.io/js/script.js'
-  script.dataset.domain = DOMAIN
-  script.dataset.plausible = '1'
-  document.head.appendChild(script)
+export function setOptedOut(value: boolean) {
+  try {
+    if (value) window.localStorage.setItem(OPT_OUT_KEY, '1')
+    else window.localStorage.removeItem(OPT_OUT_KEY)
+  } catch {
+    // stockage indisponible : le choix ne pourra pas être mémorisé
+  }
 }
 
-/** Envoie un évènement personnalisé. Sans effet si la mesure d'audience est désactivée. */
-export function track(event: string, props?: EventProps) {
-  if (!ANALYTICS_ENABLED) return
+function browserSaysNo(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const nav = navigator as Navigator & { globalPrivacyControl?: boolean; msDoNotTrack?: string }
+  return nav.doNotTrack === '1' || nav.msDoNotTrack === '1' || nav.globalPrivacyControl === true
+}
+
+export function isTrackingAllowed(): boolean {
+  return !isLocalDev() && !browserSaysNo() && !hasOptedOut()
+}
+
+/** Envoie un évènement anonyme. Ne lève jamais d'erreur et ne gêne jamais l'utilisatrice. */
+export function track(name: string, props?: EventProps, path?: string) {
+  if (!isTrackingAllowed()) return
   try {
-    window.plausible?.(event, props ? { props } : undefined)
+    const payload = JSON.stringify({ name, path: path ?? window.location.pathname, props })
+    // sendBeacon survit à la fermeture de l'onglet (utile pour la durée sur la page) ; fetch en secours.
+    if (typeof navigator.sendBeacon === 'function' && navigator.sendBeacon(ENDPOINT, payload)) return
+    void fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {})
   } catch {
     // La mesure ne doit jamais gêner l'utilisatrice.
   }

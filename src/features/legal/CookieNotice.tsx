@@ -13,9 +13,10 @@ function hasSeenNotice() {
 }
 
 /**
- * Bandeau d'information (pas de consentement à recueillir : aucun cookie de suivi ni publicitaire).
- * Si un outil de mesure d'audience ou de publicité est ajouté un jour, ce bandeau devra devenir un vrai
- * recueil de consentement (refuser aussi simple qu'accepter) et la page /cookies être mise à jour.
+ * Bandeau d'information (pas de consentement à recueillir : aucun cookie de suivi ni publicitaire ; la mesure
+ * d'audience maison est anonyme, sans cookie ni donnée personnelle, avec refus possible sur /cookies).
+ * Si un outil utilisant des cookies de suivi ou de publicité est ajouté un jour, ce bandeau devra devenir un
+ * vrai recueil de consentement (refuser aussi simple qu'accepter) et la page /cookies être mise à jour.
  */
 export function CookieNotice({ brand = 'SilkyPlace' }: { brand?: string }) {
   const [visible, setVisible] = useState(() => !hasSeenNotice())
@@ -37,7 +38,7 @@ export function CookieNotice({ brand = 'SilkyPlace' }: { brand?: string }) {
       className="animate-notice-in fixed inset-x-4 bottom-4 z-40 mx-auto flex max-w-xl flex-col gap-3 rounded-xl border border-border bg-card p-4 text-sm shadow-(--shadow-raised) sm:flex-row sm:items-center"
     >
       <p className="flex-1 text-foreground/85">
-        {brand} n'utilise aucun cookie de suivi ni de publicité. Ton espace de travail est seulement conservé dans ton navigateur.{' '}
+        {brand} n'utilise aucun cookie de suivi ni de publicité. Les visites sont comptées de façon anonyme, et ton espace de travail est seulement conservé dans ton navigateur.{' '}
         <Link to="/cookies" className="text-primary underline underline-offset-4">En savoir plus</Link>
       </p>
       <Button size="sm" variant="outline" onClick={dismiss}>Compris</Button>

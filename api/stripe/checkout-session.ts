@@ -119,13 +119,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Checkout, y compris avec un essai (trial_period_days) — jamais un "essai" qui ne débiterait personne
       // ensuite faute de moyen de paiement enregistré.
       payment_method_collection: 'always',
-      ...(isLaunchOffer
-        ? {
-            // Premier prélèvement repoussé de 30 jours — le vrai mois offert, pas juste une mention marketing.
-            subscription_data: { trial_period_days: 30 },
-            metadata: LAUNCH_OFFER_METADATA,
-          }
-        : {}),
+      // Périodicité lue par le webhook (billing_interval) pour estimer le revenu mensuel récurrent.
+      metadata: { ...(isLaunchOffer ? LAUNCH_OFFER_METADATA : {}), interval: isAnnualPrice ? 'year' : 'month' },
+      // Premier prélèvement repoussé de 30 jours — le vrai mois offert, pas juste une mention marketing.
+      ...(isLaunchOffer ? { subscription_data: { trial_period_days: 30 } } : {}),
     })
     res.status(200).json({ url: session.url })
   } catch (err) {

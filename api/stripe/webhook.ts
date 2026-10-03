@@ -90,7 +90,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (userId) {
           const { error } = await supabaseAdmin
             .from('users')
-            .update({ subscription_status: 'active', stripe_customer_id: customerId ?? null, is_launch_offer: isLaunchOffer })
+            .update({
+              subscription_status: 'active',
+              stripe_customer_id: customerId ?? null,
+              is_launch_offer: isLaunchOffer,
+              subscribed_at: new Date().toISOString(),
+              cancelled_at: null,
+              // Posé par checkout-session.ts ; absent sur les anciennes sessions.
+              billing_interval: session.metadata?.interval === 'year' ? 'year' : session.metadata?.interval === 'month' ? 'month' : null,
+            })
             .eq('id', userId)
           if (error) throw error
         }
@@ -102,7 +110,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id
         const userId = await findUserIdByStripeCustomerId(customerId)
         if (userId) {
-          const { error } = await supabaseAdmin.from('users').update({ subscription_status: 'cancelled' }).eq('id', userId)
+          const { error } = await supabaseAdmin.from('users').update({ subscription_status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', userId)
           if (error) throw error
         }
         break

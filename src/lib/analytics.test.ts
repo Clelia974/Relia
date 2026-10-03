@@ -1,44 +1,35 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { hasOptedOut, isTrackingAllowed, setOptedOut, track } from '@/lib/analytics'
 
 afterEach(() => {
-  vi.unstubAllEnvs()
-  vi.resetModules()
-  document.head.querySelectorAll('script[data-plausible]').forEach((s) => s.remove())
-  delete window.plausible
+  setOptedOut(false)
+  vi.restoreAllMocks()
 })
 
 describe('analytics', () => {
-  it('sans VITE_PLAUSIBLE_DOMAIN : rien n’est chargé et track() ne fait rien', async () => {
-    vi.stubEnv('VITE_PLAUSIBLE_DOMAIN', '')
-    const { ANALYTICS_ENABLED, initAnalytics, track } = await import('@/lib/analytics')
-    initAnalytics()
-    track('CTA Click', { location: 'hero' })
-    expect(ANALYTICS_ENABLED).toBe(false)
-    expect(document.querySelector('script[data-plausible]')).toBeNull()
-    expect(window.plausible).toBeUndefined()
+  it('« Ne pas me compter » est mémorisé puis retiré', () => {
+    expect(hasOptedOut()).toBe(false)
+    setOptedOut(true)
+    expect(hasOptedOut()).toBe(true)
+    setOptedOut(false)
+    expect(hasOptedOut()).toBe(false)
   })
 
-  it('avec le domaine : charge le script une seule fois et envoie les évènements', async () => {
-    vi.stubEnv('VITE_PLAUSIBLE_DOMAIN', 'silkyplace.evenementscles.com')
-    const { ANALYTICS_ENABLED, initAnalytics, track } = await import('@/lib/analytics')
-    initAnalytics()
-    initAnalytics()
-    expect(ANALYTICS_ENABLED).toBe(true)
-    const scripts = document.querySelectorAll('script[data-plausible]')
-    expect(scripts).toHaveLength(1)
-    expect((scripts[0] as HTMLScriptElement).dataset.domain).toBe('silkyplace.evenementscles.com')
-    const spy = vi.fn()
-    window.plausible = spy as never
+  it('n’envoie rien en développement local (localhost)', () => {
+    const beacon = vi.fn(() => true)
+    Object.defineProperty(navigator, 'sendBeacon', { value: beacon, configurable: true })
+    expect(isTrackingAllowed()).toBe(false)
     track('CTA Click', { location: 'hero' })
-    expect(spy).toHaveBeenCalledWith('CTA Click', { props: { location: 'hero' } })
+    expect(beacon).not.toHaveBeenCalled()
   })
 
-  it('un évènement qui échoue ne casse jamais l’application', async () => {
-    vi.stubEnv('VITE_PLAUSIBLE_DOMAIN', 'silkyplace.evenementscles.com')
-    const { track } = await import('@/lib/analytics')
-    window.plausible = (() => {
-      throw new Error('bloqué par un bloqueur de publicités')
-    }) as never
+  it('track() ne lève jamais d’erreur, même si l’envoi échoue', () => {
+    Object.defineProperty(navigator, 'sendBeacon', {
+      value: () => {
+        throw new Error('bloqué')
+      },
+      configurable: true,
+    })
     expect(() => track('Demo Click')).not.toThrow()
   })
 })

@@ -1,4 +1,3 @@
-import { ANALYTICS_ENABLED } from '@/lib/analytics'
 import { Link } from 'react-router-dom'
 import { CONTACT_EMAIL, LEGAL } from '@/features/landing/landingContent'
 import { LegalLayout } from '@/features/legal/LegalLayout'
@@ -33,10 +32,12 @@ export function PrivacyPage() {
         },
         {
           title: 'Cookies et mesure d’audience',
-          body: ANALYTICS_ENABLED ? (
-            <p>SilkyPlace n'utilise aucun cookie de suivi et aucune publicité. Nous mesurons l'audience du site avec Plausible Analytics, un outil européen sans cookie qui ne collecte aucune donnée personnelle : nous voyons combien de personnes visitent chaque page et sur quels boutons elles cliquent, sans jamais te suivre d'un site à l'autre. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>
-          ) : (
-            <p>SilkyPlace n'utilise aucun cookie de suivi, aucune publicité et aucun outil de mesure d'audience. Le détail est sur la page <Link to="/cookies">Cookies</Link>.</p>
+          body: (
+            <>
+              <p>SilkyPlace n'utilise aucun cookie de suivi et aucune publicité. Nous comptons simplement les visites de façon anonyme, avec notre propre outil : quelles pages sont ouvertes, quels boutons sont cliqués, quelles sections de la page d'accueil sont lues, et combien de temps on reste sur une page.</p>
+              <p>Ces comptages ne contiennent aucune donnée personnelle : ni adresse IP, ni compte, ni identifiant de navigateur, ni cookie. Il est donc impossible de te reconnaître d'une visite à l'autre. Ils sont conservés 13 mois au maximum, puis supprimés. Ils ne servent qu'à améliorer SilkyPlace, jamais à te profiler ni à te vendre quoi que ce soit.</p>
+              <p>Tu peux refuser ce comptage à tout moment, sur la page <Link to="/cookies">Cookies</Link>. Nous respectons aussi le réglage « Ne pas me suivre » de ton navigateur.</p>
+            </>
           ),
         },
         {

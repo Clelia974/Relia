@@ -147,7 +147,7 @@ describe('POST /api/stripe/checkout-session', () => {
       expect.objectContaining({
         line_items: [{ price: 'price_launch_789', quantity: 1 }],
         subscription_data: { trial_period_days: 30 },
-        metadata: { offer: 'launch_100' },
+        metadata: { offer: 'launch_100', interval: expect.stringMatching(/^(month|year)$/) },
       }),
     )
   })
@@ -164,7 +164,7 @@ describe('POST /api/stripe/checkout-session', () => {
       expect.objectContaining({
         line_items: [{ price: 'price_launch_annual_987', quantity: 1 }],
         subscription_data: { trial_period_days: 30 },
-        metadata: { offer: 'launch_100' },
+        metadata: { offer: 'launch_100', interval: expect.stringMatching(/^(month|year)$/) },
       }),
     )
   })

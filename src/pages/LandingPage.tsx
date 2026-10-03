@@ -16,6 +16,7 @@ import { TESTIMONIALS } from '@/features/landing/landingContent'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
 import { track } from '@/lib/analytics'
+import { useSectionViews } from '@/lib/useAnalytics'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
 
@@ -47,6 +48,7 @@ const DEMO_VIDEO_URL = ''
 
 export function LandingPage() {
   const navigate = useNavigate()
+  useSectionViews()
   const { isAuthenticated } = useAuth()
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)
   const onboarded = useWorkspaceStore((s) => s.workspace.userProfile.onboarded)
@@ -111,7 +113,7 @@ export function LandingPage() {
 
       <main id="contenu" className="landing-halos flex flex-col">
         {/* 1 — HERO — court : promesse, une phrase, l'appel à l'action. */}
-        <section id="haut" className="relative isolate overflow-hidden pb-24 pt-14 sm:pb-32 sm:pt-24">
+        <section data-section="hero" id="haut" className="relative isolate overflow-hidden pb-24 pt-14 sm:pb-32 sm:pt-24">
           {/* Halos très doux (bleu pâle de marque + une pointe de bordeaux) — donnent la profondeur « aérienne » sans aplat de couleur. */}
           <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[42rem] rounded-full bg-[#F6D9C4] opacity-60 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-20 -z-10 size-[36rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
@@ -157,7 +159,7 @@ export function LandingPage() {
         </section>
 
         {/* 2 — LE PROBLÈME — 4 cartes + la phrase-clé du manifeste. */}
-        <section id="probleme" className={cn(SECTION, 'bg-card/50')}>
+        <section data-section="probleme" id="probleme" className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Le problème</p>
@@ -174,7 +176,7 @@ export function LandingPage() {
         </section>
 
         {/* LA SOLUTION — ta journée avec SilkyPlace : ce que tu gagnes, au fil des heures. */}
-        <section className={SECTION}>
+        <section data-section="solution" className={SECTION}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Ce que tu gagnes</p>
@@ -191,7 +193,7 @@ export function LandingPage() {
         </section>
 
         {DEMO_VIDEO_URL && (
-          <section className={SECTION} aria-labelledby="demo">
+          <section data-section="demo" className={SECTION} aria-labelledby="demo">
             <div className={cn(CONTAINER, 'max-w-4xl text-center')}>
               <h2 id="demo" className={H2}>SilkyPlace en 90 secondes</h2>
               <div className="mt-10 aspect-video overflow-hidden rounded-2xl border border-border shadow-(--shadow-raised)">
@@ -209,7 +211,7 @@ export function LandingPage() {
         )}
 
         {/* LES FONCTIONNALITÉS — la vraie capture de chaque écran, dans un portable. */}
-        <section id="fonctionnalites" className={SECTION}>
+        <section data-section="fonctionnalites" id="fonctionnalites" className={SECTION}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tout au même endroit</p>
@@ -223,7 +225,7 @@ export function LandingPage() {
         </section>
 
         {/* EN 3 ÉTAPES + essai sans compte. */}
-        <section className={cn(SECTION, 'bg-card/50')}>
+        <section data-section="etapes" className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
               <div>
@@ -248,7 +250,7 @@ export function LandingPage() {
 
         {/* PREUVE SOCIALE — uniquement de vrais avis, jamais inventés : la section n'existe pas tant qu'il n'y en a pas. */}
         {TESTIMONIALS.length > 0 && (
-          <section className={SECTION} aria-labelledby="temoignages">
+          <section data-section="temoignages" className={SECTION} aria-labelledby="temoignages">
             <div className={CONTAINER}>
               <h2 id="temoignages" className={H2}>Ce que disent les décoratrices et décorateurs</h2>
               <ul className="mt-12 grid gap-6 md:grid-cols-3">
@@ -266,7 +268,7 @@ export function LandingPage() {
         )}
 
         {/* TARIFS — phrase de prix, un seul bouton, risque réduit. */}
-        <section id="tarifs" className={cn(SECTION, 'bg-card/50')}>
+        <section data-section="tarifs" id="tarifs" className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>
@@ -287,7 +289,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="questions" className={SECTION} aria-labelledby="faq">
+        <section data-section="faq" id="questions" className={SECTION} aria-labelledby="faq">
           <div className={cn(CONTAINER, 'max-w-3xl')}>
             <div className="text-center">
               <p className={KICKER}>Questions</p>
@@ -300,7 +302,7 @@ export function LandingPage() {
         </section>
 
         {/* 11 — APPEL FINAL */}
-        <section className="bg-[#520C0C] py-24 text-[#DDE6EF] sm:py-36" aria-labelledby="final">
+        <section data-section="appel-final" className="bg-[#520C0C] py-24 text-[#DDE6EF] sm:py-36" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
             <h2 id="final" className="text-balance font-heading text-4xl font-semibold tracking-tight sm:text-6xl">
               Tu as un mariage à organiser ?
