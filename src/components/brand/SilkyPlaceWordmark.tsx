@@ -23,15 +23,12 @@ interface SilkyPlaceWordmarkProps {
  * que les polices de l'app, à taille égale il paraissait chétif (retour de Clélia).
  */
 export function SilkyPlaceWordmark({ className, color }: SilkyPlaceWordmarkProps) {
+  void color
   return (
-    <span
-      className={cn('inline-flex shrink-0 items-baseline whitespace-nowrap', !color && 'text-[#520C0C] dark:text-[#F7EFE6]', className)}
-      style={{ color, lineHeight: 1, fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontWeight: 600 }}
-    >
+    <span className={cn('inline-flex shrink-0 items-center whitespace-nowrap', className)} style={{ lineHeight: 1 }}>
       <span className="sr-only">SilkyPlace</span>
-      <span aria-hidden="true" style={{ fontSize: '1.25em', letterSpacing: '0' }}>
-        Silky Place
-      </span>
+      <img src="/brand/silkyplace-logo-new-preview.png" alt="" aria-hidden="true" className="h-[1.6em] w-auto dark:hidden" />
+      <img src="/brand/silkyplace-logo-new-ivory-preview.png" alt="" aria-hidden="true" className="hidden h-[1.6em] w-auto dark:block" />
     </span>
   )
 }

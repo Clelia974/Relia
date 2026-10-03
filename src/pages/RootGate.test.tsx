@@ -35,16 +35,16 @@ function renderAt(hostname: string) {
 describe('RootGate', () => {
   it('affiche la landing "lancement" sur le domaine principal (silkyplace.evenementscles.com)', () => {
     renderAt('silkyplace.evenementscles.com')
-    expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
+    expect(screen.getByText('Tu connais déjà ces moments')).toBeInTheDocument()
   })
 
   it('affiche la landing "lancement" sur l’adresse Vercel technique (relia-app.vercel.app)', () => {
     renderAt('relia-app.vercel.app')
-    expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
+    expect(screen.getByText('Tu connais déjà ces moments')).toBeInTheDocument()
   })
 
   it('affiche la landing "lancement" par défaut (autre hôte, ex. preview Vercel)', () => {
     renderAt('relia-abc123.vercel.app')
-    expect(screen.getByText('Quelle est la date du mariage ?')).toBeInTheDocument()
+    expect(screen.getByText('Tu connais déjà ces moments')).toBeInTheDocument()
   })
 })

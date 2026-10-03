@@ -12,6 +12,7 @@ import { WeddingLayout } from '@/pages/mariages/WeddingLayout'
 import { WeddingOverviewTab } from '@/pages/mariages/WeddingOverviewTab'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
+import { ProductPage } from '@/pages/ProductPage'
 import { SilkyPlaceLandingPage } from '@/pages/SilkyPlaceLandingPage'
 import { RootGate } from '@/pages/RootGate'
 import { LoginPage } from '@/pages/auth/LoginPage'
@@ -126,6 +127,7 @@ export function AppRouter() {
       <Route path="/remboursement" element={<RefundPage />} />
       <Route path="/cookies" element={<CookiesPage />} />
       <Route path="/lead/new/:userId" element={<LeadFormPage />} />
+      <Route path="/produit" element={<ProductPage />} />
       <Route path="/liste-attente" element={<SilkyPlaceLandingPage />} />
       {/* Ancienne adresse de la liste d'attente, gardée pour les liens déjà partagés. */}
       <Route path="/zordi" element={<Navigate to="/liste-attente" replace />} />

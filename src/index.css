@@ -70,24 +70,24 @@
        texte anthracite, bordeaux (#6B1F23) comme UNIQUE couleur d'action, vert sauge pour les
        statuts positifs. L'or n'est plus qu'un fil décoratif (--thread). Les survols et états
        sélectionnés sont des teintes bleues (--accent), jamais dorées. */
-    --background: #DEE6EF;
+    --background: #FAF7F2;
     --foreground: #2C2C2C;
-    --card: #FAFAF8;
+    --card: #FFFFFF;
     --card-foreground: #2C2C2C;
-    --popover: #FAFAF8;
+    --popover: #FFFFFF;
     --popover-foreground: #2C2C2C;
     --primary: #6B1F23;
     --primary-foreground: #FBF3EA;
-    --secondary: #D5DFEA;
+    --secondary: #F3EDE3;
     --secondary-foreground: #2C2C2C;
-    --muted: #D2DCE7;
-    --muted-foreground: #4F5B6A;
-    --accent: #D0DDEC;
+    --muted: #F1EBE1;
+    --muted-foreground: #5E5A53;
+    --accent: #F4E9E4;
     --accent-foreground: #6B1F23;
     --destructive: #B54A2C;
     --destructive-foreground: #FBF3EA;
-    --border: #C8D3E0;
-    --input: #8496AB;
+    --border: #E6DED1;
+    --input: #A89E90;
     --ring: var(--primary);
     --thread: #C9A15A;
     --thread-text: #75561A;
@@ -107,17 +107,17 @@
     --chart-4: #4F7CAC;
     --chart-5: #A23F2C;
     --radius: 0.625rem;
-    --sidebar: #F1F3F6;
+    --sidebar: #F4EFE7;
     --sidebar-foreground: #2C2C2C;
     --sidebar-primary: #6B1F23;
     --sidebar-primary-foreground: #FBF3EA;
-    --sidebar-accent: #D0DDEC;
+    --sidebar-accent: #F4E9E4;
     --sidebar-accent-foreground: #6B1F23;
-    --sidebar-border: #D3DCE6;
+    --sidebar-border: #E6DED1;
     --sidebar-ring: var(--primary);
     /* Ombres douces et froides (teinte bleu-gris) : la profondeur vient de l'ombre, pas de bordures épaisses. */
-    --shadow-card: 0 1px 2px rgb(31 45 61 / 0.05), 0 6px 20px -8px rgb(31 45 61 / 0.10);
-    --shadow-raised: 0 2px 4px rgb(31 45 61 / 0.06), 0 12px 28px -10px rgb(31 45 61 / 0.18);
+    --shadow-card: 0 1px 2px rgb(82 50 30 / 0.05), 0 6px 20px -8px rgb(82 50 30 / 0.10);
+    --shadow-raised: 0 2px 4px rgb(82 50 30 / 0.06), 0 12px 28px -10px rgb(82 50 30 / 0.18);
     --ease-out-soft: cubic-bezier(0.22, 0.75, 0.25, 1);
 }
 
@@ -356,13 +356,13 @@ p { text-wrap: pretty; }
    composants de la landing continuent d'utiliser bg-card/border-border : seules les
    valeurs changent ici, rien dans l'app connectée. */
 .landing-airy {
-  --background: #F5F8FB;
+  --background: #FCFAF6;
   --card: #FFFFFF;
   --popover: #FFFFFF;
-  --secondary: #ECF1F7;
-  --muted: #ECF1F7;
-  --accent: #E7EEF6;
-  --border: #E2E8F0;
-  --shadow-card: 0 1px 2px rgb(31 45 61 / 0.03), 0 12px 32px -14px rgb(31 45 61 / 0.10);
-  --shadow-raised: 0 2px 6px rgb(31 45 61 / 0.04), 0 28px 56px -24px rgb(31 45 61 / 0.18);
+  --secondary: #F6F1E9;
+  --muted: #F6F1E9;
+  --accent: #F4ECE0;
+  --border: #EEE7DC;
+  --shadow-card: 0 1px 2px rgb(82 50 30 / 0.04), 0 12px 32px -14px rgb(82 50 30 / 0.10);
+  --shadow-raised: 0 2px 6px rgb(82 50 30 / 0.05), 0 28px 56px -24px rgb(82 50 30 / 0.18);
 }

@@ -1,21 +1,13 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Button } from '@/components/ui/button'
-import { BeforeAfterSection } from '@/features/landing/components/BeforeAfterSection'
-import { DayTimeline } from '@/features/landing/components/DayTimeline'
-import { FaqAccordion } from '@/features/landing/components/FaqAccordion'
-import { FeatureCardsGrid } from '@/features/landing/components/FeatureCardsGrid'
+import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { PainPointCards } from '@/features/landing/components/PainPointCards'
-import { PricingSection } from '@/features/landing/components/PricingSection'
-import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
-import { WhoItsForSection } from '@/features/landing/components/WhoItsForSection'
-import { CONTACT_EMAIL, TESTIMONIALS } from '@/features/landing/landingContent'
 import { SP_BUTTON } from '@/features/landing/brandColors'
 import { CookieNotice } from '@/features/legal/CookieNotice'
-import { LegalLinks } from '@/features/legal/LegalLinks'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/store/workspaceStore'
@@ -26,30 +18,6 @@ const H2 = 'text-balance font-heading text-4xl font-semibold leading-[1.1] track
 const KICKER = 'inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#5F6B4C]'
 /** Boutons en pilule, comme le reste de la landing aérienne. */
 const PILL = 'rounded-full'
-
-/** Copywriting de Clélia (2026-09-29), condensé le 2026-10-01 à sa demande (« moins de texte, plus de cartes, comme Wedli »). */
-const DAY_TIMELINE = [
-  { time: '8h00', text: 'Tu regardes tes messages avant même ton café.' },
-  { time: '11h00', text: 'Une cliente demande où en est son devis.' },
-  { time: '14h30', text: 'Tu cherches le numéro d’un prestataire dans tes mails.' },
-  { time: '18h00', text: 'Tu voudrais t’arrêter. Mais tu penses à ce qu’il reste à faire.' },
-  { time: '21h00', text: 'Tu reprends ton téléphone. « Juste pour vérifier. » Et demain, il faudra recommencer.' },
-]
-
-/** 3 étapes ; la 3e (« Profite de ta soirée ») choisie par Clélia le 2026-10-01 — remplace « Respire », qui sonnait traduit de l'anglais. */
-const STEPS = [
-  { title: 'Crée ton espace', text: 'Installation en 1 minute, sans carte bancaire.' },
-  { title: 'Ajoute ton mariage', text: 'Ou importe ceux que tu as déjà dans ton fichier Excel.' },
-  { title: 'Profite de ta soirée', text: 'Demain matin, tu sais exactement par quoi commencer.' },
-]
-
-const TIME_RECOVERED = [
-  { title: 'Ta créativité', lines: ['Créer.', 'Chercher une idée.', 'Tester une nouvelle ambiance.', 'Avoir à nouveau envie de créer.'] },
-  { title: 'Ta famille', lines: ['Être vraiment présente.', 'Sans une tâche qui tourne dans un coin de ta tête.'] },
-  { title: 'Ton couple', lines: ['Dîner sans : « Attends, je réponds juste à ça. »'] },
-  { title: 'Toi', lines: ['Sortir.', 'Lire.', 'Dormir.', 'Faire du sport.', 'Ou ne rien faire.'] },
-]
-
 
 export function LandingPage() {
   const navigate = useNavigate()
@@ -67,9 +35,9 @@ export function LandingPage() {
   }, [])
 
   /** Compte requis pour tout le reste de l'app (cf. ProtectedRoute sur AppLayout/onboarding) : la landing doit d'abord faire créer un compte avant de proposer onboarding/app. */
-  const ctaLabel = !isAuthenticated ? 'Commencer mon premier mariage' : onboarded ? "Ouvrir l'application" : 'Continuer'
+  const ctaLabel = !isAuthenticated ? 'Voir comment ça marche en 1 minute' : onboarded ? "Ouvrir l'application" : 'Continuer'
   const start = () => {
-    if (!isAuthenticated) navigate('/inscription')
+    if (!isAuthenticated) navigate('/produit')
     else navigate(onboarded ? '/aujourdhui' : '/onboarding')
   }
   /** Proposée uniquement tant que l'espace n'a jamais été configuré : charger la démo n'écrase ainsi aucune donnée. */
@@ -99,13 +67,12 @@ export function LandingPage() {
               <SilkyPlaceWordmark className="text-[26px] sm:text-[32px]" />
             </a>
             <nav aria-label="Sections de la page" className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-              <a href="#fonctionnalites" className="transition-colors hover:text-foreground">Comment ça marche</a>
-              <a href="#tarifs" className="transition-colors hover:text-foreground">Tarifs</a>
-              <a href="#questions" className="transition-colors hover:text-foreground">Questions</a>
+              <Link to="/produit#tarifs" className="transition-colors hover:text-foreground">Tarifs</Link>
+              <Link to="/produit#questions" className="transition-colors hover:text-foreground">Questions</Link>
             </nav>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" className={PILL} onClick={() => navigate('/connexion')}>Se connecter</Button>
-              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={start}>{ctaLabel}</Button>
+              <Button size="sm" className={cn(SP_BUTTON, PILL, 'px-4')} onClick={start}>{isAuthenticated ? ctaLabel : 'Comment ça marche'}</Button>
             </div>
           </div>
         </header>
@@ -115,7 +82,9 @@ export function LandingPage() {
         {/* 1 — HERO — court : promesse, une phrase, l'appel à l'action. */}
         <section id="haut" className="relative isolate overflow-hidden pb-24 pt-14 sm:pb-32 sm:pt-24">
           {/* Halos très doux (bleu pâle de marque + une pointe de bordeaux) — donnent la profondeur « aérienne » sans aplat de couleur. */}
-          <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[42rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -left-40 -top-40 -z-10 size-[42rem] rounded-full bg-[#F6D9C4] opacity-60 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-20 -z-10 size-[36rem] rounded-full bg-[#DDE6EF] opacity-70 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/3 -z-10 size-[28rem] rounded-full bg-[#E9E4CF] opacity-60 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute -right-32 top-24 -z-10 size-[30rem] rounded-full bg-[#520C0C] opacity-[0.05] blur-3xl" />
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
@@ -127,15 +96,23 @@ export function LandingPage() {
                 <h1 className="text-balance font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-[#520C0C] sm:text-7xl">
                   Tu sais où tu en es, sur chaque mariage. <span className="mt-3 block text-[0.72em] italic leading-[1.08] text-[#5F6B4C]">Ferme ton ordi sans arrière-pensée.</span>
                 </h1>
-                <p className="max-w-xl text-pretty text-lg leading-relaxed text-foreground/80">
-                  Ce qui est confirmé, ce qui reste à faire, ce qui doit être payé : tout est au même endroit, sans rien garder en tête.
-                </p>
+                <div className="max-w-xl space-y-3 text-pretty text-lg leading-relaxed text-foreground/80">
+                  <p>
+                    <strong className="font-semibold text-foreground">Tu n’as pas besoin</strong> d’un logiciel compliqué, d’une formation, de tout
+                    ressaisir, ni de passer tes soirées dessus.
+                  </p>
+                  <p>
+                    <strong className="font-semibold text-foreground">Tu as juste besoin</strong> d’un endroit qui te montre ce qui est confirmé, ce qui
+                    reste à faire, ce qui doit être payé, et où tu en es sur chaque mariage.
+                  </p>
+                  <p>Tu peux même importer tes mariages depuis Excel.</p>
+                </div>
                 <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                   <Button size="lg" className={cn('h-13 w-full px-8 text-base sm:w-auto', SP_BUTTON, PILL, 'shadow-(--shadow-raised)')} onClick={start}>
                     {ctaLabel}
                   </Button>
                   {!onboarded && (
-                    <Button variant="outline" size="lg" className={cn('h-13 w-full bg-card/70 px-8 text-base sm:w-auto', PILL)} onClick={openDemo}>
+                    <Button variant="ghost" size="lg" className={cn('h-13 w-full px-6 text-base text-muted-foreground sm:w-auto', PILL)} onClick={openDemo}>
                       Voir une démo
                     </Button>
                   )}
@@ -165,152 +142,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* 2 bis — LA JOURNÉE QUI DÉBORDE — frise horizontale interactive (une heure à la fois). */}
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
-            </div>
-            <p className="mt-4 text-center text-muted-foreground">Clique sur une heure.</p>
-            <div className="mt-12">
-              <DayTimeline
-                moments={DAY_TIMELINE}
-                conclusion="SilkyPlace ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer."
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 3 — FONCTIONNALITÉS — grille de cartes, à la manière de Wedli. */}
-        <section id="fonctionnalites" className={cn(SECTION, 'bg-card')}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={KICKER}>Tout au même endroit</p>
-              <h2 className={cn(H2, 'mt-3')}>Chaque fonctionnalité part d’un problème réel</h2>
-              <p className="mt-5 text-lg text-muted-foreground">De l’installation à la désinstallation, tout ton mariage est réuni dans un seul espace. Clique sur une carte pour voir l’écran.</p>
-            </div>
-            <div className="mt-14">
-              <FeatureCardsGrid />
-            </div>
-          </div>
-        </section>
-
-        {/* 4 — EN 3 ÉTAPES + essai sans compte. */}
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
-              <div>
-                <p className={KICKER}>Simple</p>
-                <h2 className={cn(H2, 'mt-3')}>Commence en trois étapes</h2>
-                <ol className="mt-10 flex flex-col gap-8">
-                  {STEPS.map((step, i) => (
-                    <li key={step.title} className="flex gap-5">
-                      <span className="font-heading text-3xl font-semibold leading-none text-[#520C0C]/30">{String(i + 1).padStart(2, '0')}</span>
-                      <div>
-                        <p className="font-heading text-lg font-semibold text-foreground">{step.title}</p>
-                        <p className="mt-1 text-muted-foreground">{step.text}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              <WeddingTimelinePreview ctaLabel={ctaLabel} onStart={start} />
-            </div>
-          </div>
-        </section>
-
-        {/* 5 — TÉMOIGNAGES (affichés uniquement s'il y en a de vrais) */}
-        {TESTIMONIALS.length > 0 && (
-          <section className={SECTION} aria-labelledby="temoignages">
-            <div className={CONTAINER}>
-              <h2 id="temoignages" className={H2}>Ce que disent les décoratrices et décorateurs</h2>
-              <ul className="mt-12 grid gap-6 md:grid-cols-3">
-                {TESTIMONIALS.map((t) => (
-                  <li key={t.author} className="rounded-2xl border border-border bg-card p-7 shadow-(--shadow-card)">
-                    <p className="font-heading text-xl font-semibold text-foreground">{t.headline}</p>
-                    <blockquote className="mt-3 leading-relaxed text-muted-foreground">{t.quote}</blockquote>
-                    <p className="mt-5 text-sm font-medium text-foreground">{t.author}</p>
-                    <p className="text-sm text-muted-foreground">{t.role}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
-
-        {/* 6 — LE TEMPS RÉCUPÉRÉ — 4 cartes. */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className={H2}>Et le temps que tu récupères, tu en fais quoi ?</h2>
-              <p className="mt-5 text-lg text-muted-foreground">Le temps que tu récupères n’a pas besoin d’être productif.</p>
-            </div>
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {TIME_RECOVERED.map((item) => (
-                <div key={item.title} className="rounded-2xl border border-border bg-card p-7 shadow-(--shadow-card)">
-                  <p className="font-heading text-lg font-semibold text-[#520C0C]">{item.title}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.lines.join(' ')}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 7 — AVANT / AVEC SilkyPlace */}
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={KICKER}>La différence</p>
-              <h2 className={cn(H2, 'mt-3')}>Avant SilkyPlace. Avec SilkyPlace.</h2>
-            </div>
-            <div className="mt-14">
-              <BeforeAfterSection />
-            </div>
-          </div>
-        </section>
-
-        {/* 8 — POUR QUI */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-3')}>SilkyPlace est fait pour toi si…</h2>
-            </div>
-            <div className="mt-14">
-              <WhoItsForSection ctaLabel={ctaLabel} onStart={start} />
-            </div>
-          </div>
-        </section>
-
-        {/* 9 — TARIFS */}
-        <section id="tarifs" className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={KICKER}>Tarifs</p>
-              <h2 className={cn(H2, 'mt-3')}>14 jours pour essayer SilkyPlace</h2>
-              <p className="mt-5 text-lg text-muted-foreground">
-                Sans carte bancaire. Ensuite, reste gratuite jusqu’à 3 mariages, ou passe à Solo pour les mariages illimités.
-              </p>
-            </div>
-            <div className="mt-14">
-              <PricingSection ctaLabel={ctaLabel} onStart={start} />
-            </div>
-          </div>
-        </section>
-
-        {/* 10 — FAQ */}
-        <section id="questions" className={cn(SECTION, 'bg-card')} aria-labelledby="faq">
-          <div className={cn(CONTAINER, 'max-w-3xl')}>
-            <div className="text-center">
-              <p className={KICKER}>Questions</p>
-              <h2 id="faq" className={cn(H2, 'mt-3')}>Tout ce que tu te demandes avant de commencer</h2>
-            </div>
-            <div className="mt-12">
-              <FaqAccordion />
-            </div>
-          </div>
-        </section>
-
         {/* 11 — APPEL FINAL */}
         <section className="bg-[#520C0C] py-24 text-[#DDE6EF] sm:py-36" aria-labelledby="final">
           <div className={cn(CONTAINER, 'flex flex-col items-center gap-6 text-center')}>
@@ -325,29 +156,12 @@ export function LandingPage() {
             >
               {ctaLabel}
             </Button>
-            <p className="text-sm text-[#DDE6EF]/80">14 jours de fonctionnalités Solo · Sans carte bancaire · 1 minute</p>
+            <p className="text-sm text-[#DDE6EF]/80">14 jours gratuits · Sans carte bancaire · Installation en 1 minute</p>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-border py-12">
-        <div className={cn(CONTAINER, 'flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between')}>
-          <p>
-            Une question ? Écris à{' '}
-            <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-foreground underline underline-offset-4">
-              {CONTACT_EMAIL}
-            </a>
-          </p>
-          <p>© {new Date().getFullYear()} SilkyPlace · Événements Clés</p>
-        </div>
-        <div className={cn(CONTAINER, 'mt-2 text-sm text-muted-foreground')}>
-          <p>SilkyPlace — L’organisation pensée pour les décoratrices et décorateurs de mariage indépendants.</p>
-          <p className="mt-1">Les devis et factures générés sont indicatifs : vérifie tes obligations légales avant émission.</p>
-        </div>
-        <div className={cn(CONTAINER, 'mt-4')}>
-          <LegalLinks />
-        </div>
-      </footer>
+      <LandingFooter />
       <CookieNotice />
     </div>
   )
