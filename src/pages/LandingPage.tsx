@@ -104,7 +104,7 @@ export function LandingPage() {
         </header>
       )}
 
-      <main id="contenu" className="flex flex-col">
+      <main id="contenu" className="landing-halos flex flex-col">
         {/* 1 — HERO — court : promesse, une phrase, l'appel à l'action. */}
         <section id="haut" className="relative isolate overflow-hidden pb-24 pt-14 sm:pb-32 sm:pt-24">
           {/* Halos très doux (bleu pâle de marque + une pointe de bordeaux) — donnent la profondeur « aérienne » sans aplat de couleur. */}
@@ -152,7 +152,7 @@ export function LandingPage() {
         </section>
 
         {/* 2 — LE PROBLÈME — 4 cartes + la phrase-clé du manifeste. */}
-        <section id="probleme" className={cn(SECTION, 'bg-card')}>
+        <section id="probleme" className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Le problème</p>
@@ -218,7 +218,7 @@ export function LandingPage() {
         </section>
 
         {/* EN 3 ÉTAPES + essai sans compte. */}
-        <section className={cn(SECTION, 'bg-card')}>
+        <section className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
               <div>
@@ -261,7 +261,7 @@ export function LandingPage() {
         )}
 
         {/* TARIFS — phrase de prix, un seul bouton, risque réduit. */}
-        <section id="tarifs" className={cn(SECTION, 'bg-card')}>
+        <section id="tarifs" className={cn(SECTION, 'bg-card/50')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>

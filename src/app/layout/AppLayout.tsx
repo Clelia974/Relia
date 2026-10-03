@@ -26,7 +26,7 @@ export function AppLayout() {
   }, [])
 
   return (
-    <div className="min-h-dvh bg-background text-foreground lg:flex">
+    <div className="app-airy min-h-dvh bg-background text-foreground lg:flex">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:outline-none focus:ring-3 focus:ring-ring/50"
