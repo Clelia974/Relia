@@ -101,7 +101,7 @@ describe('LandingPage', () => {
       'Chaque fonctionnalité part d’un problème réel',
       'Commence en trois étapes',
       'Quelle est la date du mariage ?',
-      '14 jours pour essayer SilkyPlace',
+      '1 mois pour essayer SilkyPlace',
       'Tout ce que tu te demandes avant de commencer',
       'Tu as un mariage à organiser ?',
     ])
@@ -142,7 +142,7 @@ describe('LandingPage', () => {
 
   it('les tarifs suivent le choix mensuel / annuel, avec le bon calcul de l’économie', () => {
     setup()
-    const pricing = within(screen.getByRole('heading', { name: '14 jours pour essayer SilkyPlace' }).closest('section')!)
+    const pricing = within(screen.getByRole('heading', { name: '1 mois pour essayer SilkyPlace' }).closest('section')!)
     expect(pricing.getByText(`${PRICE_MONTHLY} €`)).toBeTruthy()
     fireEvent.click(pricing.getByRole('button', { name: /Annuel/ }))
     expect(pricing.getByText(`${PRICE_ANNUAL} €`)).toBeTruthy()

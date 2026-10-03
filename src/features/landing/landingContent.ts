@@ -7,7 +7,8 @@
 /** Le paiement (Stripe Checkout) est réellement ouvert depuis l'Étape 3 : la mention « bientôt » disparaît de la landing. */
 export const BILLING_LIVE = true
 
-export const TRIAL_DAYS = 14
+/** Essai gratuit sans carte pour tout le monde. Doit rester égal au défaut de public.users.trial_end_date (cf. supabase/sql/017_trial_30_days.sql). */
+export const TRIAL_DAYS = 30
 export const PRICE_MONTHLY = 39
 export const PRICE_ANNUAL = 390
 /** 12 × 39 € = 468 € ; 390 € par an = 78 € d'économie, soit 2 mois offerts. */

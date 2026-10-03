@@ -38,7 +38,7 @@ describe('PaymentPage', () => {
 
     renderPage()
 
-    expect(screen.getByText('Essai Pro en cours')).toBeInTheDocument()
+    expect(screen.getByText('Essai Solo en cours')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Passer à Solo' })).toBeInTheDocument()
   })

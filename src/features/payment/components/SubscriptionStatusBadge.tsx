@@ -12,8 +12,8 @@ const STATUS_TONE: Record<SubscriptionAccessStatus, BadgeTone> = {
 }
 
 const STATUS_LABEL: Record<SubscriptionAccessStatus, string> = {
-  trial: 'Essai Pro en cours',
-  grace: 'Essai Pro terminé',
+  trial: 'Essai Solo en cours',
+  grace: 'Essai Solo terminé',
   expired: 'Version Gratuite',
   active: 'Pro actif',
   cancelled: 'Abonnement annulé',

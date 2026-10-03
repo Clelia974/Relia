@@ -12,7 +12,7 @@ import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { PainPointCards } from '@/features/landing/components/PainPointCards'
 import { SP_BUTTON } from '@/features/landing/brandColors'
-import { TESTIMONIALS } from '@/features/landing/landingContent'
+import { TESTIMONIALS, TRIAL_DAYS } from '@/features/landing/landingContent'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
 import { track } from '@/lib/analytics'
@@ -150,7 +150,7 @@ export function LandingPage() {
                     </Button>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">14 jours gratuits · Sans carte bancaire · Installation en 1 minute</p>
+                <p className="text-sm text-muted-foreground">{TRIAL_DAYS} jours gratuits · Sans carte bancaire · Installation en 1 minute</p>
               </div>
 
               <HeroShowcase />
@@ -272,7 +272,7 @@ export function LandingPage() {
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tarifs</p>
-              <h2 className={cn(H2, 'mt-3')}>14 jours pour essayer SilkyPlace</h2>
+              <h2 className={cn(H2, 'mt-3')}>1 mois pour essayer SilkyPlace</h2>
               <p className="mt-5 text-lg text-muted-foreground">
                 Moins d’un euro par jour, pour ne plus rien garder en tête.
               </p>
@@ -281,7 +281,7 @@ export function LandingPage() {
               <PricingSection ctaLabel={ctaLabel} onStart={() => start('tarifs')} />
             </div>
             <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <li>14 jours gratuits pour tout essayer</li>
+              <li>{TRIAL_DAYS} jours gratuits pour tout essayer</li>
               <li>Aucune carte bancaire demandée</li>
               <li>Tu importes tes mariages depuis Excel</li>
               <li>Gratuite jusqu’à 3 mariages si tu ne continues pas</li>
@@ -315,7 +315,7 @@ export function LandingPage() {
             >
               {ctaLabel}
             </Button>
-            <p className="text-sm text-[#DDE6EF]/80">14 jours gratuits · Sans carte bancaire · Installation en 1 minute</p>
+            <p className="text-sm text-[#DDE6EF]/80">{TRIAL_DAYS} jours gratuits · Sans carte bancaire · Installation en 1 minute</p>
           </div>
         </section>
       </main>

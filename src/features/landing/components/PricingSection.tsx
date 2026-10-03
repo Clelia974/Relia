@@ -99,7 +99,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
               <span className="text-base font-normal text-muted-foreground">{billing === 'month' ? ' / mois' : ' / an'}</span>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis {euro(LAUNCH_OFFER_PRICE_MONTHLY)}/mois
+              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''} en plus de l’essai, puis {euro(LAUNCH_OFFER_PRICE_MONTHLY)}/mois
               verrouillé à vie pour toi. Une fois les {LAUNCH_OFFER_LIMIT} places prises, le tarif standard passe à {euro(PRICE_MONTHLY)}/mois
               pour les nouvelles inscriptions.
             </p>

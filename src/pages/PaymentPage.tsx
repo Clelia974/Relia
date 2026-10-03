@@ -132,7 +132,7 @@ export function PaymentPage() {
           <CardHeader>
             <CardTitle>Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes</CardTitle>
             <CardDescription>
-              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''}, puis ce tarif verrouillé — même si le tarif
+              {LAUNCH_OFFER_FREE_MONTHS} mois offert{LAUNCH_OFFER_FREE_MONTHS > 1 ? 's' : ''} en plus de l’essai, puis ce tarif verrouillé — même si le tarif
               standard augmente plus tard, il reste le tien tant que tu restes abonnée.
             </CardDescription>
           </CardHeader>
