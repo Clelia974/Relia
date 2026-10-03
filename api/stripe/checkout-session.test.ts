@@ -135,7 +135,7 @@ describe('POST /api/stripe/checkout-session', () => {
     )
   })
 
-  it("crée la session de l'offre de lancement avec le mois offert (trial_period_days) et le tag de metadata, tant qu'il reste des places", async () => {
+  it("crée la session de l'offre de lancement avec le mois offert (trial_end à +30 jours) et le tag de metadata, tant qu'il reste des places", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-launch' })
     maybeSingleMock.mockReset().mockResolvedValue({ data: { redeemed_count: 42 }, error: null })
     const res = mockRes()
@@ -146,7 +146,7 @@ describe('POST /api/stripe/checkout-session', () => {
     expect(createSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({
         line_items: [{ price: 'price_launch_789', quantity: 1 }],
-        subscription_data: { trial_period_days: 30 },
+        subscription_data: { trial_end: expect.any(Number) },
         metadata: { offer: 'launch_100', interval: expect.stringMatching(/^(month|year)$/) },
       }),
     )
@@ -163,10 +163,49 @@ describe('POST /api/stripe/checkout-session', () => {
     expect(createSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({
         line_items: [{ price: 'price_launch_annual_987', quantity: 1 }],
-        subscription_data: { trial_period_days: 30 },
+        subscription_data: { trial_end: expect.any(Number) },
         metadata: { offer: 'launch_100', interval: expect.stringMatching(/^(month|year)$/) },
       }),
     )
+  })
+
+  it("offre de lancement en cours d'essai : le mois offert s'ajoute APRÈS la fin de l'essai (pas à partir du jour du paiement)", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/x' })
+    const trialEndIso = new Date(Date.now() + 10 * 86_400_000).toISOString()
+    maybeSingleMock
+      .mockReset()
+      .mockResolvedValueOnce({ data: { redeemed_count: 3 }, error: null })
+      .mockResolvedValueOnce({ data: { trial_end_date: trialEndIso }, error: null })
+    const res = mockRes()
+
+    await handler(mockReq({ body: { priceId: 'price_launch_789' } }), res)
+
+    const expected = Math.floor(new Date(trialEndIso).getTime() / 1000) + 30 * 86_400
+    expect(createSessionMock).toHaveBeenCalledWith(expect.objectContaining({ subscription_data: { trial_end: expected } }))
+  })
+
+  it("abonnement standard en cours d'essai : le premier prélèvement attend la fin de l'essai", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/x' })
+    const trialEndIso = new Date(Date.now() + 10 * 86_400_000).toISOString()
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { trial_end_date: trialEndIso }, error: null })
+    const res = mockRes()
+
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
+
+    expect(createSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ subscription_data: { trial_end: Math.floor(new Date(trialEndIso).getTime() / 1000) } }),
+    )
+  })
+
+  it("abonnement standard à moins de 48 h de la fin de l'essai (ou essai terminé) : facturé tout de suite, sans essai Stripe", async () => {
+    createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/x' })
+    maybeSingleMock.mockReset().mockResolvedValue({ data: { trial_end_date: new Date(Date.now() + 86_400_000).toISOString() }, error: null })
+    const res = mockRes()
+
+    await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
+
+    const args = createSessionMock.mock.calls[0][0] as Record<string, unknown>
+    expect(args.subscription_data).toBeUndefined()
   })
 
   it("refuse aussi le price annuel de l'offre une fois les 100 places prises (même compteur que le mensuel)", async () => {
@@ -191,13 +230,14 @@ describe('POST /api/stripe/checkout-session', () => {
 
   it("un priceId standard (mensuel/annuel) ne déclenche jamais le mois offert ni le comptage de l'offre de lancement", async () => {
     createSessionMock.mockReset().mockResolvedValue({ url: 'https://checkout.stripe.com/session-abc' })
-    maybeSingleMock.mockReset()
+    maybeSingleMock.mockReset().mockResolvedValue({ data: null, error: null })
     const res = mockRes()
 
     await handler(mockReq({ body: { priceId: 'price_month_123' } }), res)
 
     expect(res.statusCode).toBe(200)
-    expect(maybeSingleMock).not.toHaveBeenCalled()
+    // Une seule lecture (la fin d'essai), jamais le compteur de l'offre de lancement : sans essai en cours, aucun essai Stripe.
+    expect(maybeSingleMock).toHaveBeenCalledTimes(1)
     expect(createSessionMock).toHaveBeenCalledWith(expect.not.objectContaining({ subscription_data: expect.anything() }))
   })
 

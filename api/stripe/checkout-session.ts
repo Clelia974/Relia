@@ -32,6 +32,8 @@ const LAUNCH_OFFER_PRICE_IDS = new Set(
   ),
 )
 const LAUNCH_OFFER_LIMIT = 100
+/** Mois offert de l'offre de lancement, ajouté APRÈS l'essai gratuit (cf. LAUNCH_OFFER_FREE_MONTHS dans landingContent.ts). */
+const LAUNCH_OFFER_FREE_DAYS = 30
 /** Identifie une session créée pour l'offre de lancement — lu par le webhook pour ne compter que ces abonnements-là dans is_launch_offer. */
 const LAUNCH_OFFER_METADATA = { offer: 'launch_100' }
 
@@ -104,6 +106,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const annualPriceIds = [process.env.VITE_STRIPE_PRICE_SOLO_YEARLY, process.env.VITE_STRIPE_PRICE_LAUNCH_OFFER_ANNUAL]
   const isAnnualPrice = annualPriceIds.includes(priceId)
 
+  // Fin de l'essai gratuit de l'application (public.users.trial_end_date). Une cliente qui s'abonne en cours d'essai ne
+  // doit pas perdre les jours qu'il lui reste : le premier prélèvement est repoussé jusqu'à la fin de l'essai, et,
+  // pour l'offre de lancement, le mois offert s'y ajoute APRÈS (et non à partir du jour du paiement).
+  const nowSec = Math.floor(Date.now() / 1000)
+  // Si la lecture échoue, on continue sans essai restant : au pire la cliente perd ses jours d'essai, jamais le paiement.
+  let profile: { trial_end_date?: string | null } | null | undefined = null
+  try {
+    const profileResult = await supabaseAdmin.from('users').select('trial_end_date').eq('id', user.id).maybeSingle()
+    profile = profileResult?.data
+  } catch {
+    // lecture impossible : on continue sans essai restant
+  }
+  const parsedTrialEnd = profile?.trial_end_date ? Math.floor(new Date(profile.trial_end_date).getTime() / 1000) : 0
+  const trialEndSec = parsedTrialEnd > nowSec ? parsedTrialEnd : null
+  // Stripe Checkout exige une fin d'essai à plus de 48 h : en dessous, on facture sans essai.
+  const MIN_TRIAL_AHEAD_SECONDS = 49 * 3600
+  let subscriptionTrialEnd: number | null = null
+  if (isLaunchOffer) subscriptionTrialEnd = (trialEndSec ?? nowSec) + LAUNCH_OFFER_FREE_DAYS * 86_400
+  else if (trialEndSec && trialEndSec - nowSec >= MIN_TRIAL_AHEAD_SECONDS) subscriptionTrialEnd = trialEndSec
+
   const siteUrl = process.env.VITE_SITE_URL ?? 'https://silkyplace.evenementscles.com'
 
   try {
@@ -121,8 +143,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       payment_method_collection: 'always',
       // Périodicité lue par le webhook (billing_interval) pour estimer le revenu mensuel récurrent.
       metadata: { ...(isLaunchOffer ? LAUNCH_OFFER_METADATA : {}), interval: isAnnualPrice ? 'year' : 'month' },
-      // Premier prélèvement repoussé de 30 jours — le vrai mois offert, pas juste une mention marketing.
-      ...(isLaunchOffer ? { subscription_data: { trial_period_days: 30 } } : {}),
+      // Premier prélèvement repoussé jusqu'à la fin de l'essai (+ le mois offert pour l'offre de lancement).
+      ...(subscriptionTrialEnd ? { subscription_data: { trial_end: subscriptionTrialEnd } } : {}),
     })
     res.status(200).json({ url: session.url })
   } catch (err) {
