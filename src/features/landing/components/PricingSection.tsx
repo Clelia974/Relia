@@ -164,7 +164,7 @@ export function PricingSection({ ctaLabel, onStart }: PricingSectionProps) {
       </div>
 
       <p className="mx-auto max-w-2xl text-center text-sm text-muted-foreground">
-        Résilie en un clic, sans justification à donner. Tes mariages, tâches et finances restent stockés sur ton appareil — exportables
+        Résiliable à tout moment, directement depuis ton compte. Tes mariages, tâches et finances restent stockés sur ton appareil — exportables
         en un clic à tout moment, même si tu arrêtes SilkyPlace. Pas de verrouillage volontaire de tes données.
       </p>
     </div>
