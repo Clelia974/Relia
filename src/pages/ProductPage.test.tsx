@@ -49,20 +49,17 @@ function setup() {
 }
 
 describe('ProductPage', () => {
-  it('a un seul titre principal et les sections du schéma : pour qui, bénéfices, ce qu’il y a dedans, tarifs, FAQ', () => {
+  it('a un seul titre principal et les sections attendues, sans doublon', () => {
     setup()
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
     const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     expect(titles).toEqual([
-      'Ce que tu gagnes',
-      'Dans SilkyPlace, tu as :',
-      'À quel moment ta journée finit vraiment ?',
+      'Ta journée avec SilkyPlace',
       'Chaque fonctionnalité part d’un problème réel',
       'Commence en trois étapes',
       'Quelle est la date du mariage ?',
       'Avant SilkyPlace. Avec SilkyPlace.',
       'Et le temps que tu récupères, tu en fais quoi ?',
-      'SilkyPlace est fait pour toi si…',
       '14 jours pour essayer SilkyPlace',
       'Tout ce que tu te demandes avant de commencer',
       'Tu as un mariage à organiser ?',
@@ -95,11 +92,18 @@ describe('ProductPage', () => {
     for (const item of FAQ) expect(screen.getByText(item.q)).toBeTruthy()
   })
 
-  it('un clic sur une carte de fonctionnalité ouvre la capture réelle de l’écran', () => {
+  it('choisir une fonctionnalité affiche la capture réelle de l’écran dans le portable', () => {
     setup()
     fireEvent.click(screen.getByRole('button', { name: /Désinstallation et retour/ }))
-    const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByRole('img', { name: /désinstallation/i })).toHaveAttribute('src', '/landing/desinstallation.jpg')
+    expect(screen.getByRole('img', { name: /désinstallation/i })).toHaveAttribute('src', '/landing/desinstallation.jpg')
+  })
+
+  it('la frise « Ta journée avec SilkyPlace » se parcourt au clic, la conclusion n’apparaît qu’à 21h', () => {
+    setup()
+    expect(screen.getByText(/Tu ouvres SilkyPlace/)).toBeInTheDocument()
+    expect(screen.queryByText(/Rien à installer, rien à paramétrer/)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '21h00' }))
+    expect(screen.getByText(/Rien à installer, rien à paramétrer/)).toBeInTheDocument()
   })
 
   it("offre de lancement disponible : affiche le nombre réel de places restantes, jamais un chiffre codé en dur", () => {

@@ -18,7 +18,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
-interface FeatureCard {
+export interface FeatureCard {
   icon: LucideIcon
   title: string
   /** La question que se pose la décoratrice. */
@@ -36,7 +36,7 @@ interface FeatureCard {
  * désinstallation, chargement, formules déco…). Un clic ouvre la capture
  * réelle de l'écran correspondant — remplace l'ancien carrousel.
  */
-const CARDS: FeatureCard[] = [
+export const FEATURE_CARDS: FeatureCard[] = [
   {
     icon: Clock,
     title: 'Installation et Jour J',
@@ -148,7 +148,7 @@ export function FeatureCardsGrid() {
   return (
     <div className="flex flex-col gap-5">
       <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {CARDS.map((card, i) => {
+        {FEATURE_CARDS.map((card, i) => {
           const Icon = card.icon
           return (
             <li key={card.title}>

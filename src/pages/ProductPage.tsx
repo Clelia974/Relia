@@ -1,18 +1,16 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Check, Pin } from 'lucide-react'
 import { AuthenticatedHeader } from '@/app/layout/AuthenticatedHeader'
 import { SilkyPlaceWordmark } from '@/components/brand/SilkyPlaceWordmark'
 import { Button } from '@/components/ui/button'
 import { BeforeAfterSection } from '@/features/landing/components/BeforeAfterSection'
 import { DayTimeline } from '@/features/landing/components/DayTimeline'
 import { FaqAccordion } from '@/features/landing/components/FaqAccordion'
-import { FeatureCardsGrid } from '@/features/landing/components/FeatureCardsGrid'
+import { FeatureShowcase } from '@/features/landing/components/FeatureShowcase'
 import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { PricingSection } from '@/features/landing/components/PricingSection'
 import { WeddingTimelinePreview } from '@/features/landing/components/WeddingTimelinePreview'
-import { WhoItsForSection } from '@/features/landing/components/WhoItsForSection'
 import { SP_BUTTON } from '@/features/landing/brandColors'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
@@ -25,34 +23,15 @@ const H2 = 'text-balance font-heading text-4xl font-semibold leading-[1.1] track
 const KICKER = 'inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#5F6B4C]'
 const PILL = 'rounded-full'
 
-/** Cinq résultats concrets — ce que la décoratrice vit après, pas les fonctionnalités. */
-const QUICK_BENEFITS = [
-  'Tu vois en un coup d’œil ce qui est confirmé, ce qui reste à faire et ce qui doit être payé.',
-  'Ton déroulé du Jour J, minute par minute.',
-  'Matériel, prestataires et plan de salle au même endroit.',
-  'Tes devis et factures, sans tout ressaisir.',
-  'Ta marge sur chaque mariage, enfin claire.',
+/** « Ta journée avec SilkyPlace » — les mêmes heures que la frise du problème, vues après : ce que la décoratrice gagne, au fil de la journée. */
+const DAY_WITH_SILKYPLACE = [
+  { time: '8h00', text: 'Tu ouvres SilkyPlace : ce qui est confirmé, ce qui reste à faire, ce qui doit être payé. Tout est là.' },
+  { time: '11h00', text: 'Une cliente demande où en est son devis : tu le retrouves tout de suite, sans fouiller tes mails.' },
+  { time: '14h30', text: 'Il te faut le numéro d’un prestataire ? Il est dans la fiche du mariage, avec son horaire.' },
+  { time: '18h00', text: 'Tu fermes ton ordi. Tu sais exactement par quoi commencer demain.' },
+  { time: '21h00', text: 'Tu dînes sans « juste vérifier ». Ton déroulé, ton plan de table et ta marge sont déjà rangés.' },
 ]
 
-/** « Dans SilkyPlace, tu as » — bénéfices, pas seulement fonctionnalités. */
-const WHATS_INSIDE = [
-  'Un planning par mariage : tu sais qui arrive, et à quelle heure.',
-  'Une liste de matériel : tu vérifies une fois, pas trois.',
-  'Tes prestataires : qui a confirmé, qui doit encore répondre.',
-  'Un plan de salle et de table, prêt sans refaire la veille.',
-  'Un moodboard : palette, matières et ambiance à envoyer aux mariés.',
-  'Tes finances et ton bilan : ta marge, mariage par mariage.',
-]
-
-const DAY_TIMELINE = [
-  { time: '8h00', text: 'Tu regardes tes messages avant même ton café.' },
-  { time: '11h00', text: 'Une cliente demande où en est son devis.' },
-  { time: '14h30', text: 'Tu cherches le numéro d’un prestataire dans tes mails.' },
-  { time: '18h00', text: 'Tu voudrais t’arrêter. Mais tu penses à ce qu’il reste à faire.' },
-  { time: '21h00', text: 'Tu reprends ton téléphone. « Juste pour vérifier. » Et demain, il faudra recommencer.' },
-]
-
-/** 3 étapes ; la 3e (« Profite de ta soirée ») choisie par Clélia le 2026-10-01 — remplace « Respire », qui sonnait traduit de l'anglais. */
 const STEPS = [
   { title: 'Crée ton espace', text: 'Installation en 1 minute, sans carte bancaire.' },
   { title: 'Ajoute ton mariage', text: 'Ou importe ceux que tu as déjà dans ton fichier Excel.' },
@@ -65,6 +44,9 @@ const TIME_RECOVERED = [
   { title: 'Ton couple', lines: ['Dîner sans : « Attends, je réponds juste à ça. »'] },
   { title: 'Toi', lines: ['Sortir.', 'Lire.', 'Dormir.', 'Faire du sport.', 'Ou ne rien faire.'] },
 ]
+
+/** Lien « embed » de la démo de 60-90 s (YouTube non répertorié, Vimeo ou Loom). Vide tant que la vidéo n'existe pas : la section est alors masquée. */
+const DEMO_VIDEO_URL = ''
 
 const FINAL_CTA = 'Commencer mon premier mariage'
 
@@ -127,68 +109,51 @@ export function ProductPage() {
           </div>
         </section>
 
-        {/* BÉNÉFICES RAPIDES + CE QU'IL Y A DEDANS — deux colonnes, comme le schéma. */}
-        <section className={cn(SECTION, 'bg-card')}>
-          <div className={cn(CONTAINER, 'grid grid-cols-1 gap-12 lg:grid-cols-2')}>
-            <div>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#520C0C]">Ce que tu gagnes</h2>
-              <ul className="mt-8 flex flex-col gap-4">
-                {QUICK_BENEFITS.map((b) => (
-                  <li key={b} className="flex items-start gap-3 text-lg leading-snug text-foreground/90">
-                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[#A9B08F]/30 text-[#5F6B4C]">
-                      <Check className="size-4" aria-hidden="true" />
-                    </span>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-8 rounded-2xl bg-secondary px-5 py-4 text-base leading-relaxed text-foreground/80">
-                Rien à installer, rien à paramétrer. Tu peux même importer tes mariages depuis Excel.
-              </p>
+        {DEMO_VIDEO_URL && (
+          <section className={SECTION} aria-labelledby="demo">
+            <div className={cn(CONTAINER, 'max-w-4xl text-center')}>
+              <h2 id="demo" className={H2}>SilkyPlace en 90 secondes</h2>
+              <div className="mt-10 aspect-video overflow-hidden rounded-2xl border border-border shadow-(--shadow-raised)">
+                <iframe
+                  src={DEMO_VIDEO_URL}
+                  title="Démo de SilkyPlace"
+                  className="size-full"
+                  allow="accelerometer; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
             </div>
-            <div>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#520C0C]">Dans SilkyPlace, tu as :</h2>
-              <ul className="mt-8 flex flex-col gap-4">
-                {WHATS_INSIDE.map((w) => (
-                  <li key={w} className="flex items-start gap-3 text-lg leading-snug text-foreground/90">
-                    <Pin className="mt-1 size-5 shrink-0 text-[#520C0C]/70" aria-hidden="true" />
-                    {w}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-8 text-base font-medium text-[#520C0C]">
-                Tout est simple et pas à pas : tu crées ton espace, tu ajoutes un mariage, tu avances.
-              </p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* LA JOURNÉE QUI DÉBORDE — frise interactive. */}
-        <section className={SECTION}>
+        {/* TA JOURNÉE AVEC SILKYPLACE — ce que tu gagnes, au fil des heures. */}
+        <section className={cn(SECTION, 'bg-card')}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
-              <h2 className={H2}>À quel moment ta journée finit vraiment ?</h2>
+              <p className={KICKER}>Ce que tu gagnes</p>
+              <h2 className={H2}>Ta journée avec SilkyPlace</h2>
             </div>
             <p className="mt-4 text-center text-muted-foreground">Clique sur une heure.</p>
             <div className="mt-12">
               <DayTimeline
-                moments={DAY_TIMELINE}
-                conclusion="SilkyPlace ne réduit pas le nombre de mariages que tu as à gérer. Il réduit ce que tu dois garder en tête pour les gérer."
+                moments={DAY_WITH_SILKYPLACE}
+                conclusion="Rien à installer, rien à paramétrer. Tu peux même importer tes mariages depuis Excel : tu avances pas à pas, sans tout garder en tête."
               />
             </div>
           </div>
         </section>
 
-        {/* LES ÉCRANS — cartes cliquables existantes. */}
-        <section id="fonctionnalites" className={cn(SECTION, 'bg-card')}>
+        {/* LES FONCTIONNALITÉS — la vraie capture de chaque écran, dans un portable. */}
+        <section id="fonctionnalites" className={SECTION}>
           <div className={CONTAINER}>
             <div className="mx-auto max-w-2xl text-center">
               <p className={KICKER}>Tout au même endroit</p>
               <h2 className={cn(H2, 'mt-3')}>Chaque fonctionnalité part d’un problème réel</h2>
-              <p className="mt-5 text-lg text-muted-foreground">Clique sur une carte pour voir l’écran.</p>
+              <p className="mt-5 text-lg text-muted-foreground">Choisis un écran pour le voir tel qu’il est dans SilkyPlace.</p>
             </div>
             <div className="mt-14">
-              <FeatureCardsGrid />
+              <FeatureShowcase />
             </div>
           </div>
         </section>
@@ -242,18 +207,6 @@ export function ProductPage() {
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.lines.join(' ')}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section className={SECTION}>
-          <div className={CONTAINER}>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={KICKER}>Pour qui</p>
-              <h2 className={cn(H2, 'mt-3')}>SilkyPlace est fait pour toi si…</h2>
-            </div>
-            <div className="mt-14">
-              <WhoItsForSection ctaLabel={ctaLabel} onStart={start} />
             </div>
           </div>
         </section>
