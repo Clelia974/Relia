@@ -170,6 +170,29 @@ describe('PaymentPage', () => {
     expect(screen.getByText('29 €')).toBeInTheDocument()
   })
 
+  it("tant que l'offre de lancement est disponible, c'est le seul prix : ni carte « Passer à Solo », ni 39 € / 390 €", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 5, remaining: 95, available: true }, isLoading: false })
+
+    renderPage()
+
+    expect(screen.getByRole('button', { name: "Profiter de l'offre de lancement" })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Passer à Solo' })).not.toBeInTheDocument()
+    expect(screen.queryByText('39 €')).not.toBeInTheDocument()
+    expect(screen.queryByText('390 €')).not.toBeInTheDocument()
+  })
+
+  it("une fois les 100 places prises, le tarif standard (39 €) apparaît et l'offre de lancement disparaît", () => {
+    useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
+
+    renderPage()
+
+    expect(screen.queryByRole('button', { name: "Profiter de l'offre de lancement" })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Passer à Solo' })).toBeInTheDocument()
+    expect(screen.getByText('39 €')).toBeInTheDocument()
+  })
+
   it('offre de lancement en annuel : distingue le mois offert de la remise annuelle, ne dit jamais "3 mois offerts"', () => {
     useSubscriptionCheckMock.mockReturnValue({ status: 'trial', hasAccess: true, daysLeftInTrial: 10, isLoading: false })
     useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 0, remaining: 100, available: true }, isLoading: false })

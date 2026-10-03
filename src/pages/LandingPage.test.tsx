@@ -149,6 +149,18 @@ describe('LandingPage', () => {
     expect(ANNUAL_FREE_MONTHS).toBe(2)
   })
 
+  it("la landing ne dit « moins d'un euro par jour » qu'au tarif de lancement ; après les 100 places, elle donne le vrai prix par jour", () => {
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 5, remaining: 95, available: true }, isLoading: false })
+    setup()
+    expect(screen.getByText(/Moins d’un euro par jour/)).toBeInTheDocument()
+    expect(document.body.textContent).not.toMatch(/passe à 39/)
+    cleanup()
+    useLaunchOfferAvailabilityMock.mockReturnValue({ offer: { limit: 100, redeemed: 100, remaining: 0, available: false }, isLoading: false })
+    setup()
+    expect(screen.queryByText(/Moins d’un euro par jour/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Environ 1,30 € par jour/)).toBeInTheDocument()
+  })
+
   it('la mention « bientôt » de l’abonnement a disparu maintenant que le paiement est réellement ouvert (Étape 3)', () => {
     setup()
     expect(screen.queryByText(/L’abonnement ouvre avec la connexion en ligne/)).toBeNull()

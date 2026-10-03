@@ -46,6 +46,8 @@ export function PaymentPage() {
 
   // Réservée aux comptes qui n'ont encore jamais payé — "100 premières clientes", pas une réduction de réabonnement.
   const isEligibleForLaunchOffer = status === 'trial' || status === 'grace' || status === 'expired'
+  // Tant que l'offre de lancement est disponible, c'est le SEUL prix affiché ; le tarif standard n'apparaît qu'ensuite.
+  const showLaunchOffer = isEligibleForLaunchOffer && Boolean(launchOffer?.available)
 
   useEffect(() => {
     const result = searchParams.get('paiement')
@@ -127,7 +129,7 @@ export function PaymentPage() {
         </Card>
       )}
 
-      {isEligibleForLaunchOffer && launchOffer?.available && (
+      {showLaunchOffer && (
         <Card className="border-2 border-primary">
           <CardHeader>
             <CardTitle>Offre de lancement — {LAUNCH_OFFER_LIMIT} premières clientes</CardTitle>
@@ -179,7 +181,7 @@ export function PaymentPage() {
             )}
 
             <p className="text-sm text-muted-foreground">
-              {launchOffer.remaining} place{launchOffer.remaining > 1 ? 's' : ''} restante{launchOffer.remaining > 1 ? 's' : ''} sur{' '}
+              {launchOffer!.remaining} place{launchOffer!.remaining > 1 ? 's' : ''} restante{launchOffer!.remaining > 1 ? 's' : ''} sur{' '}
               {LAUNCH_OFFER_LIMIT}.
             </p>
 
@@ -217,7 +219,7 @@ export function PaymentPage() {
         </Card>
       )}
 
-      {status !== 'active' && (
+      {status !== 'active' && !showLaunchOffer && (
         <Card>
           <CardHeader>
             <CardTitle>Passer à Solo</CardTitle>

@@ -12,7 +12,8 @@ import { LandingFooter } from '@/features/landing/components/LandingFooter'
 import { HeroShowcase } from '@/features/landing/components/HeroShowcase'
 import { PainPointCards } from '@/features/landing/components/PainPointCards'
 import { SP_BUTTON } from '@/features/landing/brandColors'
-import { TESTIMONIALS, TRIAL_DAYS } from '@/features/landing/landingContent'
+import { PRICE_MONTHLY, TESTIMONIALS, TRIAL_DAYS } from '@/features/landing/landingContent'
+import { useLaunchOfferAvailability } from '@/features/payment/useLaunchOfferAvailability'
 import { CookieNotice } from '@/features/legal/CookieNotice'
 import { useAuth } from '@/hooks/useAuth'
 import { track } from '@/lib/analytics'
@@ -49,6 +50,11 @@ const DEMO_VIDEO_URL = ''
 export function LandingPage() {
   const navigate = useNavigate()
   useSectionViews()
+  // « Moins d'un euro par jour » n'est vrai qu'au tarif de lancement (29 €/mois) : au tarif standard, on dit le vrai prix par jour.
+  const { offer: launchOffer } = useLaunchOfferAvailability()
+  const pricePerDay = launchOffer?.available
+    ? 'Moins d’un euro par jour'
+    : `Environ ${(PRICE_MONTHLY / 30).toFixed(2).replace('.', ',')} € par jour`
   const { isAuthenticated } = useAuth()
   const resetWorkspace = useWorkspaceStore((s) => s.resetWorkspace)
   const onboarded = useWorkspaceStore((s) => s.workspace.userProfile.onboarded)
@@ -274,7 +280,7 @@ export function LandingPage() {
               <p className={KICKER}>Tarifs</p>
               <h2 className={cn(H2, 'mt-3')}>1 mois pour essayer SilkyPlace</h2>
               <p className="mt-5 text-lg text-muted-foreground">
-                Moins d’un euro par jour, pour ne plus rien garder en tête.
+                {pricePerDay}, pour ne plus rien garder en tête.
               </p>
             </div>
             <div className="mt-14">
